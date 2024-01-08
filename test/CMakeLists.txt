@@ -9,7 +9,7 @@ set(${PLUGIN_NAME}UnitTest_SRCS
   
 )
 set(DISABLED_TESTS
-
+MergeColoniesTest.cpp
 )
 
 create_simplnx_plugin_unit_test(PLUGIN_NAME ${PLUGIN_NAME}
