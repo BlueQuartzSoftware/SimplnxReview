@@ -28,6 +28,7 @@ set(${PLUGIN_NAME}_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
 # SimplnxReview/src/SimplnxReview/Filters/ directory.
 set(FilterList
   FindGroupingDensityFilter
+  FindLocalAverageCAxisMisalignmentsFilter
   FindMicroTextureRegionsFilter
   FindSaltykovSizesFilter
   GroupMicroTextureRegionsFilter
@@ -103,6 +104,7 @@ endif()
 # ------------------------------------------------------------------------------
 set(filter_algorithms
   FindGroupingDensity
+  FindLocalAverageCAxisMisalignments
   FindMicroTextureRegions
   FindSaltykovSizes
   GroupMicroTextureRegions
