@@ -29,6 +29,7 @@ set(${PLUGIN_NAME}_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
 set(FilterList
   FindGroupingDensityFilter
   FindMicroTextureRegionsFilter
+  FindSaltykovSizesFilter
   GroupMicroTextureRegionsFilter
   MergeColoniesFilter
 )
@@ -103,6 +104,7 @@ endif()
 set(filter_algorithms
   FindGroupingDensity
   FindMicroTextureRegions
+  FindSaltykovSizes
   GroupMicroTextureRegions
   MergeColonies
 )
