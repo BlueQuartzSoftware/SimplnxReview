@@ -157,6 +157,9 @@ IFilter::PreflightResult FindGroupingDensityFilter::preflightImpl(const DataStru
     }
   }
 
+  preflightUpdatedValues.push_back({"WARNING: This filter is experimental in nature and has not had any testing, validation or verification. Use at your own risk"});
+  resultOutputActions.warnings().push_back({-65432, "WARNING: This filter is experimental in nature and has not had any testing, validation or verification. Use at your own risk"});
+
   return {std::move(resultOutputActions), std::move(preflightUpdatedValues)};
 }
 

@@ -1,16 +1,18 @@
-# Find Local Average C-Axis Misalignments  #
+# Find Local Average C-Axis Misalignments
 
+**THIS FILTER IS UNTESTED, UNVERIFIED AND UNVALIDATED. IT IS AN EXPERIMENTAL FILTER THAT IS UNDERGOING LONG TERM DEVELOPMENT
+AND TESTING. USE AT YOUR OWN RISK**
 
-## Group (Subgroup) ##
+## Group (Subgroup)
 
 Statistics (Crystallographic)
 
-## Description ##
+## Description
 
 This filter finds parent average feature kernel average c-axis misalignment.  Alternatively, if the "Calculate Unbiased Local Average C-Axis Misalignment" parameter is TRUE, the parent average sub-boundary misalignment is calculated.
 
 
-## Parameters ##
+## Parameters
 
 | Name | Type |
 |------|------|
@@ -18,11 +20,11 @@ This filter finds parent average feature kernel average c-axis misalignment.  Al
 | Calculate Local Average C-Axis Misalignments | Boolean |
 
 
-## Required DataContainers ##
+## Required DataContainers
 
 Volume
 
-## Required Objects ##
+## Required Objects
 
 | Type | Default Name | Description | Comment | Filters Known to Create Data |
 |------|--------------|-------------|---------|-----|
@@ -34,7 +36,7 @@ Volume
 
 | Ensemble | CrystalStructures | Enumeration (int) specifying the crystal structure of each Ensemble/phase (Hexagonal=0, Cubic=1, Orthorhombic=2) | Values should be present from experimental data or synthetic generation and cannot be determined by this filter. Not having these values will result in the filter to fail/not execute. | Read H5Ebsd File (IO), Read Ensemble Info File (IO), Initialize Synthetic Volume (SyntheticBuilding) |
 
-## Created Objects ##
+## Created Objects
 
 | Type | Default Name | Description | Comment |
 |------|--------------|-------------|---------|
@@ -44,15 +46,15 @@ Volume
 
 
 
-## Example Pipelines ##
+## Example Pipelines
 
 
 
-## License & Copyright ##
+## License & Copyright
 
 Please see the description file distributed with this **Plugin**
 
-## DREAM.3D Mailing Lists ##
+## DREAM.3D Mailing Lists
 
 If you need more help with a **Filter**, please consider asking your question on the [DREAM.3D Users Google group!](https://groups.google.com/forum/?hl=en#!forum/dream3d-users)
 

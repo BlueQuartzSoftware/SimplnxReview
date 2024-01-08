@@ -1,5 +1,8 @@
 # Group MicroTexture Regions (C-Axis Misorientation)
 
+**THIS FILTER IS UNTESTED, UNVERIFIED AND UNVALIDATED. IT IS AN EXPERIMENTAL FILTER THAT IS UNDERGOING LONG TERM DEVELOPMENT
+AND TESTING. USE AT YOUR OWN RISK**
+
 ## Group (Subgroup)
 
 Reconstruction Filters (Grouping)

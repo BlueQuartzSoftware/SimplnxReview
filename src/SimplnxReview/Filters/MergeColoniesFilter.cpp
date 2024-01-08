@@ -150,6 +150,9 @@ IFilter::PreflightResult MergeColoniesFilter::preflightImpl(const DataStructure&
     resultOutputActions.value().appendAction(std::move(action));
   }
 
+  preflightUpdatedValues.push_back({"WARNING: This filter is experimental in nature and has not had any testing, validation or verification. Use at your own risk"});
+  resultOutputActions.warnings().push_back({-65432, "WARNING: This filter is experimental in nature and has not had any testing, validation or verification. Use at your own risk"});
+
   // Return both the resultOutputActions and the preflightUpdatedValues via std::move()
   return {std::move(resultOutputActions), std::move(preflightUpdatedValues)};
 }

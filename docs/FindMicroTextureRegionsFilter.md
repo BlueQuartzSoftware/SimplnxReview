@@ -1,29 +1,31 @@
-# Find Microtexture Regions  #
+# Find Microtexture Regions
 
+**THIS FILTER IS UNTESTED, UNVERIFIED AND UNVALIDATED. IT IS AN EXPERIMENTAL FILTER THAT IS UNDERGOING LONG TERM DEVELOPMENT
+AND TESTING. USE AT YOUR OWN RISK**
 
-## Group (Subgroup) ##
+## Group (Subgroup)
 
 Filter Group (Filter Subgroup)
 
 
-## Description ##
+## Description
 
 This filter does the following...
 
-## Parameters ##
+## Parameters
 
 | Name             | Type |
 |------------------|------|
 | Field Array Name | String |
 
-## Required Objects ##
+## Required Objects
 
 | Type | Default Array Name | Description | Comment |
 |------|--------------------|-------------|---------|
 | Int  | SomeName           | ....        | other   |
 
 
-## Created Objects ##
+## Created Objects
 
 | Type | Default Array Name | Description | Comment |
 |------|--------------------|-------------|---------|
@@ -31,7 +33,7 @@ This filter does the following...
 
 
 
-## Authors ##
+## Authors
 
 
 **Contact Info** dream3d@bluequartz.net
@@ -42,15 +44,15 @@ This filter does the following...
 
 
 
-## Example Pipelines ##
+## Example Pipelines
 
 
 
-## License & Copyright ##
+## License & Copyright
 
 Please see the description file distributed with this **Plugin**
 
-## DREAM.3D Mailing Lists ##
+## DREAM.3D Mailing Lists
 
 If you need more help with a **Filter**, please consider asking your question on the [DREAM.3D Users Google group!](https://groups.google.com/forum/?hl=en#!forum/dream3d-users)
 
