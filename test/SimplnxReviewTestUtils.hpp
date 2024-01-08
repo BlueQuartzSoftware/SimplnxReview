@@ -46,5 +46,5 @@ using namespace nx::core;
 
 namespace SmallIn100
 {
-  
+
 } // namespace SmallIn100

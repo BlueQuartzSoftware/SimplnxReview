@@ -27,12 +27,12 @@
 #include "simplnx/Parameters/NumberParameter.hpp"
 #include "simplnx/Parameters/StringParameter.hpp"
 
-#include "OrientationAnalysis/Filters/GroupMicroTextureRegionsFilter.hpp"
-#include "OrientationAnalysis/OrientationAnalysis_test_dirs.hpp"
+#include "SimplnxReview/Filters/GroupMicroTextureRegionsFilter.hpp"
+#include "SimplnxReview/SimplnxReview_test_dirs.hpp"
 
 using namespace nx::core;
 
-TEST_CASE("OrientationAnalysis::GroupMicroTextureRegionsFilter: Valid Filter Execution", "[OrientationAnalysis][GroupMicroTextureRegionsFilter][.][UNIMPLEMENTED][!mayfail]")
+TEST_CASE("SimplnxReview::GroupMicroTextureRegionsFilter: Valid Filter Execution", "[OrientationAnalysis][GroupMicroTextureRegionsFilter][.][UNIMPLEMENTED][!mayfail]")
 {
   // Instantiate the filter, a DataStructure object and an Arguments Object
   GroupMicroTextureRegionsFilter filter;

@@ -28,6 +28,7 @@ set(${PLUGIN_NAME}_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
 # SimplnxReview/src/SimplnxReview/Filters/ directory.
 set(FilterList
   FindGroupingDensityFilter
+  FindMicroTextureRegionsFilter
   GroupMicroTextureRegionsFilter
   MergeColoniesFilter
 )
@@ -101,6 +102,7 @@ endif()
 # ------------------------------------------------------------------------------
 set(filter_algorithms
   FindGroupingDensity
+  FindMicroTextureRegions
   GroupMicroTextureRegions
   MergeColonies
 )

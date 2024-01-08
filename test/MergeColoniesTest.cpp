@@ -1,14 +1,14 @@
 #include <catch2/catch.hpp>
 
-#include "complex/Parameters/ArrayCreationParameter.hpp"
-#include "complex/Parameters/BoolParameter.hpp"
+#include "simplnx/Parameters/ArrayCreationParameter.hpp"
+#include "simplnx/Parameters/BoolParameter.hpp"
 
-#include "OrientationAnalysis/Filters/MergeColoniesFilter.hpp"
-#include "OrientationAnalysis/OrientationAnalysis_test_dirs.hpp"
+#include "SimplnxReview/Filters/MergeColoniesFilter.hpp"
+#include "SimplnxReview/SimplnxReview_test_dirs.hpp"
 
-using namespace complex;
+using namespace nx::core;
 
-TEST_CASE("OrientationAnalysis::MergeColoniesFilter: Valid Filter Execution", "[ComplexCore][MergeColoniesFilter]")
+TEST_CASE("SimplnxReview::MergeColoniesFilter: Valid Filter Execution", "[SimplnxReview][MergeColoniesFilter]")
 {
   // Instantiate the filter, a DataStructure object and an Arguments Object
   MergeColoniesFilter filter;

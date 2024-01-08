@@ -6,10 +6,11 @@
 # ------------------------------------------------------------------------------
 # Define the list of unit test source files
 set(${PLUGIN_NAME}UnitTest_SRCS
-  
+    MergeColoniesTest.cpp
+    FindMicroTextureRegionsTest.cpp
 )
 set(DISABLED_TESTS
-MergeColoniesTest.cpp
+
 )
 
 create_simplnx_plugin_unit_test(PLUGIN_NAME ${PLUGIN_NAME}

@@ -2,10 +2,10 @@
 
 #include "simplnx/Common/Constants.hpp"
 #include "simplnx/DataStructure/DataArray.hpp"
-#include "simplnx/Utilities/Math/GeometryMath.hpp"
-#include "simplnx/Utilities/Math/MatrixMath.hpp"
 #include "simplnx/DataStructure/DataGroup.hpp"
 #include "simplnx/DataStructure/NeighborList.hpp"
+#include "simplnx/Utilities/Math/GeometryMath.hpp"
+#include "simplnx/Utilities/Math/MatrixMath.hpp"
 
 #include "EbsdLib/LaueOps/LaueOps.h"
 
@@ -50,10 +50,10 @@ void RandomizeFeatureIds(usize totalPoints, usize totalFeatures, Int32Array& cel
 // -----------------------------------------------------------------------------
 GroupMicroTextureRegions::GroupMicroTextureRegions(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel,
                                                    GroupMicroTextureRegionsInputValues* inputValues)
-    : m_DataStructure(dataStructure)
-      , m_InputValues(inputValues)
-      , m_ShouldCancel(shouldCancel)
-      , m_MessageHandler(mesgHandler)
+: m_DataStructure(dataStructure)
+, m_InputValues(inputValues)
+, m_ShouldCancel(shouldCancel)
+, m_MessageHandler(mesgHandler)
 {
 }
 
@@ -77,7 +77,6 @@ bool GroupMicroTextureRegions::growGrouping(int32_t referenceFeature, int32_t ne
 {
   return false;
 }
-
 
 // -----------------------------------------------------------------------------
 void GroupMicroTextureRegions::execute()
@@ -176,7 +175,6 @@ void GroupMicroTextureRegions::execute()
   }
 }
 
-
 // -----------------------------------------------------------------------------
 Result<> GroupMicroTextureRegions::operator()()
 {
@@ -189,7 +187,7 @@ Result<> GroupMicroTextureRegions::operator()()
   auto& featureParentIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeatureParentIdsArrayName);
   featureParentIds.fill(-1);
 
- execute();
+  execute();
 
   // handle active array resize
   if(m_NumTuples < 2)

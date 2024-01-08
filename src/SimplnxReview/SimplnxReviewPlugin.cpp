@@ -9,7 +9,7 @@ namespace
 {
 // This maps previous filters from DREAM.3D Version 6.x to DREAM.3D Version 7.x
 std::map<nx::core::Uuid, nx::core::Uuid> k_SimplToComplexFilterMapping = {
-    
+
 };
 // Plugin Uuid
 constexpr AbstractPlugin::IdType k_ID = *Uuid::FromString("c09cf01b-014e-5adb-84eb-ea76fc79eeb1");

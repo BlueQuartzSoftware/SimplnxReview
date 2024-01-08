@@ -12,9 +12,11 @@
 
 #include <random>
 
-namespace nx::core {
+namespace nx::core
+{
 
-struct SIMPLNXREVIEW_EXPORT GroupMicroTextureRegionsInputValues {
+struct SIMPLNXREVIEW_EXPORT GroupMicroTextureRegionsInputValues
+{
   bool UseNonContiguousNeighbors;
   DataPath NonContiguousNeighborListArrayPath;
   DataPath ContiguousNeighborListArrayPath;
@@ -36,39 +38,33 @@ struct SIMPLNXREVIEW_EXPORT GroupMicroTextureRegionsInputValues {
  * @class GroupMicroTextureRegions
  * @brief This filter ...
  */
-class SIMPLNXREVIEW_EXPORT GroupMicroTextureRegions {
+class SIMPLNXREVIEW_EXPORT GroupMicroTextureRegions
+{
 public:
-  GroupMicroTextureRegions(DataStructure &dataStructure,
-                           const IFilter::MessageHandler &mesgHandler,
-                           const std::atomic_bool &shouldCancel,
-                           GroupMicroTextureRegionsInputValues *inputValues);
+  GroupMicroTextureRegions(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel, GroupMicroTextureRegionsInputValues* inputValues);
   ~GroupMicroTextureRegions() noexcept;
 
-  GroupMicroTextureRegions(const GroupMicroTextureRegions &) = delete;
-  GroupMicroTextureRegions(GroupMicroTextureRegions &&) noexcept = delete;
-  GroupMicroTextureRegions &
-  operator=(const GroupMicroTextureRegions &) = delete;
-  GroupMicroTextureRegions &
-  operator=(GroupMicroTextureRegions &&) noexcept = delete;
+  GroupMicroTextureRegions(const GroupMicroTextureRegions&) = delete;
+  GroupMicroTextureRegions(GroupMicroTextureRegions&&) noexcept = delete;
+  GroupMicroTextureRegions& operator=(const GroupMicroTextureRegions&) = delete;
+  GroupMicroTextureRegions& operator=(GroupMicroTextureRegions&&) noexcept = delete;
 
   Result<> operator()();
 
-  const std::atomic_bool &getCancel();
+  const std::atomic_bool& getCancel();
 
 protected:
   int getSeed(int32 newFid);
-  bool determineGrouping(int32 referenceFeature, int32 neighborFeature,
-                         int32 newFid);
+  bool determineGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid);
   void execute();
   bool growPatch(int32 currentPatch);
-  bool growGrouping(int32 referenceFeature, int32 neighborFeature,
-                    int32 newFid);
+  bool growGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid);
 
 private:
-  DataStructure &m_DataStructure;
-  const GroupMicroTextureRegionsInputValues *m_InputValues = nullptr;
-  const std::atomic_bool &m_ShouldCancel;
-  const IFilter::MessageHandler &m_MessageHandler;
+  DataStructure& m_DataStructure;
+  const GroupMicroTextureRegionsInputValues* m_InputValues = nullptr;
+  const std::atomic_bool& m_ShouldCancel;
+  const IFilter::MessageHandler& m_MessageHandler;
 
   usize m_NumTuples = 0;
   std::array<float32, 3> m_AvgCAxes = {0.0f, 0.0f, 0.0f};

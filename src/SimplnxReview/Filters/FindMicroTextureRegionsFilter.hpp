@@ -8,38 +8,27 @@
 namespace nx::core
 {
 /**
- * @class MergeColoniesFilter
+ * @class FindMicroTextureRegionsFilter
  * @brief This filter will ....
  */
-class SIMPLNXREVIEW_EXPORT MergeColoniesFilter : public IFilter
+class SIMPLNXREVIEW_EXPORT FindMicroTextureRegionsFilter : public IFilter
 {
 public:
-  MergeColoniesFilter() = default;
-  ~MergeColoniesFilter() noexcept override = default;
+  FindMicroTextureRegionsFilter() = default;
+  ~FindMicroTextureRegionsFilter() noexcept override = default;
 
-  MergeColoniesFilter(const MergeColoniesFilter&) = delete;
-  MergeColoniesFilter(MergeColoniesFilter&&) noexcept = delete;
+  FindMicroTextureRegionsFilter(const FindMicroTextureRegionsFilter&) = delete;
+  FindMicroTextureRegionsFilter(FindMicroTextureRegionsFilter&&) noexcept = delete;
 
-  MergeColoniesFilter& operator=(const MergeColoniesFilter&) = delete;
-  MergeColoniesFilter& operator=(MergeColoniesFilter&&) noexcept = delete;
+  FindMicroTextureRegionsFilter& operator=(const FindMicroTextureRegionsFilter&) = delete;
+  FindMicroTextureRegionsFilter& operator=(FindMicroTextureRegionsFilter&&) noexcept = delete;
 
   // Parameter Keys
-  static inline constexpr StringLiteral k_UseNonContiguousNeighbors_Key = "use_non_contiguous_neighbors";
-  static inline constexpr StringLiteral k_NonContiguousNeighborListArrayPath_Key = "non_contiguous_neighbor_list_array_path";
-  static inline constexpr StringLiteral k_ContiguousNeighborListArrayPath_Key = "contiguous_neighbor_list_array_path";
-  static inline constexpr StringLiteral k_AxisTolerance_Key = "axis_tolerance";
-  static inline constexpr StringLiteral k_AngleTolerance_Key = "angle_tolerance";
-  static inline constexpr StringLiteral k_FeaturePhasesArrayPath_Key = "feature_phases_array_path";
-  static inline constexpr StringLiteral k_AvgQuatsArrayPath_Key = "avg_quats_array_path";
+  static inline constexpr StringLiteral k_ImageGeomPath_Key = "image_geom_path";
   static inline constexpr StringLiteral k_FeatureIdsArrayPath_Key = "feature_ids_array_path";
-  static inline constexpr StringLiteral k_CellPhasesArrayPath_Key = "cell_phases_array_path";
-  static inline constexpr StringLiteral k_CrystalStructuresArrayPath_Key = "crystal_structures_array_path";
-  static inline constexpr StringLiteral k_CellParentIdsArrayName_Key = "cell_parent_ids_array_name";
-  static inline constexpr StringLiteral k_NewCellFeatureAttributeMatrixName_Key = "new_cell_feature_attribute_matrix_name";
-  static inline constexpr StringLiteral k_FeatureParentIdsArrayName_Key = "feature_parent_ids_array_name";
-  static inline constexpr StringLiteral k_ActiveArrayName_Key = "active_array_name";
-  static inline constexpr StringLiteral k_UseSeed_Key = "use_seed";
-  static inline constexpr StringLiteral k_SeedValue_Key = "seed_value";
+  static inline constexpr StringLiteral k_CellFeatureAttributeMatrixName_Key = "cell_feature_attribute_matrix_name";
+  static inline constexpr StringLiteral k_MicroTextureRegionNumCellsArrayName_Key = "micro_texture_region_num_cells_array_name";
+  static inline constexpr StringLiteral k_MicroTextureRegionFractionOccupiedArrayName_Key = "micro_texture_region_fraction_occupied_array_name";
 
   /**
    * @brief Returns the name of the filter.
@@ -107,5 +96,5 @@ protected:
 };
 } // namespace nx::core
 
-SIMPLNX_DEF_FILTER_TRAITS(nx::core, MergeColoniesFilter, "7e3dbc15-51a3-482c-97c2-f82f7af685bf");
-/* LEGACY UUID FOR THIS FILTER 2c4a6d83-6a1b-56d8-9f65-9453b28845b9 */
+SIMPLNX_DEF_FILTER_TRAITS(nx::core, FindMicroTextureRegionsFilter, "be3477f0-f3f0-4790-864a-0658ac7568ba");
+/* LEGACY UUID FOR THIS FILTER 90f8e3b1-2460-5862-95a1-a9e06f5ee75e */

@@ -179,11 +179,10 @@ Result<> MergeColoniesFilter::executeImpl(DataStructure& dataStructure, const Ar
   inputValues.FeatureParentIdsPath = inputValues.FeaturePhasesPath.getParent().createChildPath(filterArgs.value<std::string>(k_FeatureParentIdsArrayName_Key));
   inputValues.ActivePath = inputValues.CellFeatureAMPath.createChildPath(filterArgs.value<std::string>(k_ActiveArrayName_Key));
 
-
   inputValues.UseNonContiguousNeighbors = filterArgs.value<bool>(k_UseNonContiguousNeighbors_Key);
   inputValues.NonContiguousNeighborListArrayPath = filterArgs.value<DataPath>(k_NonContiguousNeighborListArrayPath_Key);
   inputValues.ContiguousNeighborListArrayPath = filterArgs.value<DataPath>(k_ContiguousNeighborListArrayPath_Key);
 
   return MergeColonies(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }
-} // namespace complex
+} // namespace nx::core
