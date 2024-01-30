@@ -32,6 +32,7 @@ set(FilterList
   FindMicroTextureRegionsFilter
   FindSaltykovSizesFilter
   GroupMicroTextureRegionsFilter
+  InterpolateValuesToUnstructuredGridFilter
   MergeColoniesFilter
 )
   
@@ -108,6 +109,7 @@ set(filter_algorithms
   FindMicroTextureRegions
   FindSaltykovSizes
   GroupMicroTextureRegions
+  InterpolateValuesToUnstructuredGrid
   MergeColonies
 )
 
