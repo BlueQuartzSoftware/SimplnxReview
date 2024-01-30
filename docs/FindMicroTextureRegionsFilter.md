@@ -12,47 +12,16 @@ Filter Group (Filter Subgroup)
 
 This filter does the following...
 
-## Parameters
+% Auto generated parameter table will be inserted here
 
-| Name             | Type |
-|------------------|------|
-| Field Array Name | String |
-
-## Required Objects
-
-| Type | Default Array Name | Description | Comment |
-|------|--------------------|-------------|---------|
-| Int  | SomeName           | ....        | other   |
-
-
-## Created Objects
-
-| Type | Default Array Name | Description | Comment |
-|------|--------------------|-------------|---------|
-| Int  | SomeName           | ....        | other   |
-
-
-
-## Authors
-
-
-**Contact Info** dream3d@bluequartz.net
-
-**Version** 1.0.0
-
-**License**  See the License.txt file that came with DREAM3D.
-
-
+## References
 
 ## Example Pipelines
-
-
 
 ## License & Copyright
 
 Please see the description file distributed with this **Plugin**
 
-## DREAM.3D Mailing Lists
+## DREAM3D-NX Help
 
-If you need more help with a **Filter**, please consider asking your question on the [DREAM.3D Users Google group!](https://groups.google.com/forum/?hl=en#!forum/dream3d-users)
-
+If you need help, need to file a bug report or want to request a new feature, please head over to the [DREAM3DNX-Issues](https://github.com/BlueQuartzSoftware/DREAM3DNX-Issues) GItHub site where the community of DREAM3D-NX users can help answer your questions.

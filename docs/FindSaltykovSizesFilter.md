@@ -14,35 +14,16 @@ The filter will continue iteratively performing the Saltykov Method of spheres, 
 The filter is applied in such a way so that **SaltykovEquivalentDiameters** has the correct feature-level data length.  This way, a direct one-to-one comparies between **EquivalentDiameters** and **SaltykovEquivalentDiameters** is possible.  However, it is important to note that the **SaltykovEquivalentDiameters** are not a direct transformation of **EquivalentDiameters** that they are matched up with.
 For more information, see: Joseph C. Tucker, Lisa H. Chan, Gregory S. Rohrer, Michael A. Groeber, and Anthony D. Rollett. Comparison of grain size distributions in a ni-based superalloy in three and two dimensions using the saltykov method. Scripta Materialia, 66(8):554 - 557, 2012.
 
-## Parameters
+% Auto generated parameter table will be inserted here
 
-## Required DataContainers
-
-Volume
-
-## Required Objects
-
-| Type | Default Name | Description | Comment | Filters Known to Create Data |
-|------|--------------|-------------|---------|-----|
-| Feature | EquivalentDiameters | Diameter (float) of a sphere with the same volume as the **Feature**. | Find Feature Sizes (Statistics) |
-
-## Created Objects
-
-| Type | Default Name | Description | Comment |
-|------|--------------|-------------|---------|
-| Feature | SaltykovEquivalentDiameters | Diameter (float) of the Saltykov estimated sphere. |  |
-
+## References
 
 ## Example Pipelines
-
-
 
 ## License & Copyright
 
 Please see the description file distributed with this **Plugin**
 
-## DREAM.3D Mailing Lists
+## DREAM3D-NX Help
 
-If you need more help with a **Filter**, please consider asking your question on the [DREAM.3D Users Google group!](https://groups.google.com/forum/?hl=en#!forum/dream3d-users)
-
-
+If you need help, need to file a bug report or want to request a new feature, please head over to the [DREAM3DNX-Issues](https://github.com/BlueQuartzSoftware/DREAM3DNX-Issues) GItHub site where the community of DREAM3D-NX users can help answer your questions.

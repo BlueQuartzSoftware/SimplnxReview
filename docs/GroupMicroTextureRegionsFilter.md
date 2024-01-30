@@ -15,42 +15,16 @@ NOTE: This filter is intended for use with *Hexagonal* materials.  While the c-a
 
 Developer Note: It is **very important** for end users to **seed** the data if they *ever* intend to replicate the calculations. The randomness involed in this filter aims to help avoid bias developing in the output, however with out of core this will severely slow down the calculations at runtime. In order to remedy this we are in the process of developing a floodfill method, but the bias formed by sequential parsing is something one should consider when utilizing this method.
 
-## Parameters
+% Auto generated parameter table will be inserted here
 
-| Name | Type |
-|------|------|
-| C-Axis Alignment Tolerance | float32 |
-| Use Running Average | bool |
-| Use Seed For Random Generation | bool |
-| Seed Value | uint64 |
+## References
 
-## Required Geometry
-
-Image Geometry
-
-## Required Objects
-
-| Type | Default Name | Description | Comment | Filters Known to Create Data |
-|------|--------------|-------------|---------|-----|
-| Cell | FeatureIds | Ids (ints) that specify to which **Feature** each **Cell** belongs. | Values should be present from segmentation of experimental data or synthetic generation and cannot be determined by this filter. Not having these values will result in the filter to fail/not execute. | Segment Features (Misorientation, C-Axis Misorientation, Scalar) (Reconstruction), Read Dx File (IO), Read Ph File (IO), Pack Primary Phases (SyntheticBuilding), Insert Precipitate Phases (SyntheticBuilding), Establish Matrix Phase (SyntheticBuilding) |
-| Feature | FeaturePhases | Phase Id (int) specifying the phase of the **Feature**| | Find Feature Phases (Generic), Read Feature Info File (IO), Pack Primary Phases (SyntheticBuilding), Insert Precipitate Phases (SyntheticBuilding), Establish Matrix Phase (SyntheticBuilding) |
-| Feature | Volumes | | | |
-| Feature | AvgQuats | Four (4) values (floats) defining the average orientation of the **Feature** in quaternion representation | Filter will calculate average quaternions for **Features** if not already calculated. | Find Feature Average Orientations (Statistics) |
-| Ensemble | CrystalStructures | Enumeration (int) specifying the crystal structure of each Ensemble/phase (Hexagonal=0, Cubic=1, Orthorhombic=2) | Values should be present from experimental data or synthetic generation and cannot be determined by this filter. Not having these values will result in the filter to fail/not execute. | Read H5Ebsd File (IO), Read Ensemble Info File (IO), Initialize Synthetic Volume (SyntheticBuilding) |
-
-## Created Objects
-
-| Type | Default Name | Description | Comment |
-|------|--------------|-------------|---------|
-| Feature | Active | Boolean value specifying if the **Feature** is still in the sample (1 if the **Feature** is in the sample and 0 if it is not). | At the end of the filter, all **Features** will be "Active" as the "Inactive" **Features** will have been removed. |
-| Feature | ParentIds | List of grouped microtexture region **Features**. |  |
-| Cell | ParentIds | List of grouped microtexture region **Cells**. |  |
-| Attribute Matrix | NewCellFeatureAttributeMatrixName |  |  |
+## Example Pipelines
 
 ## License & Copyright
 
 Please see the description file distributed with this **Plugin**
 
-## DREAM3DNX Help
+## DREAM3D-NX Help
 
-Check out our GitHub community page at [DREAM3DNX-Issues](https://github.com/BlueQuartzSoftware/DREAM3DNX-Issues) to report bugs, ask the community for help, discuss features, or get help from the developers.
+If you need help, need to file a bug report or want to request a new feature, please head over to the [DREAM3DNX-Issues](https://github.com/BlueQuartzSoftware/DREAM3DNX-Issues) GItHub site where the community of DREAM3D-NX users can help answer your questions.

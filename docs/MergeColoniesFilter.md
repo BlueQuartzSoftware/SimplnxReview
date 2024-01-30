@@ -22,51 +22,16 @@ The list of *special* misorientations can be found in the paper by Germain et al
 | 63.262 | d2 at 72.73 degrees from c in the plane of (a2,c) |
 | 90 | d3 at 5.26 degrees from a2 in the basal plane |
 
-## Parameters ##
+% Auto generated parameter table will be inserted here
 
-| Name | Type | Description |
-|------|------| ----------- |
-| Use Seed | bool | Whether a seed shouold be used for random generation |
-| Seed | uint64 | This is the value fed into the random generator |
-| Axis Tolerance (Degrees) | float32 | Tolerance allowed when comparing the axis part of the axis-angle representation of the misorientation to the *special* misorientations listed above |
-| Angle Tolerance (Degrees) | float32 | Tolerance allowed when comparing the angle part of the axis-angle representation of the misorientation to the *special* misorientations listed above |
-| Use Non-Contiguous Neighbors | bool | Whether to use a non-contiguous neighbor list during the merging process |
+## References
 
-## Required Geometry ##
+## Example Pipelines
 
-Not Applicable
-
-## Required Objects ##
-
-| Kind | Default Name | Type | Component Dimensions | Description |
-|------|--------------|------|----------------------|-------------|
-| **Feature Attribute Array** | NonContiguousNeighbors | Int32NeighborList | (1) | List of non-contiguous neighbors for each **Feature**. Only needed if *Use Non-Contiguous Neighbors* is checked |
-| **Feature Attribute Array** | NeighborList | Int32NeighborList | (1) | List of neighbors for each **Feature** |
-| **Element Attribute Array** | FeatureIds | int32 | (1) | Specifies to which **Feature** each **Element** belongs |
-| **Element Attribute Array** | Phases | int32 | (1) | Specifies to which **Ensemble** each **Element** belongs |
-| **Feature Attribute Array** | Phases | int32 | (1) | Specifies to which **Ensemble** each **Feature** belongs |
-| **Feature Attribute Array** | AvgQuats | float32 | (4) | Specifies the average orientation of the **Feature** in quaternion representation |
-| **Ensemble Attribute Array** | CrystalStructures | uint32 | (1) | Enumeration representing the crystal structure for each **Ensemble** |
-
-## Created Objects ##
-
-| Kind | Default Name | Type | Component Dimensions | Description |
-|------|--------------|------|----------------------|-------------|
-| **Element Attribute Array** | ParentIds | int32 | (1) | Specifies to which *parent* each **Element** belongs |
-| **Attribute Matrix** | NewFeatureData | Feature | N/A | Created **Feature Attribute Matrix** name |
-| **Feature Attribute Array** | ParentIds | int32 | (1) | Specifies to which *parent* each **Feature** belongs |
-| **Feature Attribute Array** | Active | bool | (1) | Specifies if the **Feature** is still in the sample (*true* if the **Feature** is in the sample and *false* if it is not). At the end of the **Filter**, all **Features** will be *Active* |
-
-## References ##
-
-[1] L. Germain, N. Gey and M. Humbert, Reliability of reconstructed Beta orientation maps in titanium alloys, Ultramicrscopy, 2007, 1129-1135.
-
-## Example Pipelines ##
-
-## License & Copyright ##
+## License & Copyright
 
 Please see the description file distributed with this **Plugin**
 
-## DREAM.3D Mailing Lists ##
+## DREAM3D-NX Help
 
-If you need more help with a **Filter**, please consider asking your question on the [DREAM.3D Users Google group!](https://groups.google.com/forum/?hl=en#!forum/dream3d-users)
+If you need help, need to file a bug report or want to request a new feature, please head over to the [DREAM3DNX-Issues](https://github.com/BlueQuartzSoftware/DREAM3DNX-Issues) GItHub site where the community of DREAM3D-NX users can help answer your questions.

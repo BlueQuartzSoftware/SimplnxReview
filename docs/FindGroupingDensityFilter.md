@@ -15,38 +15,16 @@ If non-contiguous neighbors were used in addition to standard neighbors for grou
 
 Since many **Checked Features** are checked by more than one **Feature** during grouping, a premium is placed on the **Parent Feature** querying the **Checked Feature** having the largest **Parent Volume.**  For **Checked Features** to be written, the *Find Checked Features* Parameter may be used.
 
-## Parameters
+% Auto generated parameter table will be inserted here
 
-| Name | Type | Description |
-|------|------| ----------- |
-| Use Non-Contiguous Neighbors | bool | Whether to also use **Neighborhoods** in addition to **Neighbors** in the **Grouping Densities** calculation. |
-| Find Checked Features | bool | Whether to write **Checked Features**. |
+## References
 
-## Required Geometry
-
-Cell
-
-## Required Objects
-
-| Kind | Default Name | Type | Component Dimensions | Description |
-|------|--------------|------|----------------------|-------------|
-| **DataArray** | N/A | float32 | (1) | Volume of the **Feature** |
-| **DataArray** | N/A | float32 | (1) | *Parent Id* of the **Feature** |
-| **NeighborList**  | N/A | int32 | (1) | List of the contiguous neighboring **Features** for a given **Feature** |
-| **NeighborLists** | N/A | int32 | (1) | List of the **Features** whose centroids are within the user specified multiple of equivalent sphere diameter from each **Feature** |
-| **DataArray** | N/A | float32 | (1) | Volume of the **Parent Feature** |
-
-## Created Objects
-
-| Kind | Default Name | Type | Component Dimensions | Description |
-|------|--------------|------|----------------------|-------------|
-| **DataArray** | CheckedFeatures |  int32 | (1) | The **Features** that were checked during grouping for a given **Parent Feature**.  This is written as the **ParentId** with the largest *Parent Volume* of the **Parent Features** that checked it. |
-| **DataArray** | GroupingDensities | float | (1) | **Parent Volume** divided by the sum of the **Checked Features** for the **Parent Feature** |
+## Example Pipelines
 
 ## License & Copyright
 
 Please see the description file distributed with this **Plugin**
 
-## DREAM3DNX Help
+## DREAM3D-NX Help
 
-Check out our GitHub community page at [DREAM3DNX-Issues](https://github.com/BlueQuartzSoftware/DREAM3DNX-Issues) to report bugs, ask the community for help, discuss features, or get help from the developers.
+If you need help, need to file a bug report or want to request a new feature, please head over to the [DREAM3DNX-Issues](https://github.com/BlueQuartzSoftware/DREAM3DNX-Issues) GItHub site where the community of DREAM3D-NX users can help answer your questions.
