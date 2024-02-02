@@ -20,4 +20,4 @@ REPOSITORY TO THE MAIN `SIMPLNX` REPOSITORY AT [https://www.github.com/bluequart
 
 ## Example Data Request
 
-If you know of a public data set that could be used as a test data set for any of these filters, please contact the developers of DREAM3D through [mailto://dream3d@bluequartz.net](mailto://dream3d@bluequartz.net) or by starting a new discussion at [https://github.com/BlueQuartzSoftware/DREAM3DNX-Issues](https://github.com/BlueQuartzSoftware/DREAM3DNX-Issues)
+If you know of a public data set that could be used as a test data set for any of these filters, please contact the developers of DREAM3D through [mailto://dream3d@bluequartz.net](mailto://dream3d@bluequartz.net) or by starting a new discussion at [https://github.com/BlueQuartzSoftware/DREAM3DNX-Issues/discussions](https://github.com/BlueQuartzSoftware/DREAM3DNX-Issues/discussions)
