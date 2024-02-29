@@ -36,17 +36,43 @@ set(FilterList
   MergeColoniesFilter
 )
   
-set(STUB_FILTERS
-
+set(ActionList
 )
+
+# ------------------------------------------------------------------------------
+# Algorithms
+# This should be integrated with the `create_simplnx_plugin` function call
+# ------------------------------------------------------------------------------
+set(AlgorithmList
+  FindGroupingDensity
+  FindLocalAverageCAxisMisalignments
+  FindMicroTextureRegions
+  FindSaltykovSizes
+  GroupMicroTextureRegions
+  InterpolateValuesToUnstructuredGrid
+  MergeColonies
+)
+
+
 
 create_simplnx_plugin(NAME ${PLUGIN_NAME}
   FILTER_LIST ${FilterList}
+  ACTION_LIST ${ActionList}
+  ALGORITHM_LIST ${AlgorithmList}  
   DESCRIPTION "${PLUGIN_NAME} Plugin"
   VERSION "0.2.0"
   DOC_CHECK
   ADD_TO_GLOBAL_LIST
 )
+
+#------------------------------------------------------------------------------
+# Add in the unit tests for the filters included in this plugin
+if(SIMPLNX_BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(${${PLUGIN_NAME}_SOURCE_DIR}/test)
+endif()
+
+
 
 # ------------------------------------------------------------------------------
 # Add any filter parameters to the `simplnx` target
@@ -77,53 +103,6 @@ target_include_directories(simplnx PUBLIC )
 # ------------------------------------------------------------------------------
 target_link_libraries(simplnx PUBLIC EbsdLib::EbsdLib)
 
-# ------------------------------------------------------------------------------
-# Include filters that need to be compiled but not available to the general user
-# These are typically auto-generated sources that need to be compiled to ensure
-# the stubs are following the latest API changes
-# ------------------------------------------------------------------------------
-foreach(file_name ${STUB_FILTERS})
-  list(APPEND hidden_filter_HDRS
-    "${${PLUGIN_NAME}_SOURCE_DIR}/src/${PLUGIN_NAME}/Filters_Private/${file_name}.hpp"
-  )
-  list(APPEND hidden_filter_SRCS
-    "${${PLUGIN_NAME}_SOURCE_DIR}/src/${PLUGIN_NAME}/Filters_Private/${file_name}.cpp"
-  )
-endforeach()
-
-option(${PLUGIN_NAME}_COMPILE_PRIVATE_FILTERS "Compile the Stubbed out filters" OFF)
-if(${${PLUGIN_NAME}_COMPILE_PRIVATE_FILTERS})
-  target_sources(${PLUGIN_NAME}
-    PRIVATE ${hidden_filter_HDRS} ${hidden_filter_SRCS}
-  )
-  source_group(TREE "${${PLUGIN_NAME}_SOURCE_DIR}/src/${PLUGIN_NAME}" PREFIX ${PLUGIN_NAME} FILES ${hidden_filter_HDRS} ${hidden_filter_SRCS})
-endif()
-
-# ------------------------------------------------------------------------------
-# Algorithms
-# This should be integrated with the `create_simplnx_plugin` function call
-# ------------------------------------------------------------------------------
-set(filter_algorithms
-  FindGroupingDensity
-  FindLocalAverageCAxisMisalignments
-  FindMicroTextureRegions
-  FindSaltykovSizes
-  GroupMicroTextureRegions
-  InterpolateValuesToUnstructuredGrid
-  MergeColonies
-)
-
-
-foreach(algorithm ${filter_algorithms})
-  target_sources(${PLUGIN_NAME}
-    PRIVATE "${${PLUGIN_NAME}_SOURCE_DIR}/src/${PLUGIN_NAME}/Filters/Algorithms/${algorithm}.cpp"
-    "${${PLUGIN_NAME}_SOURCE_DIR}/src/${PLUGIN_NAME}/Filters/Algorithms/${algorithm}.hpp"
-  )
-  source_group(TREE "${${PLUGIN_NAME}_SOURCE_DIR}/src/${PLUGIN_NAME}" PREFIX ${PLUGIN_NAME}
-    FILES "${${PLUGIN_NAME}_SOURCE_DIR}/src/${PLUGIN_NAME}/Filters/Algorithms/${algorithm}.cpp"
-    "${${PLUGIN_NAME}_SOURCE_DIR}/src/${PLUGIN_NAME}/Filters/Algorithms/${algorithm}.hpp"
-  )
-endforeach()
 
 # ------------------------------------------------------------------------------
 # Extra Sources
@@ -132,8 +111,19 @@ endforeach()
 set(PLUGIN_EXTRA_SOURCES
 
 )
-target_sources(${PLUGIN_NAME} PRIVATE ${PLUGIN_EXTRA_SOURCES})
-source_group(TREE "${${PLUGIN_NAME}_SOURCE_DIR}/src/${PLUGIN_NAME}/utilities" PREFIX ${PLUGIN_NAME} FILES ${PLUGIN_EXTRA_SOURCES})
+target_sources(${PLUGIN_NAME} 
+  PRIVATE
+    ${PLUGIN_EXTRA_SOURCES}
+)
+
+source_group(TREE "${${PLUGIN_NAME}_SOURCE_DIR}/src/${PLUGIN_NAME}/utilities" 
+            PREFIX ${PLUGIN_NAME} 
+            FILES ${PLUGIN_EXTRA_SOURCES}
+            )
+#------------------------------------------------------------------------------
+# If there are additional library packages that need to be found, this is where
+# to do that using the usual find_package(....) call
+# find_package(....)
 
 
 # ------------------------------------------------------------------------------
@@ -147,15 +137,8 @@ target_link_libraries(${PLUGIN_NAME} PUBLIC EbsdLib::EbsdLib)
 # you can use the target_include_directories(.....) cmake call
 # target_include_directories(${PLUGIN_NAME}
 #   PUBLIC
-
+#     additional include directories here
 # )
-
-# ------------------------------------------------------------------------------
-# Add in the unit tests for the filters included in this plugin
-if(SIMPLNX_BUILD_TESTS)
-  enable_testing()
-  add_subdirectory(${${PLUGIN_NAME}_SOURCE_DIR}/test)
-endif()
 
 # -----------------------------------------------------------------------
 # Install example pipelines
