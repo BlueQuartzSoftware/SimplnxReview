@@ -21,12 +21,12 @@ public:
   InterpolateValuesToUnstructuredGridFilter& operator=(InterpolateValuesToUnstructuredGridFilter&&) noexcept = delete;
 
   // Parameter Keys
-  static inline constexpr StringLiteral k_SourceGeometry_Key = "source_geometry";
+  static inline constexpr StringLiteral k_SourceGeometryPath_Key = "source_geometry_path";
   static inline constexpr StringLiteral k_InterpolatedArrayPaths_Key = "interpolated_array_paths";
   static inline constexpr StringLiteral k_UseExistingAttrMatrix_Key = "use_existing_attr_matrix";
-  static inline constexpr StringLiteral k_ExistingAttrMatrix_Key = "existing_attr_matrix";
-  static inline constexpr StringLiteral k_CreatedAttrMatrix_Key = "created_attr_matrix";
-  static inline constexpr StringLiteral k_DestinationGeometry_Key = "destination_geometry";
+  static inline constexpr StringLiteral k_ExistingAttrMatrixPath_Key = "existing_attr_matrix_path";
+  static inline constexpr StringLiteral k_CreatedAttrMatrixName_Key = "created_attr_matrix_name";
+  static inline constexpr StringLiteral k_DestinationGeometryPath_Key = "destination_geometry_path";
 
   /**
    * @brief
