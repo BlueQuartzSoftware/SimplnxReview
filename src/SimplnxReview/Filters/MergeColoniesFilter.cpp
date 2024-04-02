@@ -116,7 +116,7 @@ IFilter::PreflightResult MergeColoniesFilter::preflightImpl(const DataStructure&
   auto pCellParentIdsNameValue = filterArgs.value<std::string>(k_CellParentIdsArrayName_Key);
   auto pCellFeatureAMPathValue = filterArgs.value<DataPath>(k_NewCellFeatureAttributeMatrixName_Key);
   auto pFeatureParentIdsNameValue = filterArgs.value<std::string>(k_FeatureParentIdsArrayName_Key);
-  auto pActiveNameValue = filterArgs.value<std::string>(k_ActiveArrayName_Key);
+  auto pActiveNameValue = filterArgs.value<DataObjectNameParameter::ValueType>(k_ActiveArrayName_Key);
 
   PreflightResult preflightResult;
   nx::core::Result<OutputActions> resultOutputActions;
@@ -180,7 +180,7 @@ Result<> MergeColoniesFilter::executeImpl(DataStructure& dataStructure, const Ar
   inputValues.CellParentIdsPath = inputValues.FeatureIdsPath.getParent().createChildPath(filterArgs.value<std::string>(k_CellParentIdsArrayName_Key));
   inputValues.CellFeatureAMPath = filterArgs.value<DataPath>(k_NewCellFeatureAttributeMatrixName_Key);
   inputValues.FeatureParentIdsPath = inputValues.FeaturePhasesPath.getParent().createChildPath(filterArgs.value<std::string>(k_FeatureParentIdsArrayName_Key));
-  inputValues.ActivePath = inputValues.CellFeatureAMPath.createChildPath(filterArgs.value<std::string>(k_ActiveArrayName_Key));
+  inputValues.ActivePath = inputValues.CellFeatureAMPath.createChildPath(filterArgs.value<DataObjectNameParameter::ValueType>(k_ActiveArrayName_Key));
 
   inputValues.UseNonContiguousNeighbors = filterArgs.value<bool>(k_UseNonContiguousNeighbors_Key);
   inputValues.NonContiguousNeighborListArrayPath = filterArgs.value<DataPath>(k_NonContiguousNeighborListArrayPath_Key);

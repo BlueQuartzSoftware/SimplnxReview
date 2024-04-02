@@ -2,6 +2,8 @@
 
 #include "simplnx/Parameters/ArrayCreationParameter.hpp"
 #include "simplnx/Parameters/BoolParameter.hpp"
+#include "simplnx/Parameters/DataObjectNameParameter.hpp"
+#include "simplnx/UnitTest/UnitTestCommon.hpp"
 
 #include "SimplnxReview/Filters/MergeColoniesFilter.hpp"
 #include "SimplnxReview/SimplnxReview_test_dirs.hpp"
@@ -12,7 +14,7 @@ TEST_CASE("SimplnxReview::MergeColoniesFilter: Valid Filter Execution", "[Simpln
 {
   // Instantiate the filter, a DataStructure object and an Arguments Object
   MergeColoniesFilter filter;
-  DataStructure ds;
+  DataStructure dataStructure;
   Arguments args;
 
   // Create default Parameters for the filter.
@@ -26,16 +28,16 @@ TEST_CASE("SimplnxReview::MergeColoniesFilter: Valid Filter Execution", "[Simpln
   args.insertOrAssign(MergeColoniesFilter::k_FeatureIdsArrayPath_Key, std::make_any<DataPath>(DataPath{}));
   args.insertOrAssign(MergeColoniesFilter::k_CellPhasesArrayPath_Key, std::make_any<DataPath>(DataPath{}));
   args.insertOrAssign(MergeColoniesFilter::k_CrystalStructuresArrayPath_Key, std::make_any<DataPath>(DataPath{}));
-  args.insertOrAssign(MergeColoniesFilter::k_CellParentIdsArrayName_Key, std::make_any<DataPath>(DataPath{}));
+  args.insertOrAssign(MergeColoniesFilter::k_CellParentIdsArrayName_Key, std::make_any<DataObjectNameParameter::ValueType>(""));
   args.insertOrAssign(MergeColoniesFilter::k_NewCellFeatureAttributeMatrixName_Key, std::make_any<DataPath>(DataPath{}));
-  args.insertOrAssign(MergeColoniesFilter::k_FeatureParentIdsArrayName_Key, std::make_any<DataPath>(DataPath{}));
-  args.insertOrAssign(MergeColoniesFilter::k_ActiveArrayName_Key, std::make_any<DataPath>(DataPath{}));
+  args.insertOrAssign(MergeColoniesFilter::k_FeatureParentIdsArrayName_Key, std::make_any<DataObjectNameParameter::ValueType>(""));
+  args.insertOrAssign(MergeColoniesFilter::k_ActiveArrayName_Key, std::make_any<DataObjectNameParameter::ValueType>(""));
 
   // Preflight the filter and check result
-  auto preflightResult = filter.preflight(ds, args);
-  REQUIRE(preflightResult.outputActions.valid());
+  auto preflightResult = filter.preflight(dataStructure, args);
+  SIMPLNX_RESULT_REQUIRE_VALID(preflightResult.outputActions);
 
   // Execute the filter and check the result
-  auto executeResult = filter.execute(ds, args);
-  REQUIRE(executeResult.result.valid());
+  auto executeResult = filter.execute(dataStructure, args);
+  SIMPLNX_RESULT_REQUIRE_VALID(executeResult.result);
 }
