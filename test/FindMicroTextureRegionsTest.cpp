@@ -40,7 +40,7 @@ TEST_CASE("SimplnxReview::FindMicroTextureRegionsFilter: Valid Filter Execution"
 
   // Create default Parameters for the filter.
   args.insertOrAssign(FindMicroTextureRegionsFilter::k_FeatureIdsArrayPath_Key, std::make_any<DataPath>(DataPath{}));
-  args.insertOrAssign(FindMicroTextureRegionsFilter::k_CellFeatureAttributeMatrixName_Key, std::make_any<DataPath>(DataPath{}));
+  args.insertOrAssign(FindMicroTextureRegionsFilter::k_CellFeatureAttributeMatrixPath_Key, std::make_any<DataPath>(DataPath{}));
   args.insertOrAssign(FindMicroTextureRegionsFilter::k_MicroTextureRegionNumCellsArrayName_Key, std::make_any<StringParameter::ValueType>("SomeString"));
   args.insertOrAssign(FindMicroTextureRegionsFilter::k_MicroTextureRegionFractionOccupiedArrayName_Key, std::make_any<StringParameter::ValueType>("SomeString"));
 

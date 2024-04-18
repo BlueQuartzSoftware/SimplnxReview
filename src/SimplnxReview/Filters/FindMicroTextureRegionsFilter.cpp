@@ -55,7 +55,7 @@ Parameters FindMicroTextureRegionsFilter::parameters() const
   params.insert(std::make_unique<ArraySelectionParameter>(k_FeatureIdsArrayPath_Key, "FeatureIds", "", DataPath{}, nx::core::GetAllDataTypes()));
 
   params.insertSeparator(Parameters::Separator{"Created Data Objects"});
-  params.insert(std::make_unique<DataGroupSelectionParameter>(k_CellFeatureAttributeMatrixName_Key, "Parent Cell Feature Attribute Matrix", "", DataPath{},
+  params.insert(std::make_unique<DataGroupSelectionParameter>(k_CellFeatureAttributeMatrixPath_Key, "Parent Cell Feature Attribute Matrix", "", DataPath{},
                                                               DataGroupSelectionParameter::AllowedTypes{BaseGroup::GroupType::AttributeMatrix}));
   params.insert(std::make_unique<DataObjectNameParameter>(k_MicroTextureRegionNumCellsArrayName_Key, "Micro Texture Region Number of Cells Array Name", "", "MT Region Number of Cells"));
   params.insert(std::make_unique<DataObjectNameParameter>(k_MicroTextureRegionFractionOccupiedArrayName_Key, "Micro Texture Region Fraction Occupied Array Name", "", "MT Region Fraction Occupied"));
@@ -74,7 +74,7 @@ IFilter::PreflightResult FindMicroTextureRegionsFilter::preflightImpl(const Data
                                                                       const std::atomic_bool& shouldCancel) const
 {
   auto pFeatureIdsArrayPathValue = filterArgs.value<DataPath>(k_FeatureIdsArrayPath_Key);
-  auto pCellFeatureAttributeMatrixNameValue = filterArgs.value<DataPath>(k_CellFeatureAttributeMatrixName_Key);
+  auto pCellFeatureAttributeMatrixNameValue = filterArgs.value<DataPath>(k_CellFeatureAttributeMatrixPath_Key);
   auto pMicroTextureRegionNumCellsArrayNameValue = filterArgs.value<std::string>(k_MicroTextureRegionNumCellsArrayName_Key);
   auto pMicroTextureRegionFractionOccupiedArrayNameValue = filterArgs.value<std::string>(k_MicroTextureRegionFractionOccupiedArrayName_Key);
 
@@ -111,7 +111,7 @@ Result<> FindMicroTextureRegionsFilter::executeImpl(DataStructure& dataStructure
 
   inputValues.ImageGeomPath = filterArgs.value<DataPath>(k_ImageGeomPath_Key);
   inputValues.FeatureIdsArrayPath = filterArgs.value<DataPath>(k_FeatureIdsArrayPath_Key);
-  inputValues.CellFeatureAttributeMatrixPath = filterArgs.value<DataPath>(k_CellFeatureAttributeMatrixName_Key);
+  inputValues.CellFeatureAttributeMatrixPath = filterArgs.value<DataPath>(k_CellFeatureAttributeMatrixPath_Key);
   inputValues.MicroTextureRegionNumCellsArrayPath = inputValues.CellFeatureAttributeMatrixPath.createChildPath(filterArgs.value<std::string>(k_MicroTextureRegionNumCellsArrayName_Key));
   inputValues.MicroTextureRegionFractionOccupiedArrayPath =
       inputValues.CellFeatureAttributeMatrixPath.createChildPath(filterArgs.value<std::string>(k_MicroTextureRegionFractionOccupiedArrayName_Key));
