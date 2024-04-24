@@ -83,7 +83,7 @@ IFilter::PreflightResult FindSaltykovSizesFilter::preflightImpl(const DataStruct
   nx::core::Result<OutputActions> resultOutputActions;
   std::vector<PreflightValue> preflightUpdatedValues;
 
-  DataPath saltykovPath = pEquivalentDiametersArrayPathValue.getParent().createChildPath(pSaltykovEquivalentDiametersNameValue);
+  DataPath saltykovPath = pEquivalentDiametersArrayPathValue.replaceName(pSaltykovEquivalentDiametersNameValue);
   const auto* equivDiams = dataStructure.getDataAs<IDataArray>(pEquivalentDiametersArrayPathValue);
   {
     auto createArrayAction = std::make_unique<CreateArrayAction>(DataType::float32, equivDiams->getTupleShape(), std::vector<usize>{1}, saltykovPath);
@@ -109,7 +109,7 @@ Result<> FindSaltykovSizesFilter::executeImpl(DataStructure& dataStructure, cons
   FindSaltykovSizesInputValues inputValues;
 
   inputValues.EquivalentDiametersPath = filterArgs.value<DataPath>(k_EquivalentDiametersArrayPath_Key);
-  inputValues.SaltykovEquivalentDiametersPath = inputValues.EquivalentDiametersPath.getParent().createChildPath(filterArgs.value<std::string>(k_SaltykovEquivalentDiametersName_Key));
+  inputValues.SaltykovEquivalentDiametersPath = inputValues.EquivalentDiametersPath.replaceName(filterArgs.value<std::string>(k_SaltykovEquivalentDiametersName_Key));
   inputValues.Seed = seed;
 
   return FindSaltykovSizes(dataStructure, messageHandler, shouldCancel, &inputValues)();

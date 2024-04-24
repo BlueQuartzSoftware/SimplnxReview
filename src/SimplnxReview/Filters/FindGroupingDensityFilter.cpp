@@ -114,7 +114,7 @@ IFilter::PreflightResult FindGroupingDensityFilter::preflightImpl(const DataStru
     return MakePreflightErrorResult(-15670, fmt::format("Parent Volumes [{}] must be stored in an Attribute Matrix.", pParentVolumesPath.toString()));
   }
   {
-    DataPath groupingDataPath = pParentVolumesPath.getParent().createChildPath(pGroupingDensitiesName);
+    DataPath groupingDataPath = pParentVolumesPath.replaceName(pGroupingDensitiesName);
     auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::float32, pParentAM->getShape(), std::vector<usize>{1}, groupingDataPath);
     resultOutputActions.value().appendAction(std::move(createArrayAction));
   }
@@ -127,7 +127,7 @@ IFilter::PreflightResult FindGroupingDensityFilter::preflightImpl(const DataStru
 
   if(pFindCheckedFeatures)
   {
-    DataPath checkedFeaturesPath = pVolumesPath.getParent().createChildPath(pCheckedFeaturesName);
+    DataPath checkedFeaturesPath = pVolumesPath.replaceName(pCheckedFeaturesName);
     {
       auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::int32, pFeatureAM->getShape(), std::vector<usize>{1}, checkedFeaturesPath);
       resultOutputActions.value().appendAction(std::move(createArrayAction));
@@ -173,7 +173,7 @@ Result<> FindGroupingDensityFilter::executeImpl(DataStructure& dataStructure, co
   inputValues.ParentVolumesPath = filterArgs.value<DataPath>(k_ParentVolumesPath_Key);
   inputValues.ContiguousNLPath = filterArgs.value<DataPath>(k_ContiguousNLPath_Key);
   inputValues.VolumesPath = filterArgs.value<DataPath>(k_VolumesPath_Key);
-  inputValues.GroupingDensitiesPath = inputValues.ParentVolumesPath.getParent().createChildPath(filterArgs.value<std::string>(k_GroupingDensitiesName_Key));
+  inputValues.GroupingDensitiesPath = inputValues.ParentVolumesPath.replaceName(filterArgs.value<std::string>(k_GroupingDensitiesName_Key));
 
   inputValues.UseNonContiguousNeighbors = filterArgs.value<bool>(k_UseNonContiguousNeighbors_Key);
   if(inputValues.UseNonContiguousNeighbors)
@@ -188,7 +188,7 @@ Result<> FindGroupingDensityFilter::executeImpl(DataStructure& dataStructure, co
   inputValues.FindCheckedFeatures = filterArgs.value<bool>(k_FindCheckedFeatures_Key);
   if(inputValues.FindCheckedFeatures)
   {
-    inputValues.CheckedFeaturesPath = inputValues.VolumesPath.getParent().createChildPath(filterArgs.value<std::string>(k_CheckedFeaturesName_Key));
+    inputValues.CheckedFeaturesPath = inputValues.VolumesPath.replaceName(filterArgs.value<std::string>(k_CheckedFeaturesName_Key));
   }
   else
   {

@@ -137,7 +137,7 @@ IFilter::PreflightResult MergeColoniesFilter::preflightImpl(const DataStructure&
   // Create the CreateArray action and add it to the resultOutputActions object
   {
     std::vector<usize> tupDims = dataStructure.getDataAs<IArray>(pFeaturePhasesPathValue)->getTupleShape();
-    DataPath featureParentIdsPath = pFeaturePhasesPathValue.getParent().createChildPath(pFeatureParentIdsNameValue);
+    DataPath featureParentIdsPath = pFeaturePhasesPathValue.replaceName(pFeatureParentIdsNameValue);
     auto action = std::make_unique<CreateArrayAction>(DataType::int32, tupDims, std::vector<usize>{1}, featureParentIdsPath);
     resultOutputActions.value().appendAction(std::move(action));
   }
@@ -145,7 +145,7 @@ IFilter::PreflightResult MergeColoniesFilter::preflightImpl(const DataStructure&
   // Create the CreateArray action and add it to the resultOutputActions object
   {
     std::vector<usize> tupDims = dataStructure.getDataAs<IArray>(pFeatureIdsPathValue)->getTupleShape();
-    DataPath cellParentIdsPath = pFeatureIdsPathValue.getParent().createChildPath(pCellParentIdsNameValue);
+    DataPath cellParentIdsPath = pFeatureIdsPathValue.replaceName(pCellParentIdsNameValue);
     auto action = std::make_unique<CreateArrayAction>(DataType::int32, tupDims, std::vector<usize>{1}, cellParentIdsPath);
     resultOutputActions.value().appendAction(std::move(action));
   }
@@ -177,9 +177,9 @@ Result<> MergeColoniesFilter::executeImpl(DataStructure& dataStructure, const Ar
   inputValues.FeatureIdsPath = filterArgs.value<DataPath>(k_FeatureIdsArrayPath_Key);
   inputValues.CellPhasesPath = filterArgs.value<DataPath>(k_CellPhasesArrayPath_Key);
   inputValues.CrystalStructuresPath = filterArgs.value<DataPath>(k_CrystalStructuresArrayPath_Key);
-  inputValues.CellParentIdsPath = inputValues.FeatureIdsPath.getParent().createChildPath(filterArgs.value<std::string>(k_CellParentIdsArrayName_Key));
+  inputValues.CellParentIdsPath = inputValues.FeatureIdsPath.replaceName(filterArgs.value<std::string>(k_CellParentIdsArrayName_Key));
   inputValues.CellFeatureAMPath = filterArgs.value<DataPath>(k_NewCellFeatureAttributeMatrixName_Key);
-  inputValues.FeatureParentIdsPath = inputValues.FeaturePhasesPath.getParent().createChildPath(filterArgs.value<std::string>(k_FeatureParentIdsArrayName_Key));
+  inputValues.FeatureParentIdsPath = inputValues.FeaturePhasesPath.replaceName(filterArgs.value<std::string>(k_FeatureParentIdsArrayName_Key));
   inputValues.ActivePath = inputValues.CellFeatureAMPath.createChildPath(filterArgs.value<DataObjectNameParameter::ValueType>(k_ActiveArrayName_Key));
 
   inputValues.UseNonContiguousNeighbors = filterArgs.value<bool>(k_UseNonContiguousNeighbors_Key);

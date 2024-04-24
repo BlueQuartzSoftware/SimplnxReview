@@ -121,13 +121,12 @@ IFilter::PreflightResult GroupMicroTextureRegionsFilter::preflightImpl(const Dat
 
   {
     auto* featureIds = dataStructure.getDataAs<IDataArray>(pFeatureIdsPath);
-    auto createAction = std::make_unique<CreateArrayAction>(DataType::int32, featureIds->getTupleShape(), std::vector<usize>{1}, pFeatureIdsPath.getParent().createChildPath(pCellParentIdsName));
+    auto createAction = std::make_unique<CreateArrayAction>(DataType::int32, featureIds->getTupleShape(), std::vector<usize>{1}, pFeatureIdsPath.replaceName(pCellParentIdsName));
     resultOutputActions.value().appendAction(std::move(createAction));
   }
   {
     auto* featurePhases = dataStructure.getDataAs<IDataArray>(pFeaturePhasesPath);
-    auto createAction =
-        std::make_unique<CreateArrayAction>(DataType::int32, featurePhases->getTupleShape(), std::vector<usize>{1}, pFeaturePhasesPath.getParent().createChildPath(pFeatureParentIdsName));
+    auto createAction = std::make_unique<CreateArrayAction>(DataType::int32, featurePhases->getTupleShape(), std::vector<usize>{1}, pFeaturePhasesPath.replaceName(pFeatureParentIdsName));
     resultOutputActions.value().appendAction(std::move(createAction));
   }
 
@@ -178,8 +177,8 @@ Result<> GroupMicroTextureRegionsFilter::executeImpl(DataStructure& dataStructur
   inputValues.AvgQuatsArrayPath = filterArgs.value<DataPath>(k_AvgQuatsArrayPath_Key);
   inputValues.CrystalStructuresArrayPath = filterArgs.value<DataPath>(k_CrystalStructuresArrayPath_Key);
   inputValues.NewCellFeatureAttributeMatrixName = filterArgs.value<DataPath>(k_NewCellFeatureAttributeMatrixName_Key);
-  inputValues.CellParentIdsArrayName = inputValues.FeatureIdsArrayPath.getParent().createChildPath(filterArgs.value<std::string>(k_CellParentIdsArrayName_Key));
-  inputValues.FeatureParentIdsArrayName = inputValues.FeaturePhasesArrayPath.getParent().createChildPath(filterArgs.value<std::string>(k_FeatureParentIdsArrayName_Key));
+  inputValues.CellParentIdsArrayName = inputValues.FeatureIdsArrayPath.replaceName(filterArgs.value<std::string>(k_CellParentIdsArrayName_Key));
+  inputValues.FeatureParentIdsArrayName = inputValues.FeaturePhasesArrayPath.replaceName(filterArgs.value<std::string>(k_FeatureParentIdsArrayName_Key));
   inputValues.SeedValue = seed;
 
   return GroupMicroTextureRegions(dataStructure, messageHandler, shouldCancel, &inputValues)();
