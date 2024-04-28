@@ -133,7 +133,7 @@ IFilter::PreflightResult InterpolateValuesToUnstructuredGridFilter::preflightImp
 }
 
 //------------------------------------------------------------------------------
-Result<> InterpolateValuesToUnstructuredGridFilter::executeImpl(DataStructure& data, const Arguments& args, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
+Result<> InterpolateValuesToUnstructuredGridFilter::executeImpl(DataStructure& dataStructure, const Arguments& args, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
                                                                 const std::atomic_bool& shouldCancel) const
 {
   InterpolateValuesToUnstructuredGridInputValues inputValues;
@@ -145,6 +145,6 @@ Result<> InterpolateValuesToUnstructuredGridFilter::executeImpl(DataStructure& d
   inputValues.ExistingAttrMatrixPath = args.value<AttributeMatrixSelectionParameter::ValueType>(k_ExistingAttrMatrixPath_Key);
   inputValues.CreatedAttrMatrixName = args.value<DataObjectNameParameter::ValueType>(k_CreatedAttrMatrixName_Key);
 
-  return InterpolateValuesToUnstructuredGrid(data, messageHandler, shouldCancel, &inputValues)();
+  return InterpolateValuesToUnstructuredGrid(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }
 } // namespace nx::core

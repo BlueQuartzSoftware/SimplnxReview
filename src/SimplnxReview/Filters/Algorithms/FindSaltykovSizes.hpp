@@ -19,7 +19,7 @@ struct SIMPLNXREVIEW_EXPORT FindSaltykovSizesInputValues
 };
 
 /**
- * @class ConditionalSetValue
+ * @class FindSaltykovSizes
  * @brief This filter...
  */
 

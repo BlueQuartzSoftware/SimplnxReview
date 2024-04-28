@@ -21,9 +21,8 @@ struct SIMPLNXREVIEW_EXPORT FindMicroTextureRegionsInputValues
 };
 
 /**
- * @class ConditionalSetValue
- * @brief This filter replaces values in the target array with a user specified value
- * where a bool mask array specifies.
+ * @class FindMicroTextureRegions
+
  */
 
 class SIMPLNXREVIEW_EXPORT FindMicroTextureRegions
