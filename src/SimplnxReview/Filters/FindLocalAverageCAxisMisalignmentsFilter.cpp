@@ -61,11 +61,11 @@ Parameters FindLocalAverageCAxisMisalignmentsFilter::parameters() const
   Parameters params;
 
   // Create the parameter descriptors that are needed for this filter
-  params.insertSeparator(Parameters::Separator{"Required Selections"});
+  params.insertSeparator(Parameters::Separator{"Input Parameter(s)"});
   params.insertLinkableParameter(std::make_unique<BoolParameter>(k_CalcUnbiasedAvg_Key, "Calculate Unbiased Local C-Axis Misalignments", "", false));
   params.insertLinkableParameter(std::make_unique<BoolParameter>(k_CalcBiasedAvg_Key, "Calculate Local C-Axis Misalignments", "", false));
 
-  params.insertSeparator(Parameters::Separator{"Required Input Feature Data"});
+  params.insertSeparator(Parameters::Separator{"Input Feature Data"});
   params.insert(std::make_unique<ArraySelectionParameter>(k_FeatureParentIdsPath_Key, "Feature Parent Ids", "", DataPath{}, ArraySelectionParameter::AllowedTypes{DataType::int32},
                                                           ArraySelectionParameter::AllowedComponentShapes{{1}}));
   params.insert(std::make_unique<NeighborListSelectionParameter>(k_NeighborListPath_Key, "Neighbor List", "", DataPath{}, NeighborListSelectionParameter::AllowedTypes{DataType::int32}));
@@ -74,7 +74,7 @@ Parameters FindLocalAverageCAxisMisalignmentsFilter::parameters() const
   params.insert(std::make_unique<ArraySelectionParameter>(k_AvgCAxisMisalignmentsPath_Key, "Average C-Axis Misalignments", "", DataPath{}, ArraySelectionParameter::AllowedTypes{DataType::int32},
                                                           ArraySelectionParameter::AllowedComponentShapes{{1}}));
 
-  params.insertSeparator(Parameters::Separator{"Created Output Data"});
+  params.insertSeparator(Parameters::Separator{"Output Feature Data"});
   params.insert(std::make_unique<DataGroupSelectionParameter>(k_NewCellFeatureAttributeMatrixPath_Key, "New Cell Feature Attribute Matrix Name", "", DataPath{},
                                                               DataGroupSelectionParameter::AllowedTypes{BaseGroup::GroupType::AttributeMatrix}));
   params.insert(std::make_unique<DataObjectNameParameter>(k_NumFeaturesPerParentName_Key, "Number of Features Per Parent Array Name", "", "NumFeaturesPerParent"));

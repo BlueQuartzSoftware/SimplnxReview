@@ -57,7 +57,7 @@ Parameters FindGroupingDensityFilter::parameters() const
 {
   Parameters params;
   // Create the parameter descriptors that are needed for this filter
-  params.insertSeparator(Parameters::Separator{"Required Feature Data"});
+  params.insertSeparator(Parameters::Separator{"Input Feature Data"});
 
   params.insert(std::make_unique<ArraySelectionParameter>(k_VolumesPath_Key, "Volumes", "", DataPath{}, ArraySelectionParameter::AllowedTypes{DataType::float32},
                                                           ArraySelectionParameter::AllowedComponentShapes{{1}}));
@@ -68,11 +68,11 @@ Parameters FindGroupingDensityFilter::parameters() const
   params.insert(std::make_unique<ArraySelectionParameter>(k_ParentIdsPath_Key, "Parent Ids", "", DataPath{}, ArraySelectionParameter::AllowedTypes{DataType::int32},
                                                           ArraySelectionParameter::AllowedComponentShapes{{1}}));
 
-  params.insertSeparator(Parameters::Separator{"Required Parent Data"});
+  params.insertSeparator(Parameters::Separator{"Input Parent Data"});
   params.insert(std::make_unique<ArraySelectionParameter>(k_ParentVolumesPath_Key, "Parent Volumes", "", DataPath{}, ArraySelectionParameter::AllowedTypes{DataType::float32},
                                                           ArraySelectionParameter::AllowedComponentShapes{{1}}));
 
-  params.insertSeparator(Parameters::Separator{"Created Cell Feature Data"});
+  params.insertSeparator(Parameters::Separator{"Output Feature Data"});
   params.insertLinkableParameter(std::make_unique<BoolParameter>(k_FindCheckedFeatures_Key, "Find Checked Features", "", false));
   params.insert(std::make_unique<DataObjectNameParameter>(k_CheckedFeaturesName_Key, "Checked Features Name", "", "Checked Features"));
   params.insert(std::make_unique<DataObjectNameParameter>(k_GroupingDensitiesName_Key, "Grouping Densities Name", "", "Grouping Densities"));
