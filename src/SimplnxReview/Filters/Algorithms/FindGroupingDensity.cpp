@@ -18,9 +18,10 @@ template <class FindDensitySpecializations = FindDensitySpecializations<true, tr
 class FindDensityGrouping
 {
 public:
-  FindDensityGrouping(const std::atomic_bool& shouldCancel, const Int32Array& parentIds, const Float32Array& parentVolumes, const Float32Array& volumes, const Int32NeighborList& contiguousNL,
-                      Float32Array& groupingDensities, Int32NeighborList& nonContiguousNL, Int32Array& checkedFeatures)
+  FindDensityGrouping(const std::atomic_bool& shouldCancel, const IFilter::MessageHandler& mesgHandler, const Int32Array& parentIds, const Float32Array& parentVolumes, const Float32Array& volumes,
+                      const Int32NeighborList& contiguousNL, Float32Array& groupingDensities, Int32NeighborList& nonContiguousNL, Int32Array& checkedFeatures)
   : m_ShouldCancel(shouldCancel)
+  , m_MessageHandler(mesgHandler)
   , m_ParentIds(parentIds)
   , m_ParentVolumes(parentVolumes)
   , m_Volumes(volumes)
@@ -39,8 +40,15 @@ public:
 
   Result<> operator()()
   {
-    usize numFeatures = m_Volumes.getNumberOfTuples();
-    usize numParents = m_ParentVolumes.getNumberOfTuples();
+    const auto& parentIds = m_ParentIds.getDataStoreRef();
+    const auto& parentVolumes = m_ParentVolumes.getDataStoreRef();
+    const auto& volumes = m_Volumes.getDataStoreRef();
+
+    auto& checkedFeatures = m_CheckedFeatures.getDataStoreRef();
+    auto& groupingDensities = m_GroupingDensities.getDataStoreRef();
+
+    usize numFeatures = volumes.getNumberOfTuples();
+    usize numParents = parentVolumes.getNumberOfTuples();
 
     int kMax = 1;
     if constexpr(FindDensitySpecializations::UsingNonContiguousNeighbors)
@@ -50,7 +58,7 @@ public:
 
     int32 numNeighbors, numNeighborhoods, numCurNeighborList, neigh;
     float32 totalCheckVolume, curParentVolume;
-    std::vector<int32> totalCheckList = {};
+    std::set<int32> totalCheckList = {};
 
     std::vector<float32> checkedFeatureVolumes(1, 0.0f);
     if constexpr(FindDensitySpecializations::FindingCheckedFeatures)
@@ -58,27 +66,49 @@ public:
       // Default value-initialized to zeroes: https://en.cppreference.com/w/cpp/named_req/DefaultInsertable
       checkedFeatureVolumes.resize(numFeatures);
     }
+    int32_t progInt = 0;
+    usize prevParentId = 1;
+    usize currentParentId = 1;
+    auto start = std::chrono::steady_clock::now();
 
-    for(usize i = 1; i < numParents; i++)
+    for(usize parentIdx = 1; parentIdx < numParents; parentIdx++)
     {
+      progInt = static_cast<float>(parentIdx) / static_cast<float>(numParents) * 100.0f;
+      auto now = std::chrono::steady_clock::now();
+      // Only send updates every 1 second
+      if(std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() > 1000)
+      {
+        currentParentId = parentIdx;
+        auto totalParentIds = currentParentId - prevParentId;
+        auto rate = static_cast<float>(totalParentIds) / static_cast<float>(std::chrono::duration_cast<std::chrono::seconds>(now - start).count());
+
+        auto remainingParents = numParents - parentIdx;
+        auto minutesRemain = (remainingParents / rate) / 60; // Convert to minutes
+
+        std::string message = fmt::format("{}/{} [{}%] at {} parents/sec. Time Remain: {:.2f} Minutes", parentIdx, numParents, progInt, rate, minutesRemain);
+        m_MessageHandler(nx::core::IFilter::ProgressMessage{nx::core::IFilter::Message::Type::Info, message, progInt});
+        start = std::chrono::steady_clock::now();
+        prevParentId = currentParentId;
+      }
       if(m_ShouldCancel)
       {
         return {};
       }
       for(usize j = 1; j < numFeatures; j++)
       {
-        if(m_ParentIds[j] == i)
+        if(parentIds[j] == parentIdx)
         {
-          if(std::find(totalCheckList.begin(), totalCheckList.end(), j) == totalCheckList.end())
+          if(totalCheckList.find(j) == totalCheckList.end())
+          // if(std::find(totalCheckList.begin(), totalCheckList.end(), j) == totalCheckList.end())
           {
             totalCheckVolume += m_Volumes[j];
-            totalCheckList.push_back(static_cast<int32>(j));
+            totalCheckList.insert(static_cast<int32>(j));
             if constexpr(FindDensitySpecializations::FindingCheckedFeatures)
             {
-              if(m_ParentVolumes[i] > checkedFeatureVolumes[j])
+              if(parentVolumes[parentIdx] > checkedFeatureVolumes[j])
               {
-                checkedFeatureVolumes[j] = m_ParentVolumes[i];
-                m_CheckedFeatures[j] = static_cast<int32>(i);
+                checkedFeatureVolumes[j] = parentVolumes[parentIdx];
+                checkedFeatures[j] = static_cast<int32>(parentIdx);
               }
             }
           }
@@ -110,16 +140,17 @@ public:
               {
                 neigh = m_NonContiguousNL[j][l];
               }
-              if(std::find(totalCheckList.begin(), totalCheckList.end(), neigh) == totalCheckList.end())
+              if(totalCheckList.find(neigh) == totalCheckList.end())
+              // if(std::find(totalCheckList.begin(), totalCheckList.end(), neigh) == totalCheckList.end())
               {
                 totalCheckVolume += m_Volumes[neigh];
-                totalCheckList.push_back(neigh);
+                totalCheckList.insert(neigh);
                 if constexpr(FindDensitySpecializations::FindingCheckedFeatures)
                 {
-                  if(m_ParentVolumes[i] > checkedFeatureVolumes[neigh])
+                  if(parentVolumes[parentIdx] > checkedFeatureVolumes[neigh])
                   {
-                    checkedFeatureVolumes[neigh] = m_ParentVolumes[i];
-                    m_CheckedFeatures[neigh] = static_cast<int32>(i);
+                    checkedFeatureVolumes[neigh] = parentVolumes[parentIdx];
+                    checkedFeatures[neigh] = static_cast<int32>(parentIdx);
                   }
                 }
               }
@@ -127,16 +158,16 @@ public:
           }
         }
       }
-      curParentVolume = m_ParentVolumes[i];
+      curParentVolume = parentVolumes[parentIdx];
       if(totalCheckVolume == 0.0f)
       {
-        m_GroupingDensities[i] = -1.0f;
+        groupingDensities[parentIdx] = -1.0f;
       }
       else
       {
-        m_GroupingDensities[i] = (curParentVolume / totalCheckVolume);
+        groupingDensities[parentIdx] = (curParentVolume / totalCheckVolume);
       }
-      totalCheckList.resize(0);
+      totalCheckList.clear();
       totalCheckVolume = 0.0f;
     }
 
@@ -145,6 +176,7 @@ public:
 
 private:
   const std::atomic_bool& m_ShouldCancel;
+  const IFilter::MessageHandler& m_MessageHandler;
   const Int32Array& m_ParentIds;
   const Float32Array& m_ParentVolumes;
   const Float32Array& m_Volumes;
@@ -187,16 +219,20 @@ Result<> FindGroupingDensity::operator()()
   {
     if(m_InputValues->FindCheckedFeatures)
     {
-      return ::FindDensityGrouping<FindDensitySpecializations<true, true>>(getCancel(), parentIds, parentVolumes, volumes, contiguousNL, groupingDensities, nonContiguousNL, checkedFeatures)();
+      return ::FindDensityGrouping<FindDensitySpecializations<true, true>>(getCancel(), m_MessageHandler, parentIds, parentVolumes, volumes, contiguousNL, groupingDensities, nonContiguousNL,
+                                                                           checkedFeatures)();
     }
-    return ::FindDensityGrouping<FindDensitySpecializations<true, false>>(getCancel(), parentIds, parentVolumes, volumes, contiguousNL, groupingDensities, nonContiguousNL, checkedFeatures)();
+    return ::FindDensityGrouping<FindDensitySpecializations<true, false>>(getCancel(), m_MessageHandler, parentIds, parentVolumes, volumes, contiguousNL, groupingDensities, nonContiguousNL,
+                                                                          checkedFeatures)();
   }
   else if(m_InputValues->FindCheckedFeatures)
   {
-    return ::FindDensityGrouping<FindDensitySpecializations<false, true>>(getCancel(), parentIds, parentVolumes, volumes, contiguousNL, groupingDensities, nonContiguousNL, checkedFeatures)();
+    return ::FindDensityGrouping<FindDensitySpecializations<false, true>>(getCancel(), m_MessageHandler, parentIds, parentVolumes, volumes, contiguousNL, groupingDensities, nonContiguousNL,
+                                                                          checkedFeatures)();
   }
   else
   {
-    return ::FindDensityGrouping<FindDensitySpecializations<false, false>>(getCancel(), parentIds, parentVolumes, volumes, contiguousNL, groupingDensities, nonContiguousNL, checkedFeatures)();
+    return ::FindDensityGrouping<FindDensitySpecializations<false, false>>(getCancel(), m_MessageHandler, parentIds, parentVolumes, volumes, contiguousNL, groupingDensities, nonContiguousNL,
+                                                                           checkedFeatures)();
   }
 }
