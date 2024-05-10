@@ -11,7 +11,7 @@
 namespace nx::core
 {
 
-struct SIMPLNXREVIEW_EXPORT FindMicroTextureRegionsInputValues
+struct SIMPLNXREVIEW_EXPORT ComputeMicroTextureRegionsInputValues
 {
   DataPath ImageGeomPath;
   DataPath FeatureIdsArrayPath;
@@ -21,20 +21,20 @@ struct SIMPLNXREVIEW_EXPORT FindMicroTextureRegionsInputValues
 };
 
 /**
- * @class FindMicroTextureRegions
+ * @class ComputeMicroTextureRegions
 
  */
 
-class SIMPLNXREVIEW_EXPORT FindMicroTextureRegions
+class SIMPLNXREVIEW_EXPORT ComputeMicroTextureRegions
 {
 public:
-  FindMicroTextureRegions(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel, FindMicroTextureRegionsInputValues* inputValues);
-  ~FindMicroTextureRegions() noexcept;
+  ComputeMicroTextureRegions(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel, ComputeMicroTextureRegionsInputValues* inputValues);
+  ~ComputeMicroTextureRegions() noexcept;
 
-  FindMicroTextureRegions(const FindMicroTextureRegions&) = delete;
-  FindMicroTextureRegions(FindMicroTextureRegions&&) noexcept = delete;
-  FindMicroTextureRegions& operator=(const FindMicroTextureRegions&) = delete;
-  FindMicroTextureRegions& operator=(FindMicroTextureRegions&&) noexcept = delete;
+  ComputeMicroTextureRegions(const ComputeMicroTextureRegions&) = delete;
+  ComputeMicroTextureRegions(ComputeMicroTextureRegions&&) noexcept = delete;
+  ComputeMicroTextureRegions& operator=(const ComputeMicroTextureRegions&) = delete;
+  ComputeMicroTextureRegions& operator=(ComputeMicroTextureRegions&&) noexcept = delete;
 
   Result<> operator()();
 
@@ -42,7 +42,7 @@ public:
 
 private:
   DataStructure& m_DataStructure;
-  const FindMicroTextureRegionsInputValues* m_InputValues = nullptr;
+  const ComputeMicroTextureRegionsInputValues* m_InputValues = nullptr;
   const std::atomic_bool& m_ShouldCancel;
   const IFilter::MessageHandler& m_MessageHandler;
 };

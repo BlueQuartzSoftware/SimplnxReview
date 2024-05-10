@@ -9,7 +9,7 @@
 namespace nx::core
 {
 
-struct SIMPLNXREVIEW_EXPORT FindGroupingDensityInputValues
+struct SIMPLNXREVIEW_EXPORT ComputeGroupingDensityInputValues
 {
   DataPath VolumesPath;
   DataPath ContiguousNLPath;
@@ -23,20 +23,20 @@ struct SIMPLNXREVIEW_EXPORT FindGroupingDensityInputValues
 };
 
 /**
- * @class FindGroupingDensity
+ * @class ComputeGroupingDensity
  * @brief This filter determines the average C-axis location of each Feature.
  */
 
-class SIMPLNXREVIEW_EXPORT FindGroupingDensity
+class SIMPLNXREVIEW_EXPORT ComputeGroupingDensity
 {
 public:
-  FindGroupingDensity(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel, FindGroupingDensityInputValues* inputValues);
-  ~FindGroupingDensity() noexcept = default;
+  ComputeGroupingDensity(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel, ComputeGroupingDensityInputValues* inputValues);
+  ~ComputeGroupingDensity() noexcept = default;
 
-  FindGroupingDensity(const FindGroupingDensity&) = delete;
-  FindGroupingDensity(FindGroupingDensity&&) noexcept = delete;
-  FindGroupingDensity& operator=(const FindGroupingDensity&) = delete;
-  FindGroupingDensity& operator=(FindGroupingDensity&&) noexcept = delete;
+  ComputeGroupingDensity(const ComputeGroupingDensity&) = delete;
+  ComputeGroupingDensity(ComputeGroupingDensity&&) noexcept = delete;
+  ComputeGroupingDensity& operator=(const ComputeGroupingDensity&) = delete;
+  ComputeGroupingDensity& operator=(ComputeGroupingDensity&&) noexcept = delete;
 
   Result<> operator()();
 
@@ -44,7 +44,7 @@ public:
 
 private:
   DataStructure& m_DataStructure;
-  const FindGroupingDensityInputValues* m_InputValues = nullptr;
+  const ComputeGroupingDensityInputValues* m_InputValues = nullptr;
   const std::atomic_bool& m_ShouldCancel;
   const IFilter::MessageHandler& m_MessageHandler;
 };

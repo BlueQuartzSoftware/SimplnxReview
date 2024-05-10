@@ -66,9 +66,9 @@ Parameters InterpolateValuesToUnstructuredGridFilter::parameters() const
   params.insertSeparator(Parameters::Separator{"Output Data Object(s)"});
   params.insertLinkableParameter(
       std::make_unique<BoolParameter>(k_UseExistingAttrMatrix_Key, "Use Existing Attribute Matrix", "Use an existing attribute matrix to store the interpolated arrays.", false));
-  params.insert(
-      std::make_unique<AttributeMatrixSelectionParameter>(k_ExistingAttrMatrixPath_Key, "Vertex Attribute Matrix", "Vertex attribute matrix to store the interpolated data", DataPath({"VertexData"})));
-  params.insert(std::make_unique<DataObjectNameParameter>(k_CreatedAttrMatrixName_Key, "Created Vertex Attribute Matrix", "DataPath to created AttributeMatrix for interpolated data", "VertexData"));
+  params.insert(std::make_unique<AttributeMatrixSelectionParameter>(k_ExistingAttrMatrixPath_Key, "Vertex Attribute Matrix", "Vertex attribute matrix to store the interpolated data",
+                                                                    DataPath({"Vertex Data"})));
+  params.insert(std::make_unique<DataObjectNameParameter>(k_CreatedAttrMatrixName_Key, "Created Vertex Attribute Matrix", "DataPath to created AttributeMatrix for interpolated data", "Vertex Data"));
 
   params.linkParameters(k_UseExistingAttrMatrix_Key, k_CreatedAttrMatrixName_Key, false);
   params.linkParameters(k_UseExistingAttrMatrix_Key, k_ExistingAttrMatrixPath_Key, true);

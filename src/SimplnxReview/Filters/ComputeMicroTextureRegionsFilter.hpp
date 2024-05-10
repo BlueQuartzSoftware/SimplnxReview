@@ -8,20 +8,20 @@
 namespace nx::core
 {
 /**
- * @class FindMicroTextureRegionsFilter
+ * @class ComputeMicroTextureRegionsFilter
  * @brief This filter will ....
  */
-class SIMPLNXREVIEW_EXPORT FindMicroTextureRegionsFilter : public IFilter
+class SIMPLNXREVIEW_EXPORT ComputeMicroTextureRegionsFilter : public IFilter
 {
 public:
-  FindMicroTextureRegionsFilter() = default;
-  ~FindMicroTextureRegionsFilter() noexcept override = default;
+  ComputeMicroTextureRegionsFilter() = default;
+  ~ComputeMicroTextureRegionsFilter() noexcept override = default;
 
-  FindMicroTextureRegionsFilter(const FindMicroTextureRegionsFilter&) = delete;
-  FindMicroTextureRegionsFilter(FindMicroTextureRegionsFilter&&) noexcept = delete;
+  ComputeMicroTextureRegionsFilter(const ComputeMicroTextureRegionsFilter&) = delete;
+  ComputeMicroTextureRegionsFilter(ComputeMicroTextureRegionsFilter&&) noexcept = delete;
 
-  FindMicroTextureRegionsFilter& operator=(const FindMicroTextureRegionsFilter&) = delete;
-  FindMicroTextureRegionsFilter& operator=(FindMicroTextureRegionsFilter&&) noexcept = delete;
+  ComputeMicroTextureRegionsFilter& operator=(const ComputeMicroTextureRegionsFilter&) = delete;
+  ComputeMicroTextureRegionsFilter& operator=(ComputeMicroTextureRegionsFilter&&) noexcept = delete;
 
   // Parameter Keys
   static inline constexpr StringLiteral k_ImageGeomPath_Key = "image_geom_path";
@@ -97,5 +97,5 @@ protected:
 };
 } // namespace nx::core
 
-SIMPLNX_DEF_FILTER_TRAITS(nx::core, FindMicroTextureRegionsFilter, "be3477f0-f3f0-4790-864a-0658ac7568ba");
+SIMPLNX_DEF_FILTER_TRAITS(nx::core, ComputeMicroTextureRegionsFilter, "be3477f0-f3f0-4790-864a-0658ac7568ba");
 /* LEGACY UUID FOR THIS FILTER 90f8e3b1-2460-5862-95a1-a9e06f5ee75e */

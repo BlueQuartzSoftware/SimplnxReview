@@ -1,6 +1,6 @@
-#include "FindLocalAverageCAxisMisalignmentsFilter.hpp"
+#include "ComputeLocalAverageCAxisMisalignmentsFilter.hpp"
 
-#include "SimplnxReview/Filters/Algorithms/FindLocalAverageCAxisMisalignments.hpp"
+#include "SimplnxReview/Filters/Algorithms/ComputeLocalAverageCAxisMisalignments.hpp"
 
 #include "simplnx/DataStructure/AttributeMatrix.hpp"
 #include "simplnx/DataStructure/DataPath.hpp"
@@ -26,37 +26,37 @@ const DataPath k_UnbiasedLocalCAxisMisalignmentsPath = DataPath({"UnbiasedLocalC
 namespace nx::core
 {
 //------------------------------------------------------------------------------
-std::string FindLocalAverageCAxisMisalignmentsFilter::name() const
+std::string ComputeLocalAverageCAxisMisalignmentsFilter::name() const
 {
-  return FilterTraits<FindLocalAverageCAxisMisalignmentsFilter>::name.str();
+  return FilterTraits<ComputeLocalAverageCAxisMisalignmentsFilter>::name.str();
 }
 
 //------------------------------------------------------------------------------
-std::string FindLocalAverageCAxisMisalignmentsFilter::className() const
+std::string ComputeLocalAverageCAxisMisalignmentsFilter::className() const
 {
-  return FilterTraits<FindLocalAverageCAxisMisalignmentsFilter>::className;
+  return FilterTraits<ComputeLocalAverageCAxisMisalignmentsFilter>::className;
 }
 
 //------------------------------------------------------------------------------
-Uuid FindLocalAverageCAxisMisalignmentsFilter::uuid() const
+Uuid ComputeLocalAverageCAxisMisalignmentsFilter::uuid() const
 {
-  return FilterTraits<FindLocalAverageCAxisMisalignmentsFilter>::uuid;
+  return FilterTraits<ComputeLocalAverageCAxisMisalignmentsFilter>::uuid;
 }
 
 //------------------------------------------------------------------------------
-std::string FindLocalAverageCAxisMisalignmentsFilter::humanName() const
+std::string ComputeLocalAverageCAxisMisalignmentsFilter::humanName() const
 {
-  return "Find Local Average C-Axis Misalignments";
+  return "Compute Local Average C-Axis Misalignments";
 }
 
 //------------------------------------------------------------------------------
-std::vector<std::string> FindLocalAverageCAxisMisalignmentsFilter::defaultTags() const
+std::vector<std::string> ComputeLocalAverageCAxisMisalignmentsFilter::defaultTags() const
 {
   return {className(), "Statistics", "Crystallography"};
 }
 
 //------------------------------------------------------------------------------
-Parameters FindLocalAverageCAxisMisalignmentsFilter::parameters() const
+Parameters ComputeLocalAverageCAxisMisalignmentsFilter::parameters() const
 {
   Parameters params;
 
@@ -93,14 +93,14 @@ Parameters FindLocalAverageCAxisMisalignmentsFilter::parameters() const
 }
 
 //------------------------------------------------------------------------------
-IFilter::UniquePointer FindLocalAverageCAxisMisalignmentsFilter::clone() const
+IFilter::UniquePointer ComputeLocalAverageCAxisMisalignmentsFilter::clone() const
 {
-  return std::make_unique<FindLocalAverageCAxisMisalignmentsFilter>();
+  return std::make_unique<ComputeLocalAverageCAxisMisalignmentsFilter>();
 }
 
 //------------------------------------------------------------------------------
-IFilter::PreflightResult FindLocalAverageCAxisMisalignmentsFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
-                                                                                 const std::atomic_bool& shouldCancel) const
+IFilter::PreflightResult ComputeLocalAverageCAxisMisalignmentsFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
+                                                                                    const std::atomic_bool& shouldCancel) const
 {
   auto pCalcBiasedAvgValue = filterArgs.value<bool>(k_CalcBiasedAvg_Key);
   auto pCalcUnbiasedAvgValue = filterArgs.value<bool>(k_CalcUnbiasedAvg_Key);
@@ -202,10 +202,10 @@ IFilter::PreflightResult FindLocalAverageCAxisMisalignmentsFilter::preflightImpl
 }
 
 //------------------------------------------------------------------------------
-Result<> FindLocalAverageCAxisMisalignmentsFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
-                                                               const std::atomic_bool& shouldCancel) const
+Result<> ComputeLocalAverageCAxisMisalignmentsFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
+                                                                  const std::atomic_bool& shouldCancel) const
 {
-  FindLocalAverageCAxisMisalignmentsInputValues inputValues;
+  ComputeLocalAverageCAxisMisalignmentsInputValues inputValues;
 
   auto parentAM = filterArgs.value<DataPath>(k_NewCellFeatureAttributeMatrixPath_Key);
   inputValues.NumFeaturesPerParentPath = parentAM.createChildPath(filterArgs.value<StringParameter::ValueType>(k_NumFeaturesPerParentName_Key));
@@ -237,6 +237,6 @@ Result<> FindLocalAverageCAxisMisalignmentsFilter::executeImpl(DataStructure& da
     inputValues.UnbiasedLocalCAxisMisalignmentsPath = k_UnbiasedLocalCAxisMisalignmentsPath;
   }
 
-  return FindLocalAverageCAxisMisalignments(dataStructure, messageHandler, shouldCancel, &inputValues)();
+  return ComputeLocalAverageCAxisMisalignments(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }
 } // namespace nx::core

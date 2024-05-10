@@ -1,4 +1,4 @@
-#include "FindGroupingDensity.hpp"
+#include "ComputeGroupingDensity.hpp"
 
 #include "simplnx/DataStructure/DataArray.hpp"
 #include "simplnx/DataStructure/NeighborList.hpp"
@@ -188,7 +188,8 @@ private:
 } // namespace
 
 // -----------------------------------------------------------------------------
-FindGroupingDensity::FindGroupingDensity(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel, FindGroupingDensityInputValues* inputValues)
+ComputeGroupingDensity::ComputeGroupingDensity(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel,
+                                               ComputeGroupingDensityInputValues* inputValues)
 : m_DataStructure(dataStructure)
 , m_InputValues(inputValues)
 , m_ShouldCancel(shouldCancel)
@@ -197,13 +198,13 @@ FindGroupingDensity::FindGroupingDensity(DataStructure& dataStructure, const IFi
 }
 
 // -----------------------------------------------------------------------------
-const std::atomic_bool& FindGroupingDensity::getCancel()
+const std::atomic_bool& ComputeGroupingDensity::getCancel()
 {
   return m_ShouldCancel;
 }
 
 // -----------------------------------------------------------------------------
-Result<> FindGroupingDensity::operator()()
+Result<> ComputeGroupingDensity::operator()()
 {
   auto& parentIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->ParentIdsPath);
   auto& parentVolumes = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->ParentVolumesPath);

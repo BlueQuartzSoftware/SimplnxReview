@@ -7,8 +7,8 @@
 # Define the list of unit test source files
 set(${PLUGIN_NAME}UnitTest_SRCS
     MergeColoniesTest.cpp
-    FindLocalAverageCAxisMisalignmentsTest.cpp
-    FindMicroTextureRegionsTest.cpp
+    ComputeLocalAverageCAxisMisalignmentsTest.cpp
+    ComputeMicroTextureRegionsTest.cpp
 )
 set(DISABLED_TESTS
 

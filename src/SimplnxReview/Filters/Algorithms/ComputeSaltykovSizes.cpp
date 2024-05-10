@@ -1,4 +1,4 @@
-#include "FindSaltykovSizes.hpp"
+#include "ComputeSaltykovSizes.hpp"
 
 #include "simplnx/DataStructure/DataArray.hpp"
 #include "simplnx/DataStructure/DataGroup.hpp"
@@ -37,7 +37,7 @@ int32 ForwardDifference(int32 fx, int32 f1, int32 f0, int32 x1, int32 x0)
 } // namespace
 
 // -----------------------------------------------------------------------------
-FindSaltykovSizes::FindSaltykovSizes(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel, FindSaltykovSizesInputValues* inputValues)
+ComputeSaltykovSizes::ComputeSaltykovSizes(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel, ComputeSaltykovSizesInputValues* inputValues)
 : m_DataStructure(dataStructure)
 , m_InputValues(inputValues)
 , m_ShouldCancel(shouldCancel)
@@ -46,16 +46,16 @@ FindSaltykovSizes::FindSaltykovSizes(DataStructure& dataStructure, const IFilter
 }
 
 // -----------------------------------------------------------------------------
-FindSaltykovSizes::~FindSaltykovSizes() noexcept = default;
+ComputeSaltykovSizes::~ComputeSaltykovSizes() noexcept = default;
 
 // -----------------------------------------------------------------------------
-const std::atomic_bool& FindSaltykovSizes::getCancel()
+const std::atomic_bool& ComputeSaltykovSizes::getCancel()
 {
   return m_ShouldCancel;
 }
 
 // -----------------------------------------------------------------------------
-Result<> FindSaltykovSizes::operator()()
+Result<> ComputeSaltykovSizes::operator()()
 {
   std::mt19937_64 gen(m_InputValues->Seed);
   std::uniform_int_distribution<int32> dist(std::numeric_limits<int32>::min(), std::numeric_limits<int32>::max());

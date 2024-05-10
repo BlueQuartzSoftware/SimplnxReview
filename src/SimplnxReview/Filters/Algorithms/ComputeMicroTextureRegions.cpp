@@ -1,4 +1,4 @@
-#include "FindMicroTextureRegions.hpp"
+#include "ComputeMicroTextureRegions.hpp"
 
 #include "simplnx/DataStructure/DataArray.hpp"
 #include "simplnx/DataStructure/Geometry/ImageGeom.hpp"
@@ -8,8 +8,8 @@
 using namespace nx::core;
 
 // -----------------------------------------------------------------------------
-FindMicroTextureRegions::FindMicroTextureRegions(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel,
-                                                 FindMicroTextureRegionsInputValues* inputValues)
+ComputeMicroTextureRegions::ComputeMicroTextureRegions(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel,
+                                                       ComputeMicroTextureRegionsInputValues* inputValues)
 : m_DataStructure(dataStructure)
 , m_InputValues(inputValues)
 , m_ShouldCancel(shouldCancel)
@@ -18,16 +18,16 @@ FindMicroTextureRegions::FindMicroTextureRegions(DataStructure& dataStructure, c
 }
 
 // -----------------------------------------------------------------------------
-FindMicroTextureRegions::~FindMicroTextureRegions() noexcept = default;
+ComputeMicroTextureRegions::~ComputeMicroTextureRegions() noexcept = default;
 
 // -----------------------------------------------------------------------------
-const std::atomic_bool& FindMicroTextureRegions::getCancel()
+const std::atomic_bool& ComputeMicroTextureRegions::getCancel()
 {
   return m_ShouldCancel;
 }
 
 // -----------------------------------------------------------------------------
-Result<> FindMicroTextureRegions::operator()()
+Result<> ComputeMicroTextureRegions::operator()()
 {
   auto& imageGeom = m_DataStructure.getDataRefAs<ImageGeom>(m_InputValues->ImageGeomPath);
   auto& featureIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeatureIdsArrayPath);

@@ -8,26 +8,32 @@
 namespace nx::core
 {
 /**
- * @class FindSaltykovSizesFilter
- * @brief This filter will...
+ * @class ComputeLocalAverageCAxisMisalignmentsFilter
+ * @brief This filter will ....
  */
-class SIMPLNXREVIEW_EXPORT FindSaltykovSizesFilter : public IFilter
+class SIMPLNXREVIEW_EXPORT ComputeLocalAverageCAxisMisalignmentsFilter : public IFilter
 {
 public:
-  FindSaltykovSizesFilter() = default;
-  ~FindSaltykovSizesFilter() noexcept override = default;
+  ComputeLocalAverageCAxisMisalignmentsFilter() = default;
+  ~ComputeLocalAverageCAxisMisalignmentsFilter() noexcept override = default;
 
-  FindSaltykovSizesFilter(const FindSaltykovSizesFilter&) = delete;
-  FindSaltykovSizesFilter(FindSaltykovSizesFilter&&) noexcept = delete;
+  ComputeLocalAverageCAxisMisalignmentsFilter(const ComputeLocalAverageCAxisMisalignmentsFilter&) = delete;
+  ComputeLocalAverageCAxisMisalignmentsFilter(ComputeLocalAverageCAxisMisalignmentsFilter&&) noexcept = delete;
 
-  FindSaltykovSizesFilter& operator=(const FindSaltykovSizesFilter&) = delete;
-  FindSaltykovSizesFilter& operator=(FindSaltykovSizesFilter&&) noexcept = delete;
+  ComputeLocalAverageCAxisMisalignmentsFilter& operator=(const ComputeLocalAverageCAxisMisalignmentsFilter&) = delete;
+  ComputeLocalAverageCAxisMisalignmentsFilter& operator=(ComputeLocalAverageCAxisMisalignmentsFilter&&) noexcept = delete;
 
   // Parameter Keys
-  static inline constexpr StringLiteral k_UseSeed_Key = "use_seed";
-  static inline constexpr StringLiteral k_SeedValue_Key = "seed_value";
-  static inline constexpr StringLiteral k_EquivalentDiametersArrayPath_Key = "equivalent_diameters_array_path";
-  static inline constexpr StringLiteral k_SaltykovEquivalentDiametersName_Key = "saltykov_equivalent_diameters_name";
+  static inline constexpr StringLiteral k_CalcBiasedAvg_Key = "calc_biased_avg";
+  static inline constexpr StringLiteral k_CalcUnbiasedAvg_Key = "calc_unbiased_avg";
+  static inline constexpr StringLiteral k_NeighborListPath_Key = "neighbor_list_path";
+  static inline constexpr StringLiteral k_CAxisMisalignmentListPath_Key = "c_axis_misalignment_list_path";
+  static inline constexpr StringLiteral k_AvgCAxisMisalignmentsPath_Key = "avg_c_axis_misalignments_path";
+  static inline constexpr StringLiteral k_FeatureParentIdsPath_Key = "feature_parent_ids_path";
+  static inline constexpr StringLiteral k_NewCellFeatureAttributeMatrixPath_Key = "new_cell_feature_attribute_matrix_path";
+  static inline constexpr StringLiteral k_NumFeaturesPerParentName_Key = "num_features_per_parent_name";
+  static inline constexpr StringLiteral k_LocalCAxisMisalignmentsName_Key = "local_c_axis_misalignments_name";
+  static inline constexpr StringLiteral k_UnbiasedLocalCAxisMisalignmentsName_Key = "unbiased_local_c_axis_misalignments_name";
 
   /**
    * @brief Returns the name of the filter.
@@ -76,7 +82,7 @@ protected:
    * @brief Takes in a DataStructure and checks that the filter can be run on it with the given arguments.
    * Returns any warnings/errors. Also returns the changes that would be applied to the DataStructure.
    * Some parts of the actions may not be completely filled out if all the required information is not available at preflight time.
-   * @param dataStructure The input DataStructure instance
+   * @param ds The input DataStructure instance
    * @param filterArgs These are the input values for each parameter that is required for the filter
    * @param messageHandler The MessageHandler object
    * @return Returns a Result object with error or warning values if any of those occurred during execution of this function
@@ -86,7 +92,7 @@ protected:
   /**
    * @brief Applies the filter's algorithm to the DataStructure with the given arguments. Returns any warnings/errors.
    * On failure, there is no guarantee that the DataStructure is in a correct state.
-   * @param dataStructure The input DataStructure instance
+   * @param ds The input DataStructure instance
    * @param filterArgs These are the input values for each parameter that is required for the filter
    * @param messageHandler The MessageHandler object
    * @return Returns a Result object with error or warning values if any of those occurred during execution of this function
@@ -96,5 +102,5 @@ protected:
 };
 } // namespace nx::core
 
-SIMPLNX_DEF_FILTER_TRAITS(nx::core, FindSaltykovSizesFilter, "fde6ad53-efa2-4870-96e3-ef795b3568d0");
-/* LEGACY UUID FOR THIS FILTER cc76cffe-81ad-5ece-be2a-ce127c5fa6d7 */
+SIMPLNX_DEF_FILTER_TRAITS(nx::core, ComputeLocalAverageCAxisMisalignmentsFilter, "6002e998-04b2-4a11-87bd-43c54bce2c20");
+/* LEGACY UUID FOR THIS FILTER 49b2dd47-bb29-50d4-a051-5bad9b6b9f80 */

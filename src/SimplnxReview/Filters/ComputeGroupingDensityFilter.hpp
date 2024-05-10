@@ -8,20 +8,20 @@
 namespace nx::core
 {
 /**
- * @class FindGroupingDensityFilter
+ * @class ComputeGroupingDensityFilter
  * @brief This filter determines the average C-axis location of each Feature
  */
-class SIMPLNXREVIEW_EXPORT FindGroupingDensityFilter : public IFilter
+class SIMPLNXREVIEW_EXPORT ComputeGroupingDensityFilter : public IFilter
 {
 public:
-  FindGroupingDensityFilter() = default;
-  ~FindGroupingDensityFilter() noexcept override = default;
+  ComputeGroupingDensityFilter() = default;
+  ~ComputeGroupingDensityFilter() noexcept override = default;
 
-  FindGroupingDensityFilter(const FindGroupingDensityFilter&) = delete;
-  FindGroupingDensityFilter(FindGroupingDensityFilter&&) noexcept = delete;
+  ComputeGroupingDensityFilter(const ComputeGroupingDensityFilter&) = delete;
+  ComputeGroupingDensityFilter(ComputeGroupingDensityFilter&&) noexcept = delete;
 
-  FindGroupingDensityFilter& operator=(const FindGroupingDensityFilter&) = delete;
-  FindGroupingDensityFilter& operator=(FindGroupingDensityFilter&&) noexcept = delete;
+  ComputeGroupingDensityFilter& operator=(const ComputeGroupingDensityFilter&) = delete;
+  ComputeGroupingDensityFilter& operator=(ComputeGroupingDensityFilter&&) noexcept = delete;
 
   // Parameter Keys
   static inline constexpr StringLiteral k_VolumesPath_Key = "volumes_path";
@@ -101,5 +101,5 @@ protected:
 };
 } // namespace nx::core
 
-SIMPLNX_DEF_FILTER_TRAITS(nx::core, FindGroupingDensityFilter, "ff46afcf-de32-4f37-98bc-8f0fd4b3c122");
+SIMPLNX_DEF_FILTER_TRAITS(nx::core, ComputeGroupingDensityFilter, "ff46afcf-de32-4f37-98bc-8f0fd4b3c122");
 /* LEGACY UUID FOR THIS FILTER 708be082-8b08-4db2-94be-52781ed4d53d */

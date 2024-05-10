@@ -1,6 +1,6 @@
-#include "FindSaltykovSizesFilter.hpp"
+#include "ComputeSaltykovSizesFilter.hpp"
 
-#include "SimplnxReview/Filters/Algorithms/FindSaltykovSizes.hpp"
+#include "SimplnxReview/Filters/Algorithms/ComputeSaltykovSizes.hpp"
 
 #include "simplnx/DataStructure/DataArray.hpp"
 #include "simplnx/DataStructure/DataPath.hpp"
@@ -18,37 +18,37 @@ using namespace nx::core;
 namespace nx::core
 {
 //------------------------------------------------------------------------------
-std::string FindSaltykovSizesFilter::name() const
+std::string ComputeSaltykovSizesFilter::name() const
 {
-  return FilterTraits<FindSaltykovSizesFilter>::name.str();
+  return FilterTraits<ComputeSaltykovSizesFilter>::name.str();
 }
 
 //------------------------------------------------------------------------------
-std::string FindSaltykovSizesFilter::className() const
+std::string ComputeSaltykovSizesFilter::className() const
 {
-  return FilterTraits<FindSaltykovSizesFilter>::className;
+  return FilterTraits<ComputeSaltykovSizesFilter>::className;
 }
 
 //------------------------------------------------------------------------------
-Uuid FindSaltykovSizesFilter::uuid() const
+Uuid ComputeSaltykovSizesFilter::uuid() const
 {
-  return FilterTraits<FindSaltykovSizesFilter>::uuid;
+  return FilterTraits<ComputeSaltykovSizesFilter>::uuid;
 }
 
 //------------------------------------------------------------------------------
-std::string FindSaltykovSizesFilter::humanName() const
+std::string ComputeSaltykovSizesFilter::humanName() const
 {
-  return "Find Feature Saltykov Sizes";
+  return "Compute Feature Saltykov Sizes";
 }
 
 //------------------------------------------------------------------------------
-std::vector<std::string> FindSaltykovSizesFilter::defaultTags() const
+std::vector<std::string> ComputeSaltykovSizesFilter::defaultTags() const
 {
   return {className(), "Statistics", "Morphological"};
 }
 
 //------------------------------------------------------------------------------
-Parameters FindSaltykovSizesFilter::parameters() const
+Parameters ComputeSaltykovSizesFilter::parameters() const
 {
   Parameters params;
 
@@ -67,14 +67,14 @@ Parameters FindSaltykovSizesFilter::parameters() const
 }
 
 //------------------------------------------------------------------------------
-IFilter::UniquePointer FindSaltykovSizesFilter::clone() const
+IFilter::UniquePointer ComputeSaltykovSizesFilter::clone() const
 {
-  return std::make_unique<FindSaltykovSizesFilter>();
+  return std::make_unique<ComputeSaltykovSizesFilter>();
 }
 
 //------------------------------------------------------------------------------
-IFilter::PreflightResult FindSaltykovSizesFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
-                                                                const std::atomic_bool& shouldCancel) const
+IFilter::PreflightResult ComputeSaltykovSizesFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
+                                                                   const std::atomic_bool& shouldCancel) const
 {
   auto pEquivalentDiametersArrayPathValue = filterArgs.value<DataPath>(k_EquivalentDiametersArrayPath_Key);
   auto pSaltykovEquivalentDiametersNameValue = filterArgs.value<std::string>(k_SaltykovEquivalentDiametersName_Key);
@@ -97,8 +97,8 @@ IFilter::PreflightResult FindSaltykovSizesFilter::preflightImpl(const DataStruct
 }
 
 //------------------------------------------------------------------------------
-Result<> FindSaltykovSizesFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
-                                              const std::atomic_bool& shouldCancel) const
+Result<> ComputeSaltykovSizesFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
+                                                 const std::atomic_bool& shouldCancel) const
 {
   auto seed = filterArgs.value<std::mt19937_64::result_type>(k_SeedValue_Key);
   if(!filterArgs.value<bool>(k_UseSeed_Key))
@@ -106,12 +106,12 @@ Result<> FindSaltykovSizesFilter::executeImpl(DataStructure& dataStructure, cons
     seed = static_cast<std::mt19937_64::result_type>(std::chrono::steady_clock::now().time_since_epoch().count());
   }
 
-  FindSaltykovSizesInputValues inputValues;
+  ComputeSaltykovSizesInputValues inputValues;
 
   inputValues.EquivalentDiametersPath = filterArgs.value<DataPath>(k_EquivalentDiametersArrayPath_Key);
   inputValues.SaltykovEquivalentDiametersPath = inputValues.EquivalentDiametersPath.replaceName(filterArgs.value<std::string>(k_SaltykovEquivalentDiametersName_Key));
   inputValues.Seed = seed;
 
-  return FindSaltykovSizes(dataStructure, messageHandler, shouldCancel, &inputValues)();
+  return ComputeSaltykovSizes(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }
 } // namespace nx::core

@@ -1,4 +1,4 @@
-#include "FindLocalAverageCAxisMisalignments.hpp"
+#include "ComputeLocalAverageCAxisMisalignments.hpp"
 
 #include "simplnx/DataStructure/DataArray.hpp"
 #include "simplnx/DataStructure/NeighborList.hpp"
@@ -122,8 +122,8 @@ private:
 } // namespace
 
 // -----------------------------------------------------------------------------
-FindLocalAverageCAxisMisalignments::FindLocalAverageCAxisMisalignments(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel,
-                                                                       FindLocalAverageCAxisMisalignmentsInputValues* inputValues)
+ComputeLocalAverageCAxisMisalignments::ComputeLocalAverageCAxisMisalignments(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel,
+                                                                             ComputeLocalAverageCAxisMisalignmentsInputValues* inputValues)
 : m_DataStructure(dataStructure)
 , m_InputValues(inputValues)
 , m_ShouldCancel(shouldCancel)
@@ -132,16 +132,16 @@ FindLocalAverageCAxisMisalignments::FindLocalAverageCAxisMisalignments(DataStruc
 }
 
 // -----------------------------------------------------------------------------
-FindLocalAverageCAxisMisalignments::~FindLocalAverageCAxisMisalignments() noexcept = default;
+ComputeLocalAverageCAxisMisalignments::~ComputeLocalAverageCAxisMisalignments() noexcept = default;
 
 // -----------------------------------------------------------------------------
-const std::atomic_bool& FindLocalAverageCAxisMisalignments::getCancel()
+const std::atomic_bool& ComputeLocalAverageCAxisMisalignments::getCancel()
 {
   return m_ShouldCancel;
 }
 
 // -----------------------------------------------------------------------------
-Result<> FindLocalAverageCAxisMisalignments::operator()()
+Result<> ComputeLocalAverageCAxisMisalignments::operator()()
 {
   const auto& featureParentIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeatureParentIdsPath);
   const auto& avgCAxisMisalignments = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->AvgCAxisMisalignmentsPath);

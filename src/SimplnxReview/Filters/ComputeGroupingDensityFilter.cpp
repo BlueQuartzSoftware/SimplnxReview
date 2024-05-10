@@ -1,6 +1,6 @@
-#include "FindGroupingDensityFilter.hpp"
+#include "ComputeGroupingDensityFilter.hpp"
 
-#include "SimplnxReview/Filters/Algorithms/FindGroupingDensity.hpp"
+#include "SimplnxReview/Filters/Algorithms/ComputeGroupingDensity.hpp"
 
 #include "simplnx/DataStructure/AttributeMatrix.hpp"
 #include "simplnx/DataStructure/DataPath.hpp"
@@ -23,37 +23,37 @@ const DataPath k_ThrowawayNonContiguous = DataPath({"HiddenContiguousNL"});
 namespace nx::core
 {
 //------------------------------------------------------------------------------
-std::string FindGroupingDensityFilter::name() const
+std::string ComputeGroupingDensityFilter::name() const
 {
-  return FilterTraits<FindGroupingDensityFilter>::name.str();
+  return FilterTraits<ComputeGroupingDensityFilter>::name.str();
 }
 
 //------------------------------------------------------------------------------
-std::string FindGroupingDensityFilter::className() const
+std::string ComputeGroupingDensityFilter::className() const
 {
-  return FilterTraits<FindGroupingDensityFilter>::className;
+  return FilterTraits<ComputeGroupingDensityFilter>::className;
 }
 
 //------------------------------------------------------------------------------
-Uuid FindGroupingDensityFilter::uuid() const
+Uuid ComputeGroupingDensityFilter::uuid() const
 {
-  return FilterTraits<FindGroupingDensityFilter>::uuid;
+  return FilterTraits<ComputeGroupingDensityFilter>::uuid;
 }
 
 //------------------------------------------------------------------------------
-std::string FindGroupingDensityFilter::humanName() const
+std::string ComputeGroupingDensityFilter::humanName() const
 {
-  return "Find Grouping Densities";
+  return "Compute Grouping Densities";
 }
 
 //------------------------------------------------------------------------------
-std::vector<std::string> FindGroupingDensityFilter::defaultTags() const
+std::vector<std::string> ComputeGroupingDensityFilter::defaultTags() const
 {
   return {className(), "Statistics", "Reconstruction"};
 }
 
 //------------------------------------------------------------------------------
-Parameters FindGroupingDensityFilter::parameters() const
+Parameters ComputeGroupingDensityFilter::parameters() const
 {
   Parameters params;
   // Create the parameter descriptors that are needed for this filter
@@ -85,14 +85,14 @@ Parameters FindGroupingDensityFilter::parameters() const
 }
 
 //------------------------------------------------------------------------------
-IFilter::UniquePointer FindGroupingDensityFilter::clone() const
+IFilter::UniquePointer ComputeGroupingDensityFilter::clone() const
 {
-  return std::make_unique<FindGroupingDensityFilter>();
+  return std::make_unique<ComputeGroupingDensityFilter>();
 }
 
 //------------------------------------------------------------------------------
-IFilter::PreflightResult FindGroupingDensityFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
-                                                                  const std::atomic_bool& shouldCancel) const
+IFilter::PreflightResult ComputeGroupingDensityFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
+                                                                     const std::atomic_bool& shouldCancel) const
 {
   auto pParentIdsPath = filterArgs.value<DataPath>(k_ParentIdsPath_Key);
   auto pParentVolumesPath = filterArgs.value<DataPath>(k_ParentVolumesPath_Key);
@@ -164,10 +164,10 @@ IFilter::PreflightResult FindGroupingDensityFilter::preflightImpl(const DataStru
 }
 
 //------------------------------------------------------------------------------
-Result<> FindGroupingDensityFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
-                                                const std::atomic_bool& shouldCancel) const
+Result<> ComputeGroupingDensityFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
+                                                   const std::atomic_bool& shouldCancel) const
 {
-  FindGroupingDensityInputValues inputValues;
+  ComputeGroupingDensityInputValues inputValues;
 
   inputValues.ParentIdsPath = filterArgs.value<DataPath>(k_ParentIdsPath_Key);
   inputValues.ParentVolumesPath = filterArgs.value<DataPath>(k_ParentVolumesPath_Key);
@@ -195,6 +195,6 @@ Result<> FindGroupingDensityFilter::executeImpl(DataStructure& dataStructure, co
     inputValues.CheckedFeaturesPath = k_ThrowawayCheckedFeatures;
   }
 
-  return FindGroupingDensity(dataStructure, messageHandler, shouldCancel, &inputValues)();
+  return ComputeGroupingDensity(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }
 } // namespace nx::core

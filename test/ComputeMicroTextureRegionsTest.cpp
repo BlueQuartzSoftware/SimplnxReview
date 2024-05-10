@@ -1,5 +1,5 @@
 /**
- * This file is auto generated from the original OrientationAnalysis/FindMicroTextureRegionsFilter
+ * This file is auto generated from the original OrientationAnalysis/ComputeMicroTextureRegionsFilter
  * runtime information. These are the steps that need to be taken to utilize this
  * unit test in the proper way.
  *
@@ -15,7 +15,7 @@
  * NOTE the format of the ```TEST_CASE``` macro. Please stick to this format to
  * allow easier parsing of the unit tests.
  *
- * When you start working on this unit test remove "[FindMicroTextureRegionsFilter][.][UNIMPLEMENTED]"
+ * When you start working on this unit test remove "[ComputeMicroTextureRegionsFilter][.][UNIMPLEMENTED]"
  * from the TEST_CASE macro. This will enable this unit test to be run by default
  * and report errors.
  */
@@ -26,23 +26,23 @@
 #include "simplnx/Parameters/DataGroupSelectionParameter.hpp"
 #include "simplnx/Parameters/StringParameter.hpp"
 
-#include "SimplnxReview/Filters/FindMicroTextureRegionsFilter.hpp"
+#include "SimplnxReview/Filters/ComputeMicroTextureRegionsFilter.hpp"
 #include "SimplnxReview/SimplnxReview_test_dirs.hpp"
 
 using namespace nx::core;
 
-TEST_CASE("SimplnxReview::FindMicroTextureRegionsFilter: Valid Filter Execution", "[SimplnxReview][FindMicroTextureRegionsFilter][.][UNIMPLEMENTED][!mayfail]")
+TEST_CASE("SimplnxReview::ComputeMicroTextureRegionsFilter: Valid Filter Execution", "[SimplnxReview][ComputeMicroTextureRegionsFilter][.][UNIMPLEMENTED][!mayfail]")
 {
   // Instantiate the filter, a DataStructure object and an Arguments Object
-  FindMicroTextureRegionsFilter filter;
+  ComputeMicroTextureRegionsFilter filter;
   DataStructure ds;
   Arguments args;
 
   // Create default Parameters for the filter.
-  args.insertOrAssign(FindMicroTextureRegionsFilter::k_FeatureIdsArrayPath_Key, std::make_any<DataPath>(DataPath{}));
-  args.insertOrAssign(FindMicroTextureRegionsFilter::k_CellFeatureAttributeMatrixPath_Key, std::make_any<DataPath>(DataPath{}));
-  args.insertOrAssign(FindMicroTextureRegionsFilter::k_MicroTextureRegionNumCellsArrayName_Key, std::make_any<StringParameter::ValueType>("SomeString"));
-  args.insertOrAssign(FindMicroTextureRegionsFilter::k_MicroTextureRegionFractionOccupiedArrayName_Key, std::make_any<StringParameter::ValueType>("SomeString"));
+  args.insertOrAssign(ComputeMicroTextureRegionsFilter::k_FeatureIdsArrayPath_Key, std::make_any<DataPath>(DataPath{}));
+  args.insertOrAssign(ComputeMicroTextureRegionsFilter::k_CellFeatureAttributeMatrixPath_Key, std::make_any<DataPath>(DataPath{}));
+  args.insertOrAssign(ComputeMicroTextureRegionsFilter::k_MicroTextureRegionNumCellsArrayName_Key, std::make_any<StringParameter::ValueType>("SomeString"));
+  args.insertOrAssign(ComputeMicroTextureRegionsFilter::k_MicroTextureRegionFractionOccupiedArrayName_Key, std::make_any<StringParameter::ValueType>("SomeString"));
 
   // Preflight the filter and check result
   auto preflightResult = filter.preflight(ds, args);
@@ -53,7 +53,7 @@ TEST_CASE("SimplnxReview::FindMicroTextureRegionsFilter: Valid Filter Execution"
   REQUIRE(executeResult.result.valid());
 }
 
-// TEST_CASE("OrientationAnalysis::FindMicroTextureRegionsFilter: InValid Filter Execution")
+// TEST_CASE("OrientationAnalysis::ComputeMicroTextureRegionsFilter: InValid Filter Execution")
 //{
 //
 // }

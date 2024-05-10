@@ -23,6 +23,4 @@ PYBIND11_MODULE(simplnxreview, mod) // <== IS THAT IN ALL LOWER CASE?
   auto* plugin = internals.addPlugin<SimplnxReviewPlugin>();
 
   SimplnxReview::BindFilters(mod, internals);
-
-  internals.registerPluginPyFilters(*plugin);
 }

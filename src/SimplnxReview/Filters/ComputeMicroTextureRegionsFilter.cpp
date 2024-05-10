@@ -1,6 +1,6 @@
-#include "FindMicroTextureRegionsFilter.hpp"
+#include "ComputeMicroTextureRegionsFilter.hpp"
 
-#include "SimplnxReview/Filters/Algorithms/FindMicroTextureRegions.hpp"
+#include "SimplnxReview/Filters/Algorithms/ComputeMicroTextureRegions.hpp"
 
 #include "simplnx/DataStructure/AttributeMatrix.hpp"
 #include "simplnx/DataStructure/DataPath.hpp"
@@ -15,37 +15,37 @@ using namespace nx::core;
 namespace nx::core
 {
 //------------------------------------------------------------------------------
-std::string FindMicroTextureRegionsFilter::name() const
+std::string ComputeMicroTextureRegionsFilter::name() const
 {
-  return FilterTraits<FindMicroTextureRegionsFilter>::name.str();
+  return FilterTraits<ComputeMicroTextureRegionsFilter>::name.str();
 }
 
 //------------------------------------------------------------------------------
-std::string FindMicroTextureRegionsFilter::className() const
+std::string ComputeMicroTextureRegionsFilter::className() const
 {
-  return FilterTraits<FindMicroTextureRegionsFilter>::className;
+  return FilterTraits<ComputeMicroTextureRegionsFilter>::className;
 }
 
 //------------------------------------------------------------------------------
-Uuid FindMicroTextureRegionsFilter::uuid() const
+Uuid ComputeMicroTextureRegionsFilter::uuid() const
 {
-  return FilterTraits<FindMicroTextureRegionsFilter>::uuid;
+  return FilterTraits<ComputeMicroTextureRegionsFilter>::uuid;
 }
 
 //------------------------------------------------------------------------------
-std::string FindMicroTextureRegionsFilter::humanName() const
+std::string ComputeMicroTextureRegionsFilter::humanName() const
 {
-  return "Find MicroTexture Regions";
+  return "Compute MicroTexture Regions";
 }
 
 //------------------------------------------------------------------------------
-std::vector<std::string> FindMicroTextureRegionsFilter::defaultTags() const
+std::vector<std::string> ComputeMicroTextureRegionsFilter::defaultTags() const
 {
   return {className(), "Statistics", "Morphological"};
 }
 
 //------------------------------------------------------------------------------
-Parameters FindMicroTextureRegionsFilter::parameters() const
+Parameters ComputeMicroTextureRegionsFilter::parameters() const
 {
   Parameters params;
 
@@ -64,14 +64,14 @@ Parameters FindMicroTextureRegionsFilter::parameters() const
 }
 
 //------------------------------------------------------------------------------
-IFilter::UniquePointer FindMicroTextureRegionsFilter::clone() const
+IFilter::UniquePointer ComputeMicroTextureRegionsFilter::clone() const
 {
-  return std::make_unique<FindMicroTextureRegionsFilter>();
+  return std::make_unique<ComputeMicroTextureRegionsFilter>();
 }
 
 //------------------------------------------------------------------------------
-IFilter::PreflightResult FindMicroTextureRegionsFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
-                                                                      const std::atomic_bool& shouldCancel) const
+IFilter::PreflightResult ComputeMicroTextureRegionsFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
+                                                                         const std::atomic_bool& shouldCancel) const
 {
   auto pFeatureIdsArrayPathValue = filterArgs.value<DataPath>(k_FeatureIdsArrayPath_Key);
   auto pCellFeatureAttributeMatrixNameValue = filterArgs.value<DataPath>(k_CellFeatureAttributeMatrixPath_Key);
@@ -104,10 +104,10 @@ IFilter::PreflightResult FindMicroTextureRegionsFilter::preflightImpl(const Data
 }
 
 //------------------------------------------------------------------------------
-Result<> FindMicroTextureRegionsFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
-                                                    const std::atomic_bool& shouldCancel) const
+Result<> ComputeMicroTextureRegionsFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
+                                                       const std::atomic_bool& shouldCancel) const
 {
-  FindMicroTextureRegionsInputValues inputValues;
+  ComputeMicroTextureRegionsInputValues inputValues;
 
   inputValues.ImageGeomPath = filterArgs.value<DataPath>(k_ImageGeomPath_Key);
   inputValues.FeatureIdsArrayPath = filterArgs.value<DataPath>(k_FeatureIdsArrayPath_Key);
@@ -116,6 +116,6 @@ Result<> FindMicroTextureRegionsFilter::executeImpl(DataStructure& dataStructure
   inputValues.MicroTextureRegionFractionOccupiedArrayPath =
       inputValues.CellFeatureAttributeMatrixPath.createChildPath(filterArgs.value<std::string>(k_MicroTextureRegionFractionOccupiedArrayName_Key));
 
-  return FindMicroTextureRegions(dataStructure, messageHandler, shouldCancel, &inputValues)();
+  return ComputeMicroTextureRegions(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }
 } // namespace nx::core
