@@ -134,7 +134,8 @@ public:
             {
               if(k == 0)
               {
-                neigh = m_ContiguousNL.getListReference(static_cast<int32>(j))[l];
+                bool ok = false;
+                neigh = m_ContiguousNL.getValue(static_cast<int32>(j), l, ok);
               }
               else if(k == 1)
               {

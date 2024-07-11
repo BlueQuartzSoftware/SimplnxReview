@@ -133,7 +133,8 @@ void GroupMicroTextureRegions::execute()
             }
             else if(k == 1)
             {
-              neigh = nonContigNeighList->getListReference(firstfeature)[l];
+              bool ok = false;
+              neigh = nonContigNeighList->getValue(firstfeature, l, ok);
             }
             if(neigh != firstfeature)
             {
