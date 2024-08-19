@@ -34,6 +34,7 @@ set(FilterList
   GroupMicroTextureRegionsFilter
   InterpolateValuesToUnstructuredGridFilter
   MergeColoniesFilter
+  ReadGrainMapper3DFilter
 )
   
 set(ActionList
@@ -51,6 +52,7 @@ set(AlgorithmList
   GroupMicroTextureRegions
   InterpolateValuesToUnstructuredGrid
   MergeColonies
+  ReadGrainMapper3D
 )
 
 
