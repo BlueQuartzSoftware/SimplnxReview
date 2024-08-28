@@ -24,6 +24,10 @@ public:
   ReadGrainMapper3DFilter& operator=(ReadGrainMapper3DFilter&&) noexcept = delete;
 
   // Parameter Keys
+  static inline constexpr StringLiteral k_InputFile_Key = "input_file";
+  static inline constexpr StringLiteral k_CreatedImageGeometryPath_Key = "output_image_geometry_path";
+  static inline constexpr StringLiteral k_CellAttributeMatrixName_Key = "cell_attribute_matrix_name";
+  static inline constexpr StringLiteral k_CellEnsembleAttributeMatrixName_Key = "cell_ensemble_attribute_matrix_name";
 
   /**
    * @brief Returns the name of the filter.

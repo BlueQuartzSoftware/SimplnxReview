@@ -11,6 +11,10 @@ namespace nx::core
 
 struct SIMPLNXREVIEW_EXPORT ReadGrainMapper3DInputValues
 {
+  std::filesystem::path InputFile;
+  DataPath ImageGeometryPath;
+  std::string CellAttributeMatrixName;
+  std::string CellEnsembleAttributeMatrixName;
 };
 
 /**

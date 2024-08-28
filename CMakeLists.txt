@@ -111,14 +111,15 @@ target_link_libraries(simplnx PUBLIC EbsdLib::EbsdLib)
 # ------------------------------------------------------------------------------
 
 set(PLUGIN_EXTRA_SOURCES
-
+    "${${PLUGIN_NAME}_SOURCE_DIR}/src/${PLUGIN_NAME}/utils/GrainMapper3DUtilities.hpp"
+    "${${PLUGIN_NAME}_SOURCE_DIR}/src/${PLUGIN_NAME}/utils/GrainMapper3DUtilities.cpp"
 )
 target_sources(${PLUGIN_NAME} 
   PRIVATE
     ${PLUGIN_EXTRA_SOURCES}
 )
 
-source_group(TREE "${${PLUGIN_NAME}_SOURCE_DIR}/src/${PLUGIN_NAME}/utilities" 
+source_group(TREE "${${PLUGIN_NAME}_SOURCE_DIR}/src/${PLUGIN_NAME}/utils"
             PREFIX ${PLUGIN_NAME} 
             FILES ${PLUGIN_EXTRA_SOURCES}
             )
