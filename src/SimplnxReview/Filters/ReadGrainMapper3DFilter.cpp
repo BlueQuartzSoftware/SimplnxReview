@@ -7,6 +7,7 @@
 #include "simplnx/DataStructure/DataPath.hpp"
 #include "simplnx/DataStructure/Geometry/ImageGeom.hpp"
 #include "simplnx/Filter/Actions/CreateArrayAction.hpp"
+#include "simplnx/Filter/Actions/CreateAttributeMatrixAction.hpp"
 #include "simplnx/Filter/Actions/CreateDataGroupAction.hpp"
 #include "simplnx/Filter/Actions/CreateImageGeometryAction.hpp"
 #include "simplnx/Filter/Actions/CreateNeighborListAction.hpp"
@@ -109,7 +110,8 @@ IFilter::PreflightResult ReadGrainMapper3DFilter::preflightImpl(const DataStruct
   }
 
   // create the Image Geometry and it's attribute matrices
-  const std::vector<usize> dims = reader.getDimensions();;
+  const std::vector<usize> dims = reader.getDimensions();
+  ;
   {
     CreateImageGeometryAction::SpacingType spacing = reader.getSpacing();
     std::vector<float> origin = reader.getOrigin();
@@ -126,15 +128,37 @@ IFilter::PreflightResult ReadGrainMapper3DFilter::preflightImpl(const DataStruct
 
   auto nameToDataTypeMap = reader.getNameToDataTypeMap();
   auto nameToCompDimMap = reader.getNameToCompDimMap();
-  auto availableDataSets = reader.getDCTDatasetNames();
+  auto availableDataSets = reader.getDctDatasetNames();
   for(const auto& dataSetName : availableDataSets)
   {
-    resultOutputActions.value().appendAction(std::make_unique<CreateArrayAction>(nameToDataTypeMap[dataSetName], tupleDims, std::vector<usize>{nameToCompDimMap[dataSetName]}, cellAMPath.createChildPath(dataSetName)));
+    resultOutputActions.value().appendAction(
+        std::make_unique<CreateArrayAction>(nameToDataTypeMap[dataSetName], tupleDims, std::vector<usize>{nameToCompDimMap[dataSetName]}, cellAMPath.createChildPath(dataSetName)));
   }
 
+  // **************************************************************************
   // read the phase information
+  DataPath cellEnsembleAMPath = pImageGeometryPath.createChildPath(pCellEnsembleAttributeMatrixNameValue);
 
+  auto phases = reader.getPhaseInformation();
+  std::vector<usize> ensembleTupleDims{phases.size() + 1};
+  {
+    auto createAttributeMatrixAction = std::make_unique<CreateAttributeMatrixAction>(cellEnsembleAMPath, ensembleTupleDims);
+    resultOutputActions.value().appendAction(std::move(createAttributeMatrixAction));
+  }
 
+  // create the cell ensemble arrays
+  {
+    auto createArrayAction = std::make_unique<CreateArrayAction>(DataType::uint32, ensembleTupleDims, std::vector<usize>{1}, cellEnsembleAMPath.createChildPath(GM3DConstants::k_CrystalStructures));
+    resultOutputActions.value().appendAction(std::move(createArrayAction));
+  }
+  {
+    auto createArrayAction = std::make_unique<CreateArrayAction>(DataType::float32, ensembleTupleDims, std::vector<usize>{6}, cellEnsembleAMPath.createChildPath(GM3DConstants::k_LatticeConstants));
+    resultOutputActions.value().appendAction(std::move(createArrayAction));
+  }
+  {
+    auto createArrayAction = std::make_unique<CreateStringArrayAction>(ensembleTupleDims, cellEnsembleAMPath.createChildPath(GM3DConstants::k_MaterialName));
+    resultOutputActions.value().appendAction(std::move(createArrayAction));
+  }
 
   return {std::move(resultOutputActions), std::move(preflightUpdatedValues)};
 }

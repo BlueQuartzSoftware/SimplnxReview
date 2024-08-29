@@ -1,10 +1,13 @@
 #pragma once
 
 #include "SimplnxReview/SimplnxReview_export.hpp"
+#include "SimplnxReview/utils/GrainMapper3DUtilities.hpp"
 
 #include "simplnx/DataStructure/DataPath.hpp"
 #include "simplnx/DataStructure/DataStructure.hpp"
 #include "simplnx/Filter/IFilter.hpp"
+
+#include <hdf5.h>
 
 namespace nx::core
 {
@@ -17,6 +20,12 @@ struct SIMPLNXREVIEW_EXPORT ReadGrainMapper3DInputValues
   std::string CellEnsembleAttributeMatrixName;
 };
 
+namespace GM3DConstants
+{
+const std::string k_CrystalStructures("CrystalStructures");
+const std::string k_LatticeConstants("LatticeConstants");
+const std::string k_MaterialName("MaterialName");
+} // namespace GM3DConstants
 /**
  * @class ReadGrainMapper3D
  * @brief This filter determines the average C-axis location of each Feature.
@@ -36,6 +45,10 @@ public:
   Result<> operator()();
 
   const std::atomic_bool& getCancel();
+
+protected:
+  Result<> copyPhaseData(GrainMapper3DUtilities::GrainMapperReader& reader, hid_t fileId);
+  Result<> copyDctData(GrainMapper3DUtilities::GrainMapperReader& reader, hid_t fileId);
 
 private:
   DataStructure& m_DataStructure;

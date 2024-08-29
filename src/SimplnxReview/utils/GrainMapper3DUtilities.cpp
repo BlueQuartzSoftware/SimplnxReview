@@ -12,50 +12,67 @@
 
 using namespace nx::core;
 using namespace H5Support;
+
+namespace GM3DConst = GrainMapper3DUtilities::Constants;
+
 namespace GrainMapper3DUtilities
 {
 
-namespace Constants
+const std::map<std::string, DataType> k_NameToDataTypeMap = {
+    {GM3DConst::k_CompletenessName, DataType::float32}, {GM3DConst::k_GrainIdName, DataType::int32},      {GM3DConst::k_MaskName, DataType::uint8},
+    {GM3DConst::k_PhaseIdName, DataType::uint8},        {GM3DConst::k_RodriguesName, DataType::float32},  {GM3DConst::k_EulerZXZName, DataType::float32},
+    {GM3DConst::k_EulerZYZName, DataType::float32},     {GM3DConst::k_QuaternionName, DataType::float32}, {GM3DConst::k_IPF001Name, DataType::uint8},
+    {GM3DConst::k_IPF010Name, DataType::uint8},         {GM3DConst::k_IPF100Name, DataType::uint8}};
+
+const std::map<std::string, size_t> k_NameToCompDimMap = {{GM3DConst::k_CompletenessName, 1}, {GM3DConst::k_GrainIdName, 1},  {GM3DConst::k_MaskName, 1},     {GM3DConst::k_PhaseIdName, 1},
+                                                          {GM3DConst::k_RodriguesName, 3},    {GM3DConst::k_EulerZXZName, 3}, {GM3DConst::k_EulerZYZName, 3}, {GM3DConst::k_QuaternionName, 4},
+                                                          {GM3DConst::k_IPF001Name, 3},       {GM3DConst::k_IPF010Name, 3},   {GM3DConst::k_IPF100Name, 3}};
+
+int32_t GetLaueIndexFromSpaceGroup(int32_t spaceGroupId)
 {
-const std::string k_LabDCTGroupName("LabDCT");
-const std::string k_AbsorptionCTName("k_AbsorptionCT");
-const std::string k_ProjectInfoName("ProjectInfo");
-const std::string k_VersionName("Version");
+  // clang-format off
+  std::array<size_t, 32> sgpg =   {1, 2, 3, 6, 10, 16, 25, 47, 75, 81, 83, 89, 99, 111, 123, 143, 147, 149, 156, 162, 168, 174, 175, 177, 183, 187, 191, 195, 200, 207, 215, 221};
+  std::array<size_t, 32> pgLaue = {1, 1, 2, 2, 2,  22, 22, 22, 4,  4,  4,  42, 42, 42,  42,  3,   3,   32,  32,  32,  6,   6,   6,   62,  62,  62,  62,  23,  23,  43,  43,  43};
+  // clang-format on
+  size_t pgIndex = sgpg.size() - 1;
+  for(size_t i = 0; i < sgpg.size(); i++)
+  {
+    if(sgpg[i] > spaceGroupId)
+    {
+      pgIndex = i - 1;
+      break;
+    }
+  }
 
-const std::string k_ExtentName("Extent");
-const std::string k_SpacingName("Spacing");
-const std::string k_CenterName("Center");
-
-const std::string k_DataGroupName("Data");
-const std::string k_CompletenessName("Completeness");
-const std::string k_GrainIdName("GrainId");
-const std::string k_MaskName("Mask");
-const std::string k_PhaseIdName("PhaseId");
-const std::string k_RodriguesName("Rodrigues");
-
-const std::string k_EulerZXZName("EulerZXZ");
-const std::string k_EulerZYZName("EulerZYZ");
-const std::string k_QuaternionName("Quaternion");
-const std::string k_IPF001Name("IPF001");
-const std::string k_IPF010Name("IPF010");
-const std::string k_IPF100Name("IPF100");
-
-const std::map<std::string, DataType> k_NameToDataTypeMap = {{k_CompletenessName, DataType::float32}, {k_GrainIdName, DataType::int32},      {k_MaskName, DataType::uint8},
-                                                             {k_PhaseIdName, DataType::uint8},        {k_RodriguesName, DataType::float32},  {k_EulerZXZName, DataType::float32},
-                                                             {k_EulerZYZName, DataType::float32},     {k_QuaternionName, DataType::float32}, {k_IPF001Name, DataType::uint8},
-                                                             {k_IPF010Name, DataType::uint8},         {k_IPF100Name, DataType::uint8}};
-const std::map<std::string, size_t> k_NameToCompDimMap = {{k_CompletenessName, 1}, {k_GrainIdName, 1},    {k_MaskName, 1},   {k_PhaseIdName, 1}, {k_RodriguesName, 3}, {k_EulerZXZName, 3},
-                                                          {k_EulerZYZName, 3},     {k_QuaternionName, 4}, {k_IPF001Name, 3}, {k_IPF010Name, 3},  {k_IPF100Name, 3}};
-
-// ****************************************************************************
-// Phase Constants
-const std::string k_PhaseInfoName("PhaseInfo");
-const std::string k_Name("Name");
-const std::string k_SpaceGroupName("SpaceGroup");
-const std::string k_UnitCellName("UnitCell");
-const std::string k_UniversalHermannMauguinName("UniversalHermannMauguin");
-
-} // namespace Constants
+  size_t value = pgLaue.at(pgIndex);
+  switch(value)
+  {
+  case 1: // TriclinicOps
+    return 4;
+  case 2: // MonoclinicOps
+    return 5;
+  case 22: // OrthoRhombicOps
+    return 6;
+  case 4: // TetragonalLowOps
+    return 7;
+  case 42: // TetragonalOps
+    return 8;
+  case 3: // TrigonalLowOps
+    return 9;
+  case 32: // TrigonalOps
+    return 10;
+  case 6: // HexagonalLowOps
+    return 2;
+  case 62: // HexagonalOps
+    return 0;
+  case 23: // CubicLowOps
+    return 3;
+  case 43: // CubicOps
+    return 1;
+  default:
+    return 999;
+  }
+}
 
 GrainMapperReader::GrainMapperReader(const std::string& filePath)
 : m_FileName(filePath)
@@ -83,15 +100,15 @@ std::vector<float> GrainMapperReader::getOrigin() const
 
 std::map<std::string, DataType> GrainMapperReader::getNameToDataTypeMap() const
 {
-  return Constants::k_NameToDataTypeMap;
+  return GrainMapper3DUtilities::k_NameToDataTypeMap;
 }
 
 const std::map<std::string, size_t> GrainMapperReader::getNameToCompDimMap() const
 {
-  return Constants::k_NameToCompDimMap;
+  return GrainMapper3DUtilities::k_NameToCompDimMap;
 }
 
-std::vector<std::string> GrainMapperReader::getDCTDatasetNames() const
+std::vector<std::string> GrainMapperReader::getDctDatasetNames() const
 {
   return m_AvailableDCTDatasets;
 }
@@ -103,13 +120,12 @@ std::vector<GrainMapperReader::GrainMapperPhase> GrainMapperReader::getPhaseInfo
 
 Result<> GrainMapperReader::readHeaderOnly()
 {
-
   Result<> result;
 
   hid_t fileId = H5Support::H5Utilities::openFile(m_FileName, true);
   if(fileId < 0)
   {
-    MakeErrorResult(-39800, fmt::format("Grain Mapper 3D File '{}' could not be opened.", m_FileName));
+    return MakeErrorResult(-39800, fmt::format("Grain Mapper 3D File '{}' could not be opened.", m_FileName));
   }
   auto sentinel = H5Support::H5ScopedFileSentinel(fileId, false);
 
@@ -141,15 +157,30 @@ Result<> GrainMapperReader::readHeaderOnly()
   fmt::print("Origin: {}\n", fmt::join(m_Origin, ","));
   fmt::print("Spacing: {}\n", fmt::join(m_Spacing, ","));
 
+  error = findAvailableDctDatasets(labDctGid);
+  if(error < 0)
+  {
+  }
+  error = readPhases(fileId);
+  if(error < 0)
+  {
+  }
+
+  return result;
+}
+
+herr_t GrainMapperReader::findAvailableDctDatasets(hid_t labDctGid)
+{
   // Now check that each of the known data sets exist
   // Get the Image Geometry Dimensions
   hid_t dataGid = H5Gopen(labDctGid, Constants::k_DataGroupName.c_str(), H5P_DEFAULT);
   if(dataGid < 0)
   {
+    return -1;
   }
-  sentinel.addGroupId(dataGid);
+  auto groupSentinel = H5Support::H5ScopedGroupSentinel(dataGid, true);
 
-  for(const auto& entry : Constants::k_NameToDataTypeMap)
+  for(const auto& entry : GrainMapper3DUtilities::k_NameToDataTypeMap)
   {
     if(H5Lite::datasetExists(dataGid, entry.first))
     {
@@ -157,29 +188,66 @@ Result<> GrainMapperReader::readHeaderOnly()
       m_AvailableDCTDatasets.push_back(entry.first);
     }
   }
+  return 0;
+}
 
+herr_t GrainMapperReader::readPhases(hid_t parentId)
+{
   // Get the Phase Information
-  hid_t phaseGid = H5Gopen(fileId, Constants::k_PhaseInfoName.c_str(), H5P_DEFAULT);
-  if(phaseGid < 0)
+  hid_t phaseInfoGid = H5Gopen(parentId, Constants::k_PhaseInfoName.c_str(), H5P_DEFAULT);
+  if(phaseInfoGid < 0)
   {
+    return phaseInfoGid;
   }
-  sentinel.addGroupId(phaseGid);
+  auto groupSentinel = H5Support::H5ScopedGroupSentinel(phaseInfoGid, true);
   std::list<std::string> phaseNames;
-  error = H5Utilities::getGroupObjects(phaseGid, H5Utilities::CustomHDFDataTypes::Group, phaseNames);
+  herr_t error = H5Utilities::getGroupObjects(phaseInfoGid, H5Utilities::CustomHDFDataTypes::Group, phaseNames);
   if(error < 0)
   {
+    return error;
   }
+  m_PhaseInfos.clear();
+
   // Now we know how many phases we have, we need to programmatically generate those phase names
   // in order to keep them consistent. Yep, someone didn't really think through the parsing of this
   // or assumptions are being made about the order that HDF5 is going to give them back to you. Either
   // is bad.
   for(int i = 0; i < phaseNames.size(); i++)
   {
-    std::string name = fmt::format("Phase{:02}", i + 1);
-    std::cout << name << std::endl;
-  }
+    std::string phaseName = fmt::format("Phase{:02}", i + 1);
+    std::cout << phaseName << std::endl;
 
-  return result;
+    hid_t phaseGid = H5Gopen(phaseInfoGid, phaseName.c_str(), H5P_DEFAULT);
+    auto phaseDGidSentinel = H5Support::H5ScopedGroupSentinel(phaseGid, true);
+
+    GrainMapperPhase phase;
+    error = H5Lite::readStringDataset(phaseGid, Constants::k_Name, phase.Name);
+    if(error < 0)
+    {
+      return error;
+    }
+
+    error = H5Lite::readStringDataset(phaseGid, Constants::k_Name, phase.UniversalHermannMauguin);
+    if(error < 0)
+    {
+      return error;
+    }
+
+    error = H5Lite::readScalarDataset(phaseGid, Constants::k_SpaceGroupName, phase.SpaceGroup);
+    if(error < 0)
+    {
+      return error;
+    }
+
+    error = H5Lite::readVectorDataset(phaseGid, Constants::k_UnitCellName, phase.UnitCell);
+    if(error < 0)
+    {
+      return error;
+    }
+
+    m_PhaseInfos.push_back(phase);
+  }
+  return 0;
 }
 
 } // namespace GrainMapper3DUtilities
