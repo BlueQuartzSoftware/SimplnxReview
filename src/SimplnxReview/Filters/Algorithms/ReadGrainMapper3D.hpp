@@ -9,6 +9,8 @@
 
 #include <hdf5.h>
 
+using namespace GrainMapper3DUtilities;
+
 namespace nx::core
 {
 
@@ -18,6 +20,8 @@ struct SIMPLNXREVIEW_EXPORT ReadGrainMapper3DInputValues
   DataPath ImageGeometryPath;
   std::string CellAttributeMatrixName;
   std::string CellEnsembleAttributeMatrixName;
+  bool ConvertPhaseData;
+  bool ConvertRodriguesData;
 };
 
 namespace GM3DConstants
@@ -47,7 +51,7 @@ public:
   const std::atomic_bool& getCancel();
 
 protected:
-  Result<> copyPhaseData(GrainMapper3DUtilities::GrainMapperReader& reader, hid_t fileId);
+  Result<> copyPhaseInformation(GrainMapperReader& reader, hid_t fileId);
   Result<> copyDctData(GrainMapper3DUtilities::GrainMapperReader& reader, hid_t fileId);
 
 private:

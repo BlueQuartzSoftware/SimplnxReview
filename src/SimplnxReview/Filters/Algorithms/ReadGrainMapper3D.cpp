@@ -21,19 +21,13 @@
 #include <vector>
 
 using namespace nx::core;
+using namespace H5Support;
 using namespace GrainMapper3DUtilities;
 namespace GM3DConst = GrainMapper3DUtilities::Constants;
 
 namespace
 {
 
-template <typename T>
-Result<> ReadDataset(DataStructure& m_DataStructure, ReadGrainMapper3DInputValues* inputValues, DataPath arrayPath, hid_t parentId)
-{
-  using ArrayType = DataArray<T>;
-  auto& dataRef = m_DataStructure.getDataRefAs<ArrayType>(arrayPath);
-  auto* dataStorePtr = dataRef.getDataStore();
-}
 } // namespace
 
 namespace EbsdLib::CrystalStructure
@@ -56,10 +50,9 @@ const std::atomic_bool& ReadGrainMapper3D::getCancel()
   return m_ShouldCancel;
 }
 
-Result<> ReadGrainMapper3D::copyPhaseData(GrainMapperReader& reader, hid_t fileId)
+Result<> ReadGrainMapper3D::copyPhaseInformation(GrainMapperReader& reader, hid_t fileId)
 {
-
-  herr_t error = reader.readPhases(fileId);
+  herr_t error = reader.readPhaseInfo(fileId);
   if(error < 0)
   {
     return MakeErrorResult(-39801, fmt::format("Error reading phase info"));
@@ -103,22 +96,21 @@ Result<> ReadGrainMapper3D::copyPhaseData(GrainMapperReader& reader, hid_t fileI
 
 Result<> ReadGrainMapper3D::copyDctData(GrainMapperReader& reader, hid_t fileId)
 {
-  hid_t labDctGid = H5Gopen(fileId, GrainMapper3DUtilities::Constants::k_LabDCTGroupName.c_str(), H5P_DEFAULT);
+  hid_t labDctGid = H5Gopen(fileId, GM3DConst::k_LabDCTGroupName.c_str(), H5P_DEFAULT);
   if(labDctGid < 0)
   {
+    return MakeErrorResult(-89300, fmt::format("ReadGrainMapper3D: Error opening '{}' group.", GM3DConst::k_LabDCTGroupName));
   }
   auto groupSentinel = H5Support::H5ScopedGroupSentinel(labDctGid, true);
 
   // Now check that each of the known data sets exist
   // Get the Image Geometry Dimensions
-  hid_t dataGid = H5Gopen(labDctGid, GrainMapper3DUtilities::Constants::k_DataGroupName.c_str(), H5P_DEFAULT);
+  hid_t dataGid = H5Gopen(labDctGid, GM3DConst::k_DataGroupName.c_str(), H5P_DEFAULT);
   if(dataGid < 0)
   {
+    return MakeErrorResult(-89301, fmt::format("ReadGrainMapper3D: Error opening '/LabDCT/{}' group.", GM3DConst::k_DataGroupName));
   }
   groupSentinel.addGroupId(dataGid);
-
-  const auto& imageGeom = m_DataStructure.getDataRefAs<ImageGeom>(m_InputValues->ImageGeometryPath);
-  const usize totalPoints = imageGeom.getNumberOfCells();
 
   reader.findAvailableDctDatasets(labDctGid);
   auto dctDataSets = reader.getDctDatasetNames();
@@ -127,6 +119,51 @@ Result<> ReadGrainMapper3D::copyDctData(GrainMapperReader& reader, hid_t fileId)
   std::vector<std::string> in32DataSets = {GM3DConst::k_GrainIdName};
   std::vector<std::string> uint8DataSets = {GM3DConst::k_MaskName, GM3DConst::k_PhaseIdName, GM3DConst::k_IPF001Name, GM3DConst::k_IPF010Name, GM3DConst::k_IPF100Name};
   Result<> result;
+
+  if(m_InputValues->ConvertPhaseData)
+  {
+    uint8DataSets = {GM3DConst::k_MaskName, GM3DConst::k_IPF001Name, GM3DConst::k_IPF010Name, GM3DConst::k_IPF100Name};
+    std::vector<uint8> phaseU8;
+    herr_t error = H5Lite::readVectorDataset(dataGid, GM3DConst::k_PhaseIdName, phaseU8);
+    if(error < 0)
+    {
+      return MakeErrorResult(-89302, fmt::format("ReadGrainMapper3D: Error reading '/LabDCT/Data/{}' dataset.", GM3DConst::k_PhaseIdName));
+    }
+    DataPath dataArrayPath = m_InputValues->ImageGeometryPath.createChildPath(m_InputValues->CellAttributeMatrixName).createChildPath(GM3DConst::k_PhaseIdName);
+
+    auto& phaseI32 = m_DataStructure.getDataAs<Int32Array>(dataArrayPath)->getDataStoreRef();
+    // Copy the data from the temp buffer into the final spot.
+    std::copy(phaseU8.begin(), phaseU8.end(), phaseI32.begin());
+  }
+
+  if(m_InputValues->ConvertRodriguesData)
+  {
+    floatDataSets = {GM3DConst::k_CompletenessName, GM3DConst::k_EulerZXZName, GM3DConst::k_EulerZYZName, GM3DConst::k_QuaternionName};
+    std::vector<float32> gm3dRoData;
+    herr_t error = H5Lite::readVectorDataset(dataGid, GM3DConst::k_RodriguesName, gm3dRoData);
+    if(error < 0)
+    {
+      return MakeErrorResult(-89303, fmt::format("ReadGrainMapper3D: Error reading '/LabDCT/Data/{}' dataset.", GM3DConst::k_RodriguesName));
+    }
+    DataPath dataArrayPath = m_InputValues->ImageGeometryPath.createChildPath(m_InputValues->CellAttributeMatrixName).createChildPath(GM3DConst::k_RodriguesName);
+
+    auto& rodData = m_DataStructure.getDataAs<Float32Array>(dataArrayPath)->getDataStoreRef();
+    // Copy the data from the temp buffer into the final spot doing the conversion on the fly
+    // See the section on reference frames to understand what is going on in here.
+    for(size_t t = 0; t < rodData.getNumberOfTuples(); t++)
+    {
+      const float32 r0 = gm3dRoData[t * 3] * -1.0f;
+      const float32 r1 = gm3dRoData[t * 3 + 1] * -1.0f;
+      const float32 r2 = gm3dRoData[t * 3 + 2] * -1.0f;
+      const float length = sqrtf(r0 * r0 + r1 * r1 + r2 * r2);
+
+      rodData[t * 4] = r0 / length;
+      rodData[t * 4 + 1] = r1 / length;
+      rodData[t * 4 + 2] = r2 / length;
+      rodData[t * 4 + 3] = length;
+    }
+  }
+
   for(const auto& dataSetName : dctDataSets)
   {
     DataPath dataArrayPath = m_InputValues->ImageGeometryPath.createChildPath(m_InputValues->CellAttributeMatrixName).createChildPath(dataSetName);
@@ -161,13 +198,13 @@ Result<> ReadGrainMapper3D::operator()()
   hid_t fileId = H5Support::H5Utilities::openFile(m_InputValues->InputFile, true);
   if(fileId < 0)
   {
-    return MakeErrorResult(-39800, fmt::format("Grain Mapper 3D File '{}' could not be opened.", m_InputValues->InputFile.string()));
+    return MakeErrorResult(-89350, fmt::format("Grain Mapper 3D File '{}' could not be opened.", m_InputValues->InputFile.string()));
   }
   auto sentinel = H5Support::H5ScopedFileSentinel(fileId, false);
 
   // ***********************************************************************
   // Read the Phase Information
-  Result<> result = copyPhaseData(reader, fileId);
+  Result<> result = copyPhaseInformation(reader, fileId);
   if(result.invalid())
   {
     return result;
@@ -175,5 +212,5 @@ Result<> ReadGrainMapper3D::operator()()
 
   result = copyDctData(reader, fileId);
 
-  return {};
+  return result;
 }

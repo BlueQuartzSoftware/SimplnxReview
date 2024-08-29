@@ -70,6 +70,11 @@ Parameters ReadGrainMapper3DFilter::parameters() const
   Parameters params;
   // Create the parameter descriptors that are needed for this filter
   params.insertSeparator(Parameters::Separator{"Input Parameter(s)"});
+
+  params.insert(
+      std::make_unique<BoolParameter>(k_ConvertPhaseToInt32_Key, "Create Compatible Phase Data", "Native Phases data value is uint8. Convert to Int32 for better filter compatibility", true));
+  params.insert(std::make_unique<BoolParameter>(k_ConvertRodriguesData_Key, "Create Compatible Rodrigues Data", "Multiple Rodrigues data by -1.0 and convert to 4 component vector.", true));
+
   params.insert(std::make_unique<FileSystemPathParameter>(k_InputFile_Key, "Input File", "The input .hdf5 file path", fs::path("input.h5"), FileSystemPathParameter::ExtensionsType{".h5"},
                                                           FileSystemPathParameter::PathType::InputFile));
   params.insertSeparator(Parameters::Separator{"Output Image Geometry"});
@@ -97,6 +102,8 @@ IFilter::PreflightResult ReadGrainMapper3DFilter::preflightImpl(const DataStruct
   auto pImageGeometryPath = filterArgs.value<DataPath>(k_CreatedImageGeometryPath_Key);
   auto pCellAttributeMatrixNameValue = filterArgs.value<std::string>(k_CellAttributeMatrixName_Key);
   auto pCellEnsembleAttributeMatrixNameValue = filterArgs.value<std::string>(k_CellEnsembleAttributeMatrixName_Key);
+  auto pConvertPhaseData = filterArgs.value<bool>(k_ConvertPhaseToInt32_Key);
+  auto pConvertRodrigues = filterArgs.value<bool>(k_ConvertRodriguesData_Key);
 
   PreflightResult preflightResult;
   nx::core::Result<OutputActions> resultOutputActions;
@@ -106,17 +113,16 @@ IFilter::PreflightResult ReadGrainMapper3DFilter::preflightImpl(const DataStruct
   Result<> result = reader.readHeaderOnly();
   if(result.invalid())
   {
-    return MakePreflightErrorResult(-99582, fmt::format("An error occurred while reading the header data"));
+    auto badResult = MakePreflightErrorResult(result.errors().front().code, result.errors().front().message);
   }
 
   // create the Image Geometry and it's attribute matrices
   const std::vector<usize> dims = reader.getDimensions();
-  ;
   {
     CreateImageGeometryAction::SpacingType spacing = reader.getSpacing();
     std::vector<float> origin = reader.getOrigin();
 
-    auto createDataGroupAction = std::make_unique<CreateImageGeometryAction>(pImageGeometryPath, dims, origin, spacing, pCellAttributeMatrixNameValue);
+    auto createDataGroupAction = std::make_unique<CreateImageGeometryAction>(pImageGeometryPath, dims, origin, spacing, pCellAttributeMatrixNameValue, IGeometry::LengthUnit::Millimeter);
     resultOutputActions.value().appendAction(std::move(createDataGroupAction));
   }
 
@@ -131,8 +137,20 @@ IFilter::PreflightResult ReadGrainMapper3DFilter::preflightImpl(const DataStruct
   auto availableDataSets = reader.getDctDatasetNames();
   for(const auto& dataSetName : availableDataSets)
   {
-    resultOutputActions.value().appendAction(
-        std::make_unique<CreateArrayAction>(nameToDataTypeMap[dataSetName], tupleDims, std::vector<usize>{nameToCompDimMap[dataSetName]}, cellAMPath.createChildPath(dataSetName)));
+    if(pConvertPhaseData && dataSetName == GrainMapper3DUtilities::Constants::k_PhaseIdName)
+    {
+      resultOutputActions.value().appendAction(
+          std::make_unique<CreateArrayAction>(DataType::int32, tupleDims, std::vector<usize>{nameToCompDimMap[dataSetName]}, cellAMPath.createChildPath(dataSetName)));
+    }
+    else if(pConvertRodrigues && dataSetName == GrainMapper3DUtilities::Constants::k_RodriguesName)
+    {
+      resultOutputActions.value().appendAction(std::make_unique<CreateArrayAction>(nameToDataTypeMap[dataSetName], tupleDims, std::vector<usize>{4}, cellAMPath.createChildPath(dataSetName)));
+    }
+    else
+    {
+      resultOutputActions.value().appendAction(
+          std::make_unique<CreateArrayAction>(nameToDataTypeMap[dataSetName], tupleDims, std::vector<usize>{nameToCompDimMap[dataSetName]}, cellAMPath.createChildPath(dataSetName)));
+    }
   }
 
   // **************************************************************************
@@ -173,6 +191,9 @@ Result<> ReadGrainMapper3DFilter::executeImpl(DataStructure& dataStructure, cons
   inputValues.ImageGeometryPath = filterArgs.value<DataPath>(k_CreatedImageGeometryPath_Key);
   inputValues.CellAttributeMatrixName = filterArgs.value<std::string>(k_CellAttributeMatrixName_Key);
   inputValues.CellEnsembleAttributeMatrixName = filterArgs.value<std::string>(k_CellEnsembleAttributeMatrixName_Key);
+  inputValues.ConvertPhaseData = filterArgs.value<bool>(k_ConvertPhaseToInt32_Key);
+  ;
+  inputValues.ConvertRodriguesData = filterArgs.value<bool>(k_ConvertRodriguesData_Key);
 
   return ReadGrainMapper3D(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }

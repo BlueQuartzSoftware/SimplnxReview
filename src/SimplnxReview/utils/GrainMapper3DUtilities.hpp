@@ -78,9 +78,9 @@ public:
 
   std::vector<std::string> getDctDatasetNames() const;
   std::map<std::string, nx::core::DataType> getNameToDataTypeMap() const;
-  const std::map<std::string, size_t> getNameToCompDimMap() const;
+  std::map<std::string, size_t> getNameToCompDimMap() const;
   std::vector<GrainMapperPhase> getPhaseInformation() const;
-  herr_t readPhases(hid_t parentId);
+  herr_t readPhaseInfo(hid_t parentId);
   herr_t findAvailableDctDatasets(hid_t parentId);
 
 private:

@@ -28,6 +28,8 @@ public:
   static inline constexpr StringLiteral k_CreatedImageGeometryPath_Key = "output_image_geometry_path";
   static inline constexpr StringLiteral k_CellAttributeMatrixName_Key = "cell_attribute_matrix_name";
   static inline constexpr StringLiteral k_CellEnsembleAttributeMatrixName_Key = "cell_ensemble_attribute_matrix_name";
+  static inline constexpr StringLiteral k_ConvertPhaseToInt32_Key = "convert_phase_to_int32";
+  static inline constexpr StringLiteral k_ConvertRodriguesData_Key = "convert_rodrigues_data";
 
   /**
    * @brief Returns the name of the filter.

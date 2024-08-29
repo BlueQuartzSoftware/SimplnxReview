@@ -103,7 +103,7 @@ std::map<std::string, DataType> GrainMapperReader::getNameToDataTypeMap() const
   return GrainMapper3DUtilities::k_NameToDataTypeMap;
 }
 
-const std::map<std::string, size_t> GrainMapperReader::getNameToCompDimMap() const
+std::map<std::string, size_t> GrainMapperReader::getNameToCompDimMap() const
 {
   return GrainMapper3DUtilities::k_NameToCompDimMap;
 }
@@ -125,7 +125,7 @@ Result<> GrainMapperReader::readHeaderOnly()
   hid_t fileId = H5Support::H5Utilities::openFile(m_FileName, true);
   if(fileId < 0)
   {
-    return MakeErrorResult(-39800, fmt::format("Grain Mapper 3D File '{}' could not be opened.", m_FileName));
+    return MakeErrorResult(-39600, fmt::format("Grain Mapper 3D File '{}' could not be opened.", m_FileName));
   }
   auto sentinel = H5Support::H5ScopedFileSentinel(fileId, false);
 
@@ -133,37 +133,39 @@ Result<> GrainMapperReader::readHeaderOnly()
   hid_t labDctGid = H5Gopen(fileId, Constants::k_LabDCTGroupName.c_str(), H5P_DEFAULT);
   if(labDctGid < 0)
   {
+    return MakeErrorResult(-38602, "GrainMapperReader: Error opening group /LabDCT");
   }
   sentinel.addGroupId(labDctGid);
   std::vector<double> extents;
-  herr_t error = H5Lite::readVectorDataset(labDctGid, Constants::k_ExtentName.c_str(), extents);
+  herr_t error = H5Lite::readVectorDataset(labDctGid, Constants::k_ExtentName, extents);
   if(error < 0)
   {
+    return MakeErrorResult(-38603, "GrainMapperReader: Error reading data set /LabDCT/Extent");
   }
 
-  error = H5Lite::readVectorDataset(labDctGid, Constants::k_SpacingName.c_str(), m_Spacing);
+  error = H5Lite::readVectorDataset(labDctGid, Constants::k_SpacingName, m_Spacing);
   if(error < 0)
   {
+    return MakeErrorResult(-38604, "GrainMapperReader: Error reading data set /LabDCT/Spacing");
   }
 
   m_Dimensions = std::vector<size_t>{static_cast<size_t>(extents[0] / m_Spacing[0]), static_cast<size_t>(extents[1] / m_Spacing[1]), static_cast<size_t>(extents[2] / m_Spacing[2])};
 
-  error = H5Lite::readVectorDataset(labDctGid, Constants::k_CenterName.c_str(), m_Origin);
+  error = H5Lite::readVectorDataset(labDctGid, Constants::k_CenterName, m_Origin);
   if(error < 0)
   {
+    return MakeErrorResult(-38605, "GrainMapperReader: Error reading data set /LabDCT/Center");
   }
-
-  fmt::print("Dims: {}\n", fmt::join(m_Dimensions, ","));
-  fmt::print("Origin: {}\n", fmt::join(m_Origin, ","));
-  fmt::print("Spacing: {}\n", fmt::join(m_Spacing, ","));
 
   error = findAvailableDctDatasets(labDctGid);
   if(error < 0)
   {
+    return MakeErrorResult(-38606, "GrainMapperReader: Error parsing available data sets");
   }
-  error = readPhases(fileId);
+  error = readPhaseInfo(fileId);
   if(error < 0)
   {
+    return MakeErrorResult(-38607, fmt::format("GrainMapperReader: Error reading /PhaseInfo"));
   }
 
   return result;
@@ -176,7 +178,7 @@ herr_t GrainMapperReader::findAvailableDctDatasets(hid_t labDctGid)
   hid_t dataGid = H5Gopen(labDctGid, Constants::k_DataGroupName.c_str(), H5P_DEFAULT);
   if(dataGid < 0)
   {
-    return -1;
+    return dataGid;
   }
   auto groupSentinel = H5Support::H5ScopedGroupSentinel(dataGid, true);
 
@@ -184,14 +186,13 @@ herr_t GrainMapperReader::findAvailableDctDatasets(hid_t labDctGid)
   {
     if(H5Lite::datasetExists(dataGid, entry.first))
     {
-      fmt::print("{}\n", entry.first);
       m_AvailableDCTDatasets.push_back(entry.first);
     }
   }
   return 0;
 }
 
-herr_t GrainMapperReader::readPhases(hid_t parentId)
+herr_t GrainMapperReader::readPhaseInfo(hid_t parentId)
 {
   // Get the Phase Information
   hid_t phaseInfoGid = H5Gopen(parentId, Constants::k_PhaseInfoName.c_str(), H5P_DEFAULT);
@@ -215,7 +216,6 @@ herr_t GrainMapperReader::readPhases(hid_t parentId)
   for(int i = 0; i < phaseNames.size(); i++)
   {
     std::string phaseName = fmt::format("Phase{:02}", i + 1);
-    std::cout << phaseName << std::endl;
 
     hid_t phaseGid = H5Gopen(phaseInfoGid, phaseName.c_str(), H5P_DEFAULT);
     auto phaseDGidSentinel = H5Support::H5ScopedGroupSentinel(phaseGid, true);
