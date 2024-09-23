@@ -115,14 +115,15 @@ Result<> ReadGrainMapper3D::copyDctData(GrainMapperReader& reader, hid_t fileId)
   reader.findAvailableDctDatasets(labDctGid);
   auto dctDataSets = reader.getDctDatasetNames();
 
-  std::vector<std::string> floatDataSets = {GM3DConst::k_CompletenessName, GM3DConst::k_RodriguesName, GM3DConst::k_EulerZXZName, GM3DConst::k_EulerZYZName, GM3DConst::k_QuaternionName};
+  std::vector<std::string> floatDataSets = {GM3DConst::k_CompletenessName, GM3DConst::k_EulerZXZName, GM3DConst::k_EulerZYZName, GM3DConst::k_QuaternionName, GM3DConst::k_RodriguesName};
   std::vector<std::string> in32DataSets = {GM3DConst::k_GrainIdName};
-  std::vector<std::string> uint8DataSets = {GM3DConst::k_MaskName, GM3DConst::k_PhaseIdName, GM3DConst::k_IPF001Name, GM3DConst::k_IPF010Name, GM3DConst::k_IPF100Name};
+  std::vector<std::string> uint8DataSets = {GM3DConst::k_MaskName, GM3DConst::k_IPF001Name, GM3DConst::k_IPF010Name, GM3DConst::k_IPF100Name, GM3DConst::k_PhaseIdName};
   Result<> result;
 
-  if(m_InputValues->ConvertPhaseData)
+  // We need to special case this because we are converting from a uint8 value to an int32 value.
+  if(m_InputValues->ConvertPhaseData && (std::count(dctDataSets.begin(), dctDataSets.end(), GM3DConst::k_PhaseIdName) > 0))
   {
-    uint8DataSets = {GM3DConst::k_MaskName, GM3DConst::k_IPF001Name, GM3DConst::k_IPF010Name, GM3DConst::k_IPF100Name};
+    uint8DataSets.pop_back(); // Pop off the PhaseIdName data set since we are specifically reading it here.
     std::vector<uint8> phaseU8;
     herr_t error = H5Lite::readVectorDataset(dataGid, GM3DConst::k_PhaseIdName, phaseU8);
     if(error < 0)
@@ -136,9 +137,10 @@ Result<> ReadGrainMapper3D::copyDctData(GrainMapperReader& reader, hid_t fileId)
     std::copy(phaseU8.begin(), phaseU8.end(), phaseI32.begin());
   }
 
-  if(m_InputValues->ConvertRodriguesData)
+  // We need to special case this because we are converting from a 3 component to a 4 component
+  if(m_InputValues->ConvertOrientationData && (std::count(dctDataSets.begin(), dctDataSets.end(), GM3DConst::k_RodriguesName) > 0))
   {
-    floatDataSets = {GM3DConst::k_CompletenessName, GM3DConst::k_EulerZXZName, GM3DConst::k_EulerZYZName, GM3DConst::k_QuaternionName};
+    floatDataSets.pop_back(); // Pop off the Rodrigues data set since we are specifically reading it here.
     std::vector<float32> gm3dRoData;
     herr_t error = H5Lite::readVectorDataset(dataGid, GM3DConst::k_RodriguesName, gm3dRoData);
     if(error < 0)
@@ -164,6 +166,7 @@ Result<> ReadGrainMapper3D::copyDctData(GrainMapperReader& reader, hid_t fileId)
     }
   }
 
+  // Read all remaining data sets from the HDF5 file.
   for(const auto& dataSetName : dctDataSets)
   {
     DataPath dataArrayPath = m_InputValues->ImageGeometryPath.createChildPath(m_InputValues->CellAttributeMatrixName).createChildPath(dataSetName);
@@ -185,6 +188,28 @@ Result<> ReadGrainMapper3D::copyDctData(GrainMapperReader& reader, hid_t fileId)
     if(result.invalid())
     {
       return result;
+    }
+  }
+
+  // Convert the Quaternions Reference Frame and ordering if asked by the user and if the data set exists
+  if((std::count(dctDataSets.begin(), dctDataSets.end(), GM3DConst::k_QuaternionName) > 0) && m_InputValues->ConvertOrientationData)
+  {
+    DataPath dataArrayPath = m_InputValues->ImageGeometryPath.createChildPath(m_InputValues->CellAttributeMatrixName).createChildPath(GM3DConst::k_QuaternionName);
+    auto& quatData = m_DataStructure.getDataAs<Float32Array>(dataArrayPath)->getDataStoreRef();
+    // Copy the data from the temp buffer into the final spot doing the conversion on the fly
+    // We are reordering from wxyz (Scalar-Vector) to xyzw (Vetor-Scalar) and at the same time
+    // we are taking the conjugate of the quaternion
+    for(size_t t = 0; t < quatData.getNumberOfTuples(); t++)
+    {
+      const float32 w = quatData[t * 4];
+      const float32 x = quatData[t * 4 + 1] * -1.0f;
+      const float32 y = quatData[t * 4 + 2] * -1.0f;
+      const float32 z = quatData[t * 4 + 3] * -1.0f;
+
+      quatData[t * 4] = x;
+      quatData[t * 4 + 1] = y;
+      quatData[t * 4 + 2] = z;
+      quatData[t * 4 + 3] = w;
     }
   }
   return {};

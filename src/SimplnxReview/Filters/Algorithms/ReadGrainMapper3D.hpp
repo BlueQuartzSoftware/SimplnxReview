@@ -21,7 +21,7 @@ struct SIMPLNXREVIEW_EXPORT ReadGrainMapper3DInputValues
   std::string CellAttributeMatrixName;
   std::string CellEnsembleAttributeMatrixName;
   bool ConvertPhaseData;
-  bool ConvertRodriguesData;
+  bool ConvertOrientationData;
 };
 
 namespace GM3DConstants

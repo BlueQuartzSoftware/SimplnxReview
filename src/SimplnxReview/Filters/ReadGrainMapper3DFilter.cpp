@@ -73,7 +73,8 @@ Parameters ReadGrainMapper3DFilter::parameters() const
 
   params.insert(
       std::make_unique<BoolParameter>(k_ConvertPhaseToInt32_Key, "Create Compatible Phase Data", "Native Phases data value is uint8. Convert to Int32 for better filter compatibility", true));
-  params.insert(std::make_unique<BoolParameter>(k_ConvertRodriguesData_Key, "Create Compatible Rodrigues Data", "Multiple Rodrigues data by -1.0 and convert to 4 component vector.", true));
+  params.insert(std::make_unique<BoolParameter>(k_ConvertOrientationData_Key, "Create Compatible Orientation Data",
+                                                "Orientation data such as Quaternions and Rodrigues vectors will be converted to be DREAM3D-NX compatible", true));
 
   params.insert(std::make_unique<FileSystemPathParameter>(k_InputFile_Key, "Input File", "The input .hdf5 file path", fs::path("input.h5"), FileSystemPathParameter::ExtensionsType{".h5"},
                                                           FileSystemPathParameter::PathType::InputFile));
@@ -103,7 +104,7 @@ IFilter::PreflightResult ReadGrainMapper3DFilter::preflightImpl(const DataStruct
   auto pCellAttributeMatrixNameValue = filterArgs.value<std::string>(k_CellAttributeMatrixName_Key);
   auto pCellEnsembleAttributeMatrixNameValue = filterArgs.value<std::string>(k_CellEnsembleAttributeMatrixName_Key);
   auto pConvertPhaseData = filterArgs.value<bool>(k_ConvertPhaseToInt32_Key);
-  auto pConvertRodrigues = filterArgs.value<bool>(k_ConvertRodriguesData_Key);
+  auto pConvertOrientationData = filterArgs.value<bool>(k_ConvertOrientationData_Key);
 
   PreflightResult preflightResult;
   nx::core::Result<OutputActions> resultOutputActions;
@@ -142,7 +143,7 @@ IFilter::PreflightResult ReadGrainMapper3DFilter::preflightImpl(const DataStruct
       resultOutputActions.value().appendAction(
           std::make_unique<CreateArrayAction>(DataType::int32, tupleDims, std::vector<usize>{nameToCompDimMap[dataSetName]}, cellAMPath.createChildPath(dataSetName)));
     }
-    else if(pConvertRodrigues && dataSetName == GrainMapper3DUtilities::Constants::k_RodriguesName)
+    else if(pConvertOrientationData && dataSetName == GrainMapper3DUtilities::Constants::k_RodriguesName)
     {
       resultOutputActions.value().appendAction(std::make_unique<CreateArrayAction>(nameToDataTypeMap[dataSetName], tupleDims, std::vector<usize>{4}, cellAMPath.createChildPath(dataSetName)));
     }
@@ -192,8 +193,8 @@ Result<> ReadGrainMapper3DFilter::executeImpl(DataStructure& dataStructure, cons
   inputValues.CellAttributeMatrixName = filterArgs.value<std::string>(k_CellAttributeMatrixName_Key);
   inputValues.CellEnsembleAttributeMatrixName = filterArgs.value<std::string>(k_CellEnsembleAttributeMatrixName_Key);
   inputValues.ConvertPhaseData = filterArgs.value<bool>(k_ConvertPhaseToInt32_Key);
-  ;
-  inputValues.ConvertRodriguesData = filterArgs.value<bool>(k_ConvertRodriguesData_Key);
+
+  inputValues.ConvertOrientationData = filterArgs.value<bool>(k_ConvertOrientationData_Key);
 
   return ReadGrainMapper3D(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }
