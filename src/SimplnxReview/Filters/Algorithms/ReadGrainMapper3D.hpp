@@ -17,11 +17,16 @@ namespace nx::core
 struct SIMPLNXREVIEW_EXPORT ReadGrainMapper3DInputValues
 {
   std::filesystem::path InputFile;
-  DataPath ImageGeometryPath;
-  std::string CellAttributeMatrixName;
-  std::string CellEnsembleAttributeMatrixName;
+  bool ReadDctData;
+  DataPath DctImageGeometryPath;
+  std::string DctCellAttributeMatrixName;
+  std::string DctCellEnsembleAttributeMatrixName;
   bool ConvertPhaseData;
   bool ConvertOrientationData;
+
+  bool ReadAbsorptionData;
+  DataPath AbsorptionImageGeometryPath;
+  std::string AbsorptionCellAttributeMatrixName;
 };
 
 namespace GM3DConstants
@@ -51,8 +56,9 @@ public:
   const std::atomic_bool& getCancel();
 
 protected:
-  Result<> copyPhaseInformation(GrainMapperReader& reader, hid_t fileId);
-  Result<> copyDctData(GrainMapper3DUtilities::GrainMapperReader& reader, hid_t fileId);
+  Result<> copyPhaseInformation(GrainMapperReader& reader, hid_t fileId) const;
+  Result<> copyDctData(GrainMapper3DUtilities::GrainMapperReader& reader, hid_t fileId) const;
+  Result<> copyAbsorptionData(GrainMapperReader& reader, hid_t fileId) const;
 
 private:
   DataStructure& m_DataStructure;

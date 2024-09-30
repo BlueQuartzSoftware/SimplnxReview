@@ -50,8 +50,12 @@ const std::atomic_bool& ReadGrainMapper3D::getCancel()
   return m_ShouldCancel;
 }
 
-Result<> ReadGrainMapper3D::copyPhaseInformation(GrainMapperReader& reader, hid_t fileId)
+Result<> ReadGrainMapper3D::copyPhaseInformation(GrainMapperReader& reader, hid_t fileId) const
 {
+  if(!m_InputValues->ReadDctData)
+  {
+    return {};
+  }
   herr_t error = reader.readPhaseInfo(fileId);
   if(error < 0)
   {
@@ -59,7 +63,7 @@ Result<> ReadGrainMapper3D::copyPhaseInformation(GrainMapperReader& reader, hid_
   }
 
   auto phases = reader.getPhaseInformation();
-  DataPath cellEnsembleAMPath = m_InputValues->ImageGeometryPath.createChildPath(m_InputValues->CellEnsembleAttributeMatrixName);
+  DataPath cellEnsembleAMPath = m_InputValues->DctImageGeometryPath.createChildPath(m_InputValues->DctCellEnsembleAttributeMatrixName);
 
   // These arrays are purposely created using the AngFile constant names for BOTH the Oim and the Esprit readers!
   auto& crystalStructures = m_DataStructure.getDataRefAs<UInt32Array>(cellEnsembleAMPath.createChildPath(GM3DConstants::k_CrystalStructures));
@@ -94,8 +98,13 @@ Result<> ReadGrainMapper3D::copyPhaseInformation(GrainMapperReader& reader, hid_
   return {};
 }
 
-Result<> ReadGrainMapper3D::copyDctData(GrainMapperReader& reader, hid_t fileId)
+Result<> ReadGrainMapper3D::copyDctData(GrainMapperReader& reader, hid_t fileId) const
 {
+  if(!m_InputValues->ReadDctData)
+  {
+    return {};
+  }
+
   hid_t labDctGid = H5Gopen(fileId, GM3DConst::k_LabDCTGroupName.c_str(), H5P_DEFAULT);
   if(labDctGid < 0)
   {
@@ -130,7 +139,7 @@ Result<> ReadGrainMapper3D::copyDctData(GrainMapperReader& reader, hid_t fileId)
     {
       return MakeErrorResult(-89302, fmt::format("ReadGrainMapper3D: Error reading '/LabDCT/Data/{}' dataset.", GM3DConst::k_PhaseIdName));
     }
-    DataPath dataArrayPath = m_InputValues->ImageGeometryPath.createChildPath(m_InputValues->CellAttributeMatrixName).createChildPath(GM3DConst::k_PhaseIdName);
+    DataPath dataArrayPath = m_InputValues->DctImageGeometryPath.createChildPath(m_InputValues->DctCellAttributeMatrixName).createChildPath(GM3DConst::k_PhaseIdName);
 
     auto& phaseI32 = m_DataStructure.getDataAs<Int32Array>(dataArrayPath)->getDataStoreRef();
     // Copy the data from the temp buffer into the final spot.
@@ -147,7 +156,7 @@ Result<> ReadGrainMapper3D::copyDctData(GrainMapperReader& reader, hid_t fileId)
     {
       return MakeErrorResult(-89303, fmt::format("ReadGrainMapper3D: Error reading '/LabDCT/Data/{}' dataset.", GM3DConst::k_RodriguesName));
     }
-    DataPath dataArrayPath = m_InputValues->ImageGeometryPath.createChildPath(m_InputValues->CellAttributeMatrixName).createChildPath(GM3DConst::k_RodriguesName);
+    DataPath dataArrayPath = m_InputValues->DctImageGeometryPath.createChildPath(m_InputValues->DctCellAttributeMatrixName).createChildPath(GM3DConst::k_RodriguesName);
 
     auto& rodData = m_DataStructure.getDataAs<Float32Array>(dataArrayPath)->getDataStoreRef();
     // Copy the data from the temp buffer into the final spot doing the conversion on the fly
@@ -169,7 +178,7 @@ Result<> ReadGrainMapper3D::copyDctData(GrainMapperReader& reader, hid_t fileId)
   // Read all remaining data sets from the HDF5 file.
   for(const auto& dataSetName : dctDataSets)
   {
-    DataPath dataArrayPath = m_InputValues->ImageGeometryPath.createChildPath(m_InputValues->CellAttributeMatrixName).createChildPath(dataSetName);
+    DataPath dataArrayPath = m_InputValues->DctImageGeometryPath.createChildPath(m_InputValues->DctCellAttributeMatrixName).createChildPath(dataSetName);
 
     nx::core::HDF5::DatasetReader datasetReader(dataGid, dataSetName);
 
@@ -194,7 +203,7 @@ Result<> ReadGrainMapper3D::copyDctData(GrainMapperReader& reader, hid_t fileId)
   // Convert the Quaternions Reference Frame and ordering if asked by the user and if the data set exists
   if((std::count(dctDataSets.begin(), dctDataSets.end(), GM3DConst::k_QuaternionName) > 0) && m_InputValues->ConvertOrientationData)
   {
-    DataPath dataArrayPath = m_InputValues->ImageGeometryPath.createChildPath(m_InputValues->CellAttributeMatrixName).createChildPath(GM3DConst::k_QuaternionName);
+    DataPath dataArrayPath = m_InputValues->DctImageGeometryPath.createChildPath(m_InputValues->DctCellAttributeMatrixName).createChildPath(GM3DConst::k_QuaternionName);
     auto& quatData = m_DataStructure.getDataAs<Float32Array>(dataArrayPath)->getDataStoreRef();
     // Copy the data from the temp buffer into the final spot doing the conversion on the fly
     // We are reordering from wxyz (Scalar-Vector) to xyzw (Vetor-Scalar) and at the same time
@@ -215,10 +224,31 @@ Result<> ReadGrainMapper3D::copyDctData(GrainMapperReader& reader, hid_t fileId)
   return {};
 }
 
+Result<> ReadGrainMapper3D::copyAbsorptionData(GrainMapperReader& reader, hid_t fileId) const
+{
+  if(!m_InputValues->ReadAbsorptionData)
+  {
+    return {};
+  }
+  hid_t gid = H5Gopen(fileId, GM3DConst::k_AbsorptionCTName.c_str(), H5P_DEFAULT);
+  if(gid < 0)
+  {
+    return MakeErrorResult(-89350, fmt::format("ReadGrainMapper3D: Error opening '{}' group.", GM3DConst::k_AbsorptionCTName));
+  }
+  auto groupSentinel = H5Support::H5ScopedGroupSentinel(gid, true);
+
+  DataPath dataArrayPath =
+      m_InputValues->AbsorptionImageGeometryPath.createChildPath(m_InputValues->AbsorptionCellAttributeMatrixName).createChildPath(GrainMapper3DUtilities::Constants::k_DataGroupName);
+
+  nx::core::HDF5::DatasetReader datasetReader(gid, GM3DConst::k_DataGroupName);
+
+  return nx::core::HDF5::Support::FillDataArray<uint16>(m_DataStructure, dataArrayPath, datasetReader);
+}
+
 // -----------------------------------------------------------------------------
 Result<> ReadGrainMapper3D::operator()()
 {
-  GrainMapperReader reader(m_InputValues->InputFile.string());
+  GrainMapperReader reader(m_InputValues->InputFile.string(), m_InputValues->ReadDctData, m_InputValues->ReadAbsorptionData);
 
   hid_t fileId = H5Support::H5Utilities::openFile(m_InputValues->InputFile, true);
   if(fileId < 0)
@@ -235,7 +265,21 @@ Result<> ReadGrainMapper3D::operator()()
     return result;
   }
 
+  // ***********************************************************************
+  // Read the LabDCT Information
   result = copyDctData(reader, fileId);
+  if(result.invalid())
+  {
+    return result;
+  }
 
-  return result;
+  // ***********************************************************************
+  // Read the LabDCT Information
+  result = copyAbsorptionData(reader, fileId);
+  if(result.invalid())
+  {
+    return result;
+  }
+
+  return {};
 }

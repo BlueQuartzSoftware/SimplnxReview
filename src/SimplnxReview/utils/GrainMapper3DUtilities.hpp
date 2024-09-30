@@ -19,13 +19,14 @@ namespace GrainMapper3DUtilities
 namespace Constants
 {
 const std::string k_LabDCTGroupName("LabDCT");
-const std::string k_AbsorptionCTName("k_AbsorptionCT");
+const std::string k_AbsorptionCTName("AbsorptionCT");
 const std::string k_ProjectInfoName("ProjectInfo");
 const std::string k_VersionName("Version");
 
 const std::string k_ExtentName("Extent");
 const std::string k_SpacingName("Spacing");
 const std::string k_CenterName("Center");
+const std::string k_VirtualShift("VirtualShift");
 
 const std::string k_DataGroupName("Data");
 const std::string k_CompletenessName("Completeness");
@@ -59,7 +60,7 @@ int32_t GetLaueIndexFromSpaceGroup(int32_t spaceGroupId);
 class SIMPLNXREVIEW_EXPORT GrainMapperReader
 {
 public:
-  explicit GrainMapperReader(const std::string& filePath);
+  explicit GrainMapperReader(const std::string& filePath, bool readDctData, bool readAbsorptionData);
   ~GrainMapperReader();
 
   typedef struct
@@ -72,9 +73,16 @@ public:
 
   nx::core::Result<> readHeaderOnly();
 
-  std::vector<size_t> getDimensions() const;
-  std::vector<float> getSpacing() const;
-  std::vector<float> getOrigin() const;
+  std::vector<size_t> getLabDCTDimensions() const;
+  std::vector<float> getLabDCTSpacing() const;
+  std::vector<float> getLabDCTOrigin() const;
+
+  std::vector<size_t> getAbsorptionCTDimensions() const;
+  std::vector<float> getAbsorptionCTSpacing() const;
+  std::vector<float> getAbsorptionCTOrigin() const;
+
+  nx::core::Result<> readLabDCTHeader(hid_t fileId);
+  nx::core::Result<> readAbsorptionHeader(hid_t fileId);
 
   std::vector<std::string> getDctDatasetNames() const;
   std::map<std::string, nx::core::DataType> getNameToDataTypeMap() const;
@@ -84,14 +92,21 @@ public:
   herr_t findAvailableDctDatasets(hid_t parentId);
 
 private:
+  bool m_ReadDctData = false;
+  bool m_ReadAbsorptionData = false;
+
   std::string m_ErrorMessage = {};
   std::string m_FileName = {};
   std::string m_HDF5Path = {};
   std::string m_OINAVersion = {};
 
-  std::vector<size_t> m_Dimensions;
-  std::vector<double> m_Spacing = {1.0, 1.0, 1.0};
-  std::vector<double> m_Origin = {0.0, 0.0, 0.0};
+  std::vector<size_t> m_LabDctDimensions;
+  std::vector<double> m_LabDctSpacing = {1.0, 1.0, 1.0};
+  std::vector<double> m_LabDctOrigin = {0.0, 0.0, 0.0};
+
+  std::vector<size_t> m_AbsorptionCTDimensions;
+  std::vector<double> m_AbsorptionCTSpacing = {1.0, 1.0, 1.0};
+  std::vector<double> m_AbsorptionCTOrigin = {0.0, 0.0, 0.0};
 
   std::vector<std::string> m_AvailableDCTDatasets;
   std::vector<GrainMapperPhase> m_PhaseInfos;
