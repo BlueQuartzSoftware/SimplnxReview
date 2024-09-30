@@ -111,6 +111,12 @@ IFilter::UniquePointer ReadGrainMapper3DFilter::clone() const
 }
 
 //------------------------------------------------------------------------------
+IFilter::VersionType ReadGrainMapper3DFilter::parametersVersion() const
+{
+  return 1;
+}
+
+//------------------------------------------------------------------------------
 IFilter::PreflightResult ReadGrainMapper3DFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
                                                                 const std::atomic_bool& shouldCancel) const
 {
