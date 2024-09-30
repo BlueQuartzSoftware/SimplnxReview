@@ -104,6 +104,12 @@ IFilter::UniquePointer GroupMicroTextureRegionsFilter::clone() const
 }
 
 //------------------------------------------------------------------------------
+IFilter::VersionType GroupMicroTextureRegionsFilter::parametersVersion() const
+{
+  return 1;
+}
+
+//------------------------------------------------------------------------------
 IFilter::PreflightResult GroupMicroTextureRegionsFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
                                                                        const std::atomic_bool& shouldCancel) const
 {

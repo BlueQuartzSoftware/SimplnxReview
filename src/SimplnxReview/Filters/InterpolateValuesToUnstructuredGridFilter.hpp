@@ -59,14 +59,22 @@ public:
   std::vector<std::string> defaultTags() const override;
 
   /**
-   * @brief
-   * @return Parameters
+   * @brief Returns the parameters of the filter (i.e. its inputs)
+   * @return
    */
   Parameters parameters() const override;
 
   /**
-   * @brief
-   * @return UniquePointer
+   * @brief Returns parameters version integer.
+   * Initial version should always be 1.
+   * Should be incremented everytime the parameters change.
+   * @return VersionType
+   */
+  VersionType parametersVersion() const override;
+
+  /**
+   * @brief Returns a copy of the filter.
+   * @return
    */
   UniquePointer clone() const override;
 

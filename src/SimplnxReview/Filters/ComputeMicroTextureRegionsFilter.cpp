@@ -70,6 +70,12 @@ IFilter::UniquePointer ComputeMicroTextureRegionsFilter::clone() const
 }
 
 //------------------------------------------------------------------------------
+IFilter::VersionType ComputeMicroTextureRegionsFilter::parametersVersion() const
+{
+  return 1;
+}
+
+//------------------------------------------------------------------------------
 IFilter::PreflightResult ComputeMicroTextureRegionsFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
                                                                          const std::atomic_bool& shouldCancel) const
 {

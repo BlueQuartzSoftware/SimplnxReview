@@ -73,6 +73,12 @@ IFilter::UniquePointer ComputeSaltykovSizesFilter::clone() const
 }
 
 //------------------------------------------------------------------------------
+IFilter::VersionType ComputeSaltykovSizesFilter::parametersVersion() const
+{
+  return 1;
+}
+
+//------------------------------------------------------------------------------
 IFilter::PreflightResult ComputeSaltykovSizesFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
                                                                    const std::atomic_bool& shouldCancel) const
 {

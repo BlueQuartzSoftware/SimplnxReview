@@ -83,6 +83,12 @@ IFilter::UniquePointer InterpolateValuesToUnstructuredGridFilter::clone() const
 }
 
 //------------------------------------------------------------------------------
+IFilter::VersionType InterpolateValuesToUnstructuredGridFilter::parametersVersion() const
+{
+  return 1;
+}
+
+//------------------------------------------------------------------------------
 IFilter::PreflightResult InterpolateValuesToUnstructuredGridFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
                                                                                   const std::atomic_bool& shouldCancel) const
 {

@@ -99,6 +99,12 @@ IFilter::UniquePointer ComputeLocalAverageCAxisMisalignmentsFilter::clone() cons
 }
 
 //------------------------------------------------------------------------------
+IFilter::VersionType ComputeLocalAverageCAxisMisalignmentsFilter::parametersVersion() const
+{
+  return 1;
+}
+
+//------------------------------------------------------------------------------
 IFilter::PreflightResult ComputeLocalAverageCAxisMisalignmentsFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
                                                                                     const std::atomic_bool& shouldCancel) const
 {

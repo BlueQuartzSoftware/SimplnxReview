@@ -91,6 +91,12 @@ IFilter::UniquePointer ComputeGroupingDensityFilter::clone() const
 }
 
 //------------------------------------------------------------------------------
+IFilter::VersionType ComputeGroupingDensityFilter::parametersVersion() const
+{
+  return 1;
+}
+
+//------------------------------------------------------------------------------
 IFilter::PreflightResult ComputeGroupingDensityFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
                                                                      const std::atomic_bool& shouldCancel) const
 {
