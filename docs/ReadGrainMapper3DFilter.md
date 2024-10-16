@@ -6,11 +6,11 @@ Readers
 
 ## Description
 
-This filter will read Version 4 and Version 5 GrainMapper3D HDF5 files. The Phase information
-will be parsed from the file in addition to the "LabDCT" data.
+This filter will read Version 4 and Version 5 GrainMapper3D HDF5 files. 
 
 - Euler data is read as radians
 - The Image Geometry that is produced is in units of millimeters
+- The user has the opportunity to create compatible Orientation Data and Phase data. See below.
 
 ## Parameter Discussion
 
@@ -24,6 +24,13 @@ order will be changed from wxyz to xyzw and the conjugate will be computed.
 
 PhaseId data will be converted to "int32" (as an option) to make that data immediately compatible
 with DREAM3D's filters.
+
+## Special Notes
+
+The IPF colors (if any) that are read in from the file are *NOT* compatible with the IPF 
+Color legends provided by DREAM3D-NX or EBSDLib. The user can use the "Compute IPF Colors"
+if they need to specifically understand the crystallographic orientations or they
+can obtain the IPF legends from XNovo.
 
 % Auto generated parameter table will be inserted here
 
