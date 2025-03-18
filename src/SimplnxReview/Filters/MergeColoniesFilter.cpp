@@ -111,8 +111,8 @@ IFilter::VersionType MergeColoniesFilter::parametersVersion() const
 }
 
 //------------------------------------------------------------------------------
-IFilter::PreflightResult MergeColoniesFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
-                                                            const std::atomic_bool& shouldCancel) const
+IFilter::PreflightResult MergeColoniesFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler, const std::atomic_bool& shouldCancel,
+                                                            const ExecutionContext& executionContext) const
 {
   auto pFeaturePhasesPathValue = filterArgs.value<DataPath>(k_FeaturePhasesArrayPath_Key);
   auto pAvgQuatsPathValue = filterArgs.value<DataPath>(k_AvgQuatsArrayPath_Key);
@@ -165,7 +165,7 @@ IFilter::PreflightResult MergeColoniesFilter::preflightImpl(const DataStructure&
 
 //------------------------------------------------------------------------------
 Result<> MergeColoniesFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
-                                          const std::atomic_bool& shouldCancel) const
+                                          const std::atomic_bool& shouldCancel, const ExecutionContext& executionContext) const
 {
   MergeColoniesInputValues inputValues;
 

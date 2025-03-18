@@ -90,7 +90,7 @@ IFilter::VersionType InterpolateValuesToUnstructuredGridFilter::parametersVersio
 
 //------------------------------------------------------------------------------
 IFilter::PreflightResult InterpolateValuesToUnstructuredGridFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
-                                                                                  const std::atomic_bool& shouldCancel) const
+                                                                                  const std::atomic_bool& shouldCancel, const ExecutionContext& executionContext) const
 {
   auto srcGeomPath = filterArgs.value<DataPath>(k_SourceGeometryPath_Key);
   auto destGeomPath = filterArgs.value<DataPath>(k_DestinationGeometryPath_Key);
@@ -140,7 +140,7 @@ IFilter::PreflightResult InterpolateValuesToUnstructuredGridFilter::preflightImp
 
 //------------------------------------------------------------------------------
 Result<> InterpolateValuesToUnstructuredGridFilter::executeImpl(DataStructure& dataStructure, const Arguments& args, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
-                                                                const std::atomic_bool& shouldCancel) const
+                                                                const std::atomic_bool& shouldCancel, const ExecutionContext& executionContext) const
 {
   InterpolateValuesToUnstructuredGridInputValues inputValues;
 
