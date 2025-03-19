@@ -57,11 +57,11 @@ TEST_CASE("SimplnxReview::GroupMicroTextureRegionsFilter: Valid Filter Execution
 
   // Preflight the filter and check result
   auto preflightResult = filter.preflight(ds, args);
-  REQUIRE(preflightResult.outputActions.valid());
+  SIMPLNX_RESULT_REQUIRE_VALID(preflightResult.outputActions);
 
   // Execute the filter and check the result
   auto executeResult = filter.execute(ds, args);
-  REQUIRE(executeResult.result.valid());
+  SIMPLNX_RESULT_REQUIRE_VALID(executeResult.result);
 }
 
 // TEST_CASE("OrientationAnalysis::GroupMicroTextureRegionsFilter: InValid Filter Execution")

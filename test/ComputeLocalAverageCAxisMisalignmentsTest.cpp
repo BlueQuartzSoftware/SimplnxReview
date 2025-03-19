@@ -26,6 +26,7 @@
 #include "simplnx/Parameters/BoolParameter.hpp"
 #include "simplnx/Parameters/DataGroupSelectionParameter.hpp"
 #include "simplnx/Parameters/StringParameter.hpp"
+#include "simplnx/UnitTest/UnitTestCommon.hpp"
 
 #include "SimplnxReview/Filters/ComputeLocalAverageCAxisMisalignmentsFilter.hpp"
 #include "SimplnxReview/SimplnxReview_test_dirs.hpp"
@@ -53,11 +54,11 @@ TEST_CASE("SimplnxReview::ComputeLocalAverageCAxisMisalignmentsFilter: Valid Fil
 
   // Preflight the filter and check result
   auto preflightResult = filter.preflight(ds, args);
-  REQUIRE(preflightResult.outputActions.valid());
+  SIMPLNX_RESULT_REQUIRE_VALID(preflightResult.outputActions);
 
   // Execute the filter and check the result
   auto executeResult = filter.execute(ds, args);
-  REQUIRE(executeResult.result.valid());
+  SIMPLNX_RESULT_REQUIRE_VALID(executeResult.result);
 }
 
 // TEST_CASE("OrientationAnalysis::ComputeLocalAverageCAxisMisalignmentsFilter: InValid Filter Execution")

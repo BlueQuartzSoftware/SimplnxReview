@@ -25,6 +25,7 @@
 #include "simplnx/Parameters/ArraySelectionParameter.hpp"
 #include "simplnx/Parameters/DataGroupSelectionParameter.hpp"
 #include "simplnx/Parameters/StringParameter.hpp"
+#include "simplnx/UnitTest/UnitTestCommon.hpp"
 
 #include "SimplnxReview/Filters/ComputeMicroTextureRegionsFilter.hpp"
 #include "SimplnxReview/SimplnxReview_test_dirs.hpp"
@@ -46,11 +47,11 @@ TEST_CASE("SimplnxReview::ComputeMicroTextureRegionsFilter: Valid Filter Executi
 
   // Preflight the filter and check result
   auto preflightResult = filter.preflight(ds, args);
-  REQUIRE(preflightResult.outputActions.valid());
+  SIMPLNX_RESULT_REQUIRE_VALID(preflightResult.outputActions);
 
   // Execute the filter and check the result
   auto executeResult = filter.execute(ds, args);
-  REQUIRE(executeResult.result.valid());
+  SIMPLNX_RESULT_REQUIRE_VALID(executeResult.result);
 }
 
 // TEST_CASE("OrientationAnalysis::ComputeMicroTextureRegionsFilter: InValid Filter Execution")
