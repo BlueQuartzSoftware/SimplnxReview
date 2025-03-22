@@ -70,7 +70,7 @@ Result<> ComputeSaltykovSizes::operator()()
   // the second guess is 20 bins, after this, a forward difference will ensue
 
   float32 binLength = 0.0f;
-  int32 iter = 0;
+  //  int32 iter = 0;
   int32 saltykovLength = 0, saltykovLength1 = 0, saltykovLength2 = 0;
   int32 saltykovIndex = 1;
   int32 attempts = 0;
@@ -137,14 +137,14 @@ Result<> ComputeSaltykovSizes::operator()()
       binLengths[i] = 0;
     }
 
-    iter = 0;
+    // iter = 0;
     for(int32 i = 0; i < numberOfBins; i++)
     {
       temp.resize(0);
       std::copy(std::lower_bound(sortedEquivDiams.begin(), sortedEquivDiams.end(), binLength * i), std::upper_bound(sortedEquivDiams.begin(), sortedEquivDiams.end(), binLength * (i + 1)),
                 std::back_inserter(temp));
       binLengths[i] = temp.size();
-      iter++;
+      //      iter++;
     }
 
     std::reverse(binLengths.begin(), binLengths.end());

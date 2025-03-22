@@ -25,9 +25,9 @@ public:
   , m_AvgCAxisMisalignments(avgCAxisMisalignments)
   , m_NeighborList(neighborList)
   , m_CAxisMisalignmentList(cAxisMisalignmentList)
-  , m_NumFeaturesPerParent(numFeaturesPerParent)
   , m_UnbiasedLocalCAxisMisalignments(unbiasedLocalCAxisMisalignments)
   , m_LocalCAxisMisalignments(localCAxisMisalignments)
+  , m_NumFeaturesPerParent(numFeaturesPerParent)
   {
   }
   ~FindLocalAverageMisalignments() noexcept = default;
