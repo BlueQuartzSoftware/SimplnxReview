@@ -1,0 +1,1036 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "ci",
+      "hidden":  true,
+      "displayName": "CI build",
+      "description": "Build configuration for Azure Self Hosted",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "VCPKG_MANIFEST_DIR": {
+          "type": "STRING",
+          "value": "${sourceDir}/../simplnx"
+        },
+        "VCPKG_MANIFEST_FEATURES": {
+          "type": "STRING",
+          "value": "tests;parallel;itk;ebsd"
+        },
+        "VCPKG_OVERLAY_TRIPLETS": {
+          "type": "PATH",
+          "value": "${sourceDir}/../simplnx/cmake/triplets"
+        },
+        "VCPKG_INSTALLED_DIR": {
+          "type": "STRING",
+          "value": "${sourceDir}/../vcpkg-installed"
+        },
+        "CMAKE_TOOLCHAIN_FILE": {
+          "type": "FILEPATH",
+          "value": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        },
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "Release"
+        },
+        "SIMPLNX_BUILD_TESTS": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "SIMPLNX_BUILD_DOCS": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "SIMPLNX_BUILD_PYTHON": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "SIMPLNX_EXTRA_PLUGINS": {
+          "type": "STRING",
+          "value": ""
+        },
+        "DATA_ARCHIVE_WEB_SITE": {
+          "type": "STRING",
+          "value": "https://www.dream3d.io/Data_Archive/"
+        },
+        "DREAM3D_DATA_DIR": {
+          "type": "PATH",
+          "value": "${sourceDir}/../DREAM3D_Data"
+        },
+        "DREAM3D_ENABLE_VISUALIZATION": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "DREAM3D_ENABLE_DEVELOPER_BUILD": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "DREAM3D_ENABLE_DOCUMENTATION": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "DREAM3D_ENABLE_UPDATE_CHECK": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "DREAM3D_RELATIVE_PATH_CHECK": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "BUILD_EXAMPLES": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "DREAM3D_LICENSE_DATA_DIR": {
+          "type": "PATH",
+          "value": "${sourceDir}/../softwarekeys"
+        },
+        "DREAM3D_ENABLE_LICENSE_CHECKS": {
+          "type": "BOOL",
+          "value": "ON"
+        }
+      }
+    },
+    {
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [ "Windows" ]
+        }
+      },
+      "name": "ci-windows-v142",
+      "displayName": "ci-windows-v142",
+      "description": "Build configuration for Azure DREAM3D NX CI",
+      "generator": "Ninja",
+      "inherits": "ci",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-windows-v142"
+        },
+        "VCPKG_HOST_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-windows-v142"
+        },
+        "Python3_EXECUTABLE": {
+          "type": "PATH",
+          "value": "$env{ANACONDA_ROOT}/envs/dream3d/python.exe"
+        },
+        "MKDOCS_EXECUTABLE": {
+          "type": "PATH",
+          "value": "$env{ANACONDA_ROOT}/envs/dream3d/Scripts/mkdocs.exe"
+        },
+        "SPHINX_BUILD_EXECUTABLE": {
+          "type": "PATH",
+          "value": "$env{ANACONDA_ROOT}/envs/dream3d/Scripts/sphinx-build.exe"
+        },
+        "VTK_DIR": {
+          "type": "PATH",
+          "value": "$env{VTK_DIR}"
+        },
+        "Qt6_DIR": {
+          "type": "PATH",
+          "value": "$env{Qt6_DIR}"
+        },
+        "CMAKE_PREFIX_PATH": {
+          "type": "STRING",
+          "value": "$env{CMAKE_PREFIX_PATH}"
+        },
+        "CMAKE_MAKE_PROGRAM": {
+          "type": "FILEPATH",
+          "value": "$env{NINJA_INSTALL}/ninja.exe"
+        },
+        "SITE": {
+          "type": "STRING",
+          "value": "$env{AGENT_NAME}.bluequartz.net"
+        },
+        "BUILDNAME": {
+          "type": "STRING",
+          "value": "$env{PRESET_NAME}-$env{BUILD_BUILDNUMBER}-PR$env{SYSTEM_PULLREQUEST_PULLREQUESTNUMBER}"
+        },
+        "PLUSNative_DIR":{
+          "type": "PATH",
+          "value": "$env{PLUSNative_DIR}"
+        }
+      },
+      "environment": {
+      }
+    },
+    {
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [ "Windows" ]
+        }
+      },
+      "name": "ci-windows-v143",
+      "displayName": "ci-windows-v143",
+      "description": "Build configuration for Azure DREAM3D NX CI",
+      "generator": "Ninja",
+      "inherits": "ci",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-windows-v143"
+        },
+        "VCPKG_HOST_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-windows-v143"
+        },
+        "Python3_EXECUTABLE": {
+          "type": "PATH",
+          "value": "$env{ANACONDA_ROOT}/envs/dream3d/python.exe"
+        },
+        "MKDOCS_EXECUTABLE": {
+          "type": "PATH",
+          "value": "$env{ANACONDA_ROOT}/envs/dream3d/Scripts/mkdocs.exe"
+        },
+        "SPHINX_BUILD_EXECUTABLE": {
+          "type": "PATH",
+          "value": "$env{ANACONDA_ROOT}/envs/dream3d/Scripts/sphinx-build.exe"
+        },
+        "VTK_DIR": {
+          "type": "PATH",
+          "value": "$env{VTK_DIR}"
+        },
+        "Qt6_DIR": {
+          "type": "PATH",
+          "value": "$env{Qt6_DIR}"
+        },
+        "CMAKE_PREFIX_PATH": {
+          "type": "STRING",
+          "value": "$env{CMAKE_PREFIX_PATH}"
+        },
+        "BUILDNAME": {
+          "type": "STRING",
+          "value": "$env{PRESET_NAME}-$env{BUILD_BUILDNUMBER}-PR$env{SYSTEM_PULLREQUEST_PULLREQUESTNUMBER}"
+        },
+        "SITE": {
+          "type": "STRING",
+          "value": "$env{AGENT_NAME}.bluequartz.net"
+        },
+        "CMAKE_MAKE_PROGRAM": {
+          "type": "FILEPATH",
+          "value": "$env{NINJA_INSTALL}/ninja.exe"
+        },
+        "PLUSNative_DIR":{
+          "type": "PATH",
+          "value": "$env{PLUSNative_DIR}"
+        }
+      },
+      "environment": {
+      }
+    },
+    {
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [ "macOS" ]
+        }
+      },
+      "name": "ci-macos-x64",
+      "displayName": "ci-macos-x64",
+      "description": "Build configuration for Azure DREAM3D NX CI",
+      "generator": "Ninja",
+      "inherits": "ci",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-osx-v11"
+        },
+        "VCPKG_HOST_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-osx-v11"
+        },
+        "Python3_EXECUTABLE": {
+          "type": "PATH",
+          "value": "/opt/local/anaconda3/envs/dream3d/bin/python"
+        },
+        "MKDOCS_EXECUTABLE": {
+          "type": "PATH",
+          "value": "/opt/local/anaconda3/envs/dream3d/bin/mkdocs"
+        },
+        "SPHINX_BUILD_EXECUTABLE": {
+          "type": "PATH",
+          "value": "/opt/local/anaconda3/envs/dream3d/bin/sphinx-build"
+        },
+        "VTK_DIR": {
+          "type": "PATH",
+          "value": "/Users/Shared/NX_SDK/VTK-9.3.1-Release/lib/cmake/vtk-9.3"
+        },
+        "Qt6_DIR": {
+          "type": "PATH",
+          "value": "/Users/Shared/NX_SDK/Qt/6.6.3/macos/lib/cmake/Qt6"
+        },
+        "CMAKE_OSX_DEPLOYMENT_TARGET": {
+          "type": "STRING",
+          "value": "11.7"
+        },
+        "CMAKE_MAKE_PROGRAM": {
+          "type": "FILEPATH",
+          "value": "/opt/local/bin/ninja"
+        },
+        "BUILDNAME": {
+          "type": "STRING",
+          "value": "$env{PRESET_NAME}-$env{BUILD_BUILDNUMBER}-PR$env{SYSTEM_PULLREQUEST_PULLREQUESTNUMBER}"
+        },
+        "SITE": {
+          "type": "STRING",
+          "value": "$env{AGENT_NAME}.bluequartz.net"
+        },
+        "PLUSNative_DIR":{
+          "type": "PATH",
+          "value": "/Users/Shared/NX_SDK/Protection_PLUS_5"
+        }
+      },
+      "environment": {
+        "VCPKG_INSTALLATION_ROOT": "/opt/AzureDevOps/vcpkg"
+      }
+    },
+    {
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [ "Linux" ]
+        }
+      },
+      "name": "ci-linux-x64",
+      "displayName": "ci-linux-x64",
+      "description": "Build configuration for Azure DREAM3D NX CI",
+      "generator": "Ninja",
+      "inherits": "ci",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-linux-dynamic"
+        },
+        "VCPKG_HOST_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-linux-dynamic"
+        },
+        "Python3_EXECUTABLE": {
+          "type": "PATH",
+          "value": "/opt/local/anaconda3/envs/dream3d/bin/python"
+        },
+        "MKDOCS_EXECUTABLE": {
+          "type": "PATH",
+          "value": "/opt/local/anaconda3/envs/dream3d/bin/mkdocs"
+        },
+        "SPHINX_BUILD_EXECUTABLE": {
+          "type": "PATH",
+          "value": "/opt/local/anaconda3/envs/dream3d/bin/sphinx-build"
+        },
+        "VTK_DIR": {
+          "type": "PATH",
+          "value": "/opt/NX_SDK/VTK-9.3.1-Release/lib/cmake/vtk-9.3"
+        },
+        "Qt6_DIR": {
+          "type": "PATH",
+          "value": "/opt/NX_SDK/Qt/6.6.3/gcc_64/lib/cmake/Qt6"
+        },
+        "BUILDNAME": {
+          "type": "STRING",
+          "value": "$env{PRESET_NAME}-$env{BUILD_BUILDNUMBER}-PR$env{SYSTEM_PULLREQUEST_PULLREQUESTNUMBER}"
+        },
+        "SITE": {
+          "type": "STRING",
+          "value": "$env{AGENT_NAME}.bluequartz.net"
+        },
+        "PLUSNative_DIR":{
+          "type": "PATH",
+          "value": "/opt/NX_SDK/softwarekey/protectionplus5"
+        }
+      },
+      "environment": {
+        "VCPKG_INSTALLATION_ROOT": "/opt/buildbot/agent/vcpkg"
+      }
+    },
+    {
+      "name": "commercial-base",
+      "hidden": true,
+      "displayName": "commercial-base",
+      "description": "base configuration. Use an arch dependent preset",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/../DREAM3D-Build/commercial-base",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": {
+          "type": "FILEPATH",
+          "value": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        },
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "Release"
+        },
+        "VCPKG_MANIFEST_DIR": {
+          "type": "STRING",
+          "value": "${sourceDir}/../simplnx"
+        },
+        "VCPKG_MANIFEST_FEATURES": {
+          "type": "STRING",
+          "value": "tests;parallel;itk;ebsd;python"
+        },
+        "VCPKG_INSTALLED_DIR": {
+          "type": "STRING",
+          "value": "${sourceDir}/../vcpkg-installed-release"
+        },
+        "VCPKG_MANIFEST_INSTALL": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "VCPKG_OVERLAY_TRIPLETS": {
+          "type": "PATH",
+          "value": "${sourceDir}/../simplnx/cmake/triplets"
+        },
+        "VCPKG_APPLOCAL_DEPS": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "SIMPLNX_BUILD_TESTS": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "SIMPLNX_BUILD_DOCS": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "SIMPLNX_BUILD_PYTHON": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "SIMPLNX_EMBED_PYTHON": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "DREAM3D_DATA_DIR": {
+          "type": "STRING",
+          "value": "${sourceDir}/../DREAM3D_Data"
+        },
+        "DREAM3D_ENABLE_DOCUMENTATION": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "DREAM3D_ENABLE_STYLE_SHEET_EDITOR": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "DREAM3D_ENABLE_VISUALIZATION": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "DREAM3D_ENABLE_CHARTING": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "DREAM3D_ENABLE_LICENSE_CHECKS": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "DREAM3D_ENABLE_DEVELOPER_BUILD": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "DREAM3D_ENABLE_UPDATE_CHECK": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "BUILD_EXAMPLES": {
+          "type": "BOOL",
+          "value": "OFF"
+        }
+      }
+    },
+    {
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [ "macOS" ]
+        }
+      },
+      "name": "commercial_macos_x64_release",
+      "inherits": "commercial-base",
+      "displayName": "commercial_macos_x64_release",
+      "description": "Build configuration for macOS",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/../DREAM3D-Build/$env{BUILD_FOLDER}",
+      "cacheVariables": {
+        "VTK_DIR": {
+          "type": "PATH",
+          "value": "/Users/Shared/NX_SDK/VTK-9.3.1-Release/lib/cmake/vtk-9.3"
+        },
+        "Qt6_DIR": {
+          "type": "PATH",
+          "value": "/Users/Shared/NX_SDK/Qt/6.6.3/macos/lib/cmake/Qt6"
+        },
+        "CMAKE_MAKE_PROGRAM": {
+          "type": "FILEPATH",
+          "value": "/opt/local/bin/ninja"
+        },
+        "CMAKE_OSX_DEPLOYMENT_TARGET": {
+          "type": "STRING",
+          "value": "11.0"
+        },
+        "DREAM3D_RELATIVE_PATH_CHECK": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-osx-v11"
+        },
+        "VCPKG_HOST_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-osx-v11"
+        },
+        "SPHINX_BUILD_EXECUTABLE": {
+          "type": "PATH",
+          "value": "/opt/local/anaconda3/envs/dream3d/bin/sphinx-build"
+        },
+        "SPHINX_PYTHON_EXECUTABLE": {
+          "type": "PATH",
+          "value": "/opt/local/anaconda3/envs/dream3d/bin/python"
+        },
+        "PLUSNative_DIR":{
+          "type": "PATH",
+          "value": "/Users/Shared/NX_SDK/Protection_PLUS_5"
+        },
+        "DREAM3D_LICENSE_DATA_DIR":{
+          "type": "PATH",
+          "value": "${sourceDir}/../softwarekeys"
+        }
+      },
+      "environment": {
+        "VCPKG_INSTALLATION_ROOT": "/opt/local/vcpkg"
+      }
+    },
+    {
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [ "macOS" ]
+        }
+      },
+      "name": "commercial_macos_arm64_release",
+      "inherits": "commercial-base",
+      "displayName": "commercial_macos_arm64_release",
+      "description": "Build configuration for macOS",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/../DREAM3D-Build/$env{BUILD_FOLDER}",
+      "cacheVariables": {
+        "VTK_DIR": {
+          "type": "PATH",
+          "value": "/Users/Shared/NX_SDK/VTK-9.3.1-Release/lib/cmake/vtk-9.3"
+        },
+        "Qt6_DIR": {
+          "type": "PATH",
+          "value": "/Users/Shared/NX_SDK/Qt/6.6.3/macos/lib/cmake/Qt6"
+        },
+        "CMAKE_MAKE_PROGRAM": {
+          "type": "FILEPATH",
+          "value": "/opt/local/bin/ninja"
+        },
+        "CMAKE_OSX_DEPLOYMENT_TARGET": {
+          "type": "STRING",
+          "value": "11.0"
+        },
+        "DREAM3D_RELATIVE_PATH_CHECK": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "arm64-osx-v11"
+        },
+        "VCPKG_HOST_TRIPLET": {
+          "type": "STRING",
+          "value": "arm64-osx-v11"
+        },
+        "SPHINX_BUILD_EXECUTABLE": {
+          "type": "PATH",
+          "value": "/opt/local/anaconda3/envs/dream3d/bin/sphinx-build"
+        },
+        "SPHINX_PYTHON_EXECUTABLE": {
+          "type": "PATH",
+          "value": "/opt/local/anaconda3/envs/dream3d/bin/python"
+        },
+        "DREAM3D_BUILD_TESTS": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "SIMPLNX_DOWNLOAD_TEST_FILES": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "PLUSNative_DIR":{
+          "type": "PATH",
+          "value": "/Users/Shared/NX_SDK/Protection_PLUS_5"
+        },
+        "DREAM3D_LICENSE_DATA_DIR":{
+          "type": "PATH",
+          "value": "${sourceDir}/../softwarekeys"
+        }
+      },
+      "environment": {
+        "VCPKG_INSTALLATION_ROOT": "/opt/local/vcpkg"
+      }
+    },
+    {
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [ "Linux" ]
+        }
+      },
+      "name": "commercial_linux_x64_release",
+      "inherits": "commercial-base",
+      "displayName": "commercial_linux_x64_release",
+      "description": "Build configuration for Linux",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/../DREAM3D-Build/zRel_v7.0.1",
+      "cacheVariables": {
+        "VTK_DIR": {
+          "type": "PATH",
+          "value": "/opt/NX_SDK/VTK-9.3.1-Release/lib/cmake/vtk-9.3"
+        },
+        "Qt6_DIR": {
+          "type": "PATH",
+          "value": "/opt/NX_SDK/Qt/6.6.3/gcc_64/lib/cmake/Qt6"
+        },
+        "CMAKE_MAKE_PROGRAM": {
+          "type": "FILEPATH",
+          "value": "/usr/bin/ninja"
+        },
+        "CMAKE_OSX_DEPLOYMENT_TARGET": {
+          "type": "STRING",
+          "value": "11.0"
+        },
+        "DREAM3D_RELATIVE_PATH_CHECK": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-linux-dynamic"
+        },
+        "VCPKG_HOST_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-linux-dynamic"
+        },
+        "SPHINX_BUILD_EXECUTABLE": {
+          "type": "PATH",
+          "value": "/opt/local/anaconda3/envs/dream3d/bin/sphinx-build"
+        },
+        "PLUSNative_DIR":{
+          "type": "PATH",
+          "value": "/opt/NX_SDK/softwarekey/protectionplus5"
+        },
+        "DREAM3D_LICENSE_DATA_DIR":{
+          "type": "PATH",
+          "value": "${sourceDir}/../softwarekeys"
+        }
+      },
+      "environment": {
+        "VCPKG_INSTALLATION_ROOT": "/opt/local/vcpkg"
+      }
+    },
+    {
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [ "Windows" ]
+        }
+      },
+      "name": "commercial_windows_x64_release-v143",
+      "displayName": "commercial_windows_x64_release",
+      "description": "Commerical Release Preset for Windows",
+      "generator": "Ninja",
+      "inherits": "commercial-base",
+      "binaryDir": "${sourceDir}/../DREAM3D-Build/$env{BUILD_FOLDER}",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "$env{VCPKG_TARGET_TRIPLET}"
+        },
+        "VCPKG_HOST_TRIPLET": {
+          "type": "STRING",
+          "value": "$env{VCPKG_HOST_TRIPLET}"
+        },
+        "VCPKG_INSTALLED_DIR": {
+          "type": "STRING",
+          "value": "$env{VCPKG_INSTALLED_DIR}"
+        },
+        "VTK_DIR": {
+          "type": "PATH",
+          "value": "$env{VTK_DIR}"
+        },
+        "Qt6_DIR": {
+          "type": "PATH",
+          "value": "$env{Qt6_DIR}"
+        },
+        "Python3_EXECUTABLE": {
+          "type": "PATH",
+          "value": "$env{Python3_EXECUTABLE}"
+        },
+        "SPHINX_BUILD_EXECUTABLE": {
+          "type": "PATH",
+          "value": "$env{SPHINX_BUILD_EXECUTABLE}"
+        },
+        "PLUSNative_DIR":{
+          "type": "PATH",
+          "value": "$env{PLUSNative_DIR}"
+        },
+        "DREAM3D_LICENSE_DATA_DIR":{
+          "type": "PATH",
+          "value": "${sourceDir}/../softwarekeys"
+        }
+      },
+      "environment": {}
+    },
+    {
+      "name": "conda",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/../build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "Release"
+        },
+        "SIMPLNX_BUILD_TESTS": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "SIMPLNX_BUILD_DOCS": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "SIMPLNX_BUILD_PYTHON": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "SIMPLNX_EMBED_PYTHON": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "SIMPLNX_DOWNLOAD_TEST_FILES": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "SIMPLNX_CONDA_BUILD": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "SIMPLNX_ENABLE_INSTALL": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "SIMPLNX_PY_ENABLE_INSTALL": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "SIMPLNX_PY_INSTALL_DIR": {
+          "type": "PATH",
+          "value": "$env{SP_DIR}"
+        },
+        "SIMPLNX_PY_GENERATE_PYI": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "ITKImageProcessing_USE_JOB_POOL": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "ITKIMAGEPROCESSING_LEAN_AND_MEAN": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "SimplnxCore_INSTALL_PIPELINES": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "ITKImageProcessing_INSTALL_PIPELINES": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "OrientationAnalysis_INSTALL_PIPELINES": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "OrientationAnalysis_INSTALL_DATA_FILES": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "span-lite_DIR": {
+          "type": "PATH",
+          "value": "$env{PREFIX}/lib/cmake/span-lite"
+        },
+        "expected-lite_DIR": {
+          "type": "PATH",
+          "value": "$env{PREFIX}/lib/cmake/expected-lite"
+        },
+        "H5Support_DIR": {
+          "type": "PATH",
+          "value": "$env{PREFIX}/share/H5Support"
+        },
+        "EbsdLib_DIR": {
+          "type": "PATH",
+          "value": "$env{PREFIX}/share/EbsdLib"
+        },
+        "nod_DIR": {
+          "type": "PATH",
+          "value": "$env{PREFIX}/share/nod"
+        },
+        "VTK_DIR": {
+          "type": "PATH",
+          "value": "$env{PREFIX}/lib/cmake/vtk-9.3"
+        },
+        "ITK_DIR": {
+          "type": "PATH",
+          "value": "$env{PREFIX}/lib/cmake/ITK-5.2"
+        },
+        "HDF5_NO_FIND_PACKAGE_CONFIG_FILE": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "DREAM3D_ENABLE_VISUALIZATION": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "DREAM3D_ENABLE_DEVELOPER_BUILD": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "DREAM3D_ENABLE_DOCUMENTATION": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "DREAM3D_ENABLE_UPDATE_CHECK": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "DREAM3D_RELATIVE_PATH_CHECK": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "DREAM3D_ENABLE_STYLE_SHEET_EDITOR": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "PLUSNative_DIR":{
+          "type": "PATH",
+          "value": "$env{PLUSNative_DIR}"
+        },
+        "DREAM3D_LICENSE_DATA_DIR":{
+          "type": "PATH",
+          "value": "${sourceDir}/../softwarekeys"
+        },
+        "DREAM3D_ENABLE_CHARTING": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "BUILD_EXAMPLES": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "DREAM3D_ENABLE_LICENSE_CHECKS": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "DREAM3D_BUILD_TESTS": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "DREAM3D_ANACONDA": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "CMP_QT6_ENABLE_INSTALL": {
+          "type": "BOOL",
+          "value": "OFF"
+        },
+        "DREAM3DNX_QT_ADVANCED_DOCKING_SUBMODULE": {
+          "type": "BOOL",
+          "value": "ON"
+        }
+      }
+    },
+    {
+      "name": "conda-unix",
+      "inherits": "conda",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": {
+          "type": "PATH",
+          "value": "$env{PREFIX}"
+        },
+        "CMAKE_SYSTEM_PREFIX_PATH": {
+          "type": "PATH",
+          "value": "$env{PREFIX}"
+        },
+        "QT_HOST_PATH": {
+          "type": "PATH",
+          "value": "$env{PREFIX}"
+        }
+      }
+    },
+    {
+      "name": "conda-osx-x64",
+      "inherits": "conda-unix",
+      "cacheVariables": {
+        "SIMPLNX_PY_DISABLE_HIDDEN_VISIBILITY": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-osx-v11"
+        },
+        "VCPKG_HOST_TRIPLET": {
+          "type": "STRING",
+          "value": "x64-osx-v11"
+        },
+        "DREAM3D_RELATIVE_PATH_CHECK": {
+          "type": "BOOL",
+          "value": "ON"
+        }
+      }
+    },
+    {
+      "name": "conda-osx-arm64",
+      "inherits": "conda-unix",
+      "cacheVariables": {
+        "SIMPLNX_PY_DISABLE_HIDDEN_VISIBILITY": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "VCPKG_TARGET_TRIPLET": {
+          "type": "STRING",
+          "value": "arm64-osx-v11"
+        },
+        "VCPKG_HOST_TRIPLET": {
+          "type": "STRING",
+          "value": "arm64-osx-v11"
+        },
+        "DREAM3D_RELATIVE_PATH_CHECK": {
+          "type": "BOOL",
+          "value": "ON"
+        }
+      }
+    },
+    {
+      "name": "conda-linux",
+      "inherits": "conda-unix"
+    },
+    {
+      "name": "conda-win",
+      "inherits": "conda",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": {
+          "type": "PATH",
+          "value": "$env{LIBRARY_PREFIX}"
+        },
+        "CMAKE_SYSTEM_PREFIX_PATH": {
+          "type": "PATH",
+          "value": "$env{LIBRARY_PREFIX}"
+        },
+        "DREAM3DNX_QT_ADVANCED_DOCKING_SUBMODULE": {
+          "type": "BOOL",
+          "value": "ON"
+        },
+        "span-lite_DIR": {
+          "type": "PATH",
+          "value": "$env{LIBRARY_PREFIX}/lib/cmake/span-lite"
+        },
+        "expected-lite_DIR": {
+          "type": "PATH",
+          "value": "$env{LIBRARY_PREFIX}/lib/cmake/expected-lite"
+        },
+        "H5Support_DIR": {
+          "type": "PATH",
+          "value": "$env{LIBRARY_PREFIX}/share/H5Support"
+        },
+        "EbsdLib_DIR": {
+          "type": "PATH",
+          "value": "$env{LIBRARY_PREFIX}/share/EbsdLib"
+        },
+        "nod_DIR": {
+          "type": "PATH",
+          "value": "$env{LIBRARY_PREFIX}/share/nod"
+        },
+        "VTK_DIR": {
+          "type": "PATH",
+          "value": "$env{LIBRARY_PREFIX}/lib/cmake/vtk-9.3"
+        },
+        "QT_HOST_PATH": {
+          "type": "PATH",
+          "value": "$env{LIBRARY_PREFIX}"
+        }
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "ci-windows-v142",
+      "displayName": "ci-windows-v142 Release build",
+      "description": "Build configuration for Azure DREAM3D NX CI",
+      "configurePreset": "ci-windows-v142",
+      "configuration": "Release"
+    },
+    {
+      "name": "ci-windows-v143",
+      "displayName": "ci-windows-v143 CI build",
+      "description": "Build configuration for Azure DREAM3D NX CI",
+      "configurePreset": "ci-windows-v143",
+      "configuration": "Release"
+    },
+    {
+      "name": "ci-macos-x64",
+      "displayName": "ci-macos-x64 CI build",
+      "description": "Build configuration for Azure DREAM3D NX CI",
+      "configurePreset": "ci-macos-x64",
+      "configuration": "Release"
+    },
+    {
+      "name": "ci-linux-x64",
+      "displayName": "ci-linux-x64 CI build",
+      "description": "Build configuration for Azure DREAM3D NX CI",
+      "configurePreset": "ci-linux-x64",
+      "configuration": "Release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "ci-windows-v142",
+      "displayName": "ci-windows-v142 CI build",
+      "description": "Build configuration for Azure DREAM3D NX CI",
+      "configurePreset": "ci-windows-v142",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ci-windows-v143",
+      "displayName": "ci-windows-v143 CI build",
+      "description": "Build configuration for Azure DREAM3D NX CI",
+      "configurePreset": "ci-windows-v143",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ci-macos-x64",
+      "displayName": "ci-macos-x64 CI build",
+      "description": "Build configuration for Azure DREAM3D NX CI",
+      "configurePreset": "ci-macos-x64",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ci-linux-x64",
+      "displayName": "ci-linux-x64 CI build",
+      "description": "Build configuration for Azure DREAM3D NX CI",
+      "configurePreset": "ci-linux-x64",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}
