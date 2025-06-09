@@ -76,20 +76,20 @@ public:
       progInt = static_cast<float>(parentIdx) / static_cast<float>(numParents) * 100.0f;
       auto now = std::chrono::steady_clock::now();
       // Only send updates every 1 second
-      if(std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() > 1000)
-      {
-        currentParentId = parentIdx;
-        auto totalParentIds = currentParentId - prevParentId;
-        auto rate = static_cast<float>(totalParentIds) / static_cast<float>(std::chrono::duration_cast<std::chrono::seconds>(now - start).count());
-
-        auto remainingParents = numParents - parentIdx;
-        auto minutesRemain = (remainingParents / rate) / 60; // Convert to minutes
-
-        std::string message = fmt::format("{}/{} [{}%] at {} parents/sec. Time Remain: {:.2f} Minutes", parentIdx, numParents, progInt, rate, minutesRemain);
-        m_MessageHandler(nx::core::IFilter::ProgressMessage{nx::core::IFilter::Message::Type::Info, message, progInt});
-        start = std::chrono::steady_clock::now();
-        prevParentId = currentParentId;
-      }
+      // if(std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() > 1000)
+      // {
+      //   currentParentId = parentIdx;
+      //   auto totalParentIds = currentParentId - prevParentId;
+      //   auto rate = static_cast<float>(totalParentIds) / static_cast<float>(std::chrono::duration_cast<std::chrono::seconds>(now - start).count());
+      //
+      //   auto remainingParents = numParents - parentIdx;
+      //   auto minutesRemain = (remainingParents / rate) / 60; // Convert to minutes
+      //
+      //   std::string message = fmt::format("{}/{} [{}%] at {} parents/sec. Time Remain: {:.2f} Minutes", parentIdx, numParents, progInt, rate, minutesRemain);
+      //   m_MessageHandler(nx::core::IFilter::ProgressMessage{nx::core::IFilter::Message::Type::Info, message, progInt});
+      //   start = std::chrono::steady_clock::now();
+      //   prevParentId = currentParentId;
+      // }
       if(m_ShouldCancel)
       {
         return {};

@@ -29,6 +29,13 @@ public:
   static inline constexpr StringLiteral k_DestinationGeometryPath_Key = "destination_geometry_path";
 
   /**
+   * @brief Reads SIMPL json and converts it simplnx Arguments.
+   * @param json
+   * @return Result<Arguments>
+   */
+  static Result<Arguments> FromSIMPLJson(const nlohmann::json& json);
+
+  /**
    * @brief
    * @return std::string
    */

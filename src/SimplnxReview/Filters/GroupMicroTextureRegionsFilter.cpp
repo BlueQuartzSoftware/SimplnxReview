@@ -191,4 +191,24 @@ Result<> GroupMicroTextureRegionsFilter::executeImpl(DataStructure& dataStructur
 
   return GroupMicroTextureRegions(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }
+
+namespace
+{
+namespace SIMPL
+{
+
+} // namespace SIMPL
+} // namespace
+
+Result<Arguments> GroupMicroTextureRegionsFilter::FromSIMPLJson(const nlohmann::json& json)
+{
+  Arguments args = GroupMicroTextureRegionsFilter().getDefaultArguments();
+
+  std::vector<Result<>> results;
+
+  Result<> conversionResult = MergeResults(std::move(results));
+
+  return ConvertResultTo<Arguments>(std::move(conversionResult), std::move(args));
+}
+
 } // namespace nx::core

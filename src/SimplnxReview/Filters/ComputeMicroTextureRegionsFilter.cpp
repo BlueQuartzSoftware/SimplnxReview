@@ -128,4 +128,24 @@ Result<> ComputeMicroTextureRegionsFilter::executeImpl(DataStructure& dataStruct
 
   return ComputeMicroTextureRegions(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }
+
+namespace
+{
+namespace SIMPL
+{
+
+} // namespace SIMPL
+} // namespace
+
+Result<Arguments> ComputeMicroTextureRegionsFilter::FromSIMPLJson(const nlohmann::json& json)
+{
+  Arguments args = ComputeMicroTextureRegionsFilter().getDefaultArguments();
+
+  std::vector<Result<>> results;
+
+  Result<> conversionResult = MergeResults(std::move(results));
+
+  return ConvertResultTo<Arguments>(std::move(conversionResult), std::move(args));
+}
+
 } // namespace nx::core

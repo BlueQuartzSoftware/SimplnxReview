@@ -198,4 +198,24 @@ Result<> MergeColoniesFilter::executeImpl(DataStructure& dataStructure, const Ar
 
   return MergeColonies(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }
+
+namespace
+{
+namespace SIMPL
+{
+
+} // namespace SIMPL
+} // namespace
+
+Result<Arguments> MergeColoniesFilter::FromSIMPLJson(const nlohmann::json& json)
+{
+  Arguments args = MergeColoniesFilter().getDefaultArguments();
+
+  std::vector<Result<>> results;
+
+  Result<> conversionResult = MergeResults(std::move(results));
+
+  return ConvertResultTo<Arguments>(std::move(conversionResult), std::move(args));
+}
+
 } // namespace nx::core
