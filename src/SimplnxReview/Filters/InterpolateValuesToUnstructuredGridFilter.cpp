@@ -139,17 +139,17 @@ IFilter::PreflightResult InterpolateValuesToUnstructuredGridFilter::preflightImp
 }
 
 //------------------------------------------------------------------------------
-Result<> InterpolateValuesToUnstructuredGridFilter::executeImpl(DataStructure& dataStructure, const Arguments& args, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
+Result<> InterpolateValuesToUnstructuredGridFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
                                                                 const std::atomic_bool& shouldCancel, const ExecutionContext& executionContext) const
 {
   InterpolateValuesToUnstructuredGridInputValues inputValues;
 
-  inputValues.SourceGeomPath = args.value<DataPath>(k_SourceGeometryPath_Key);
-  inputValues.DestinationGeomPath = args.value<DataPath>(k_DestinationGeometryPath_Key);
-  inputValues.InputDataPaths = args.value<std::vector<DataPath>>(k_InterpolatedArrayPaths_Key);
-  inputValues.UseExistingAttrMatrix = args.value<BoolParameter::ValueType>(k_UseExistingAttrMatrix_Key);
-  inputValues.ExistingAttrMatrixPath = args.value<AttributeMatrixSelectionParameter::ValueType>(k_ExistingAttrMatrixPath_Key);
-  inputValues.CreatedAttrMatrixName = args.value<DataObjectNameParameter::ValueType>(k_CreatedAttrMatrixName_Key);
+  inputValues.SourceGeomPath = filterArgs.value<DataPath>(k_SourceGeometryPath_Key);
+  inputValues.DestinationGeomPath = filterArgs.value<DataPath>(k_DestinationGeometryPath_Key);
+  inputValues.InputDataPaths = filterArgs.value<std::vector<DataPath>>(k_InterpolatedArrayPaths_Key);
+  inputValues.UseExistingAttrMatrix = filterArgs.value<BoolParameter::ValueType>(k_UseExistingAttrMatrix_Key);
+  inputValues.ExistingAttrMatrixPath = filterArgs.value<AttributeMatrixSelectionParameter::ValueType>(k_ExistingAttrMatrixPath_Key);
+  inputValues.CreatedAttrMatrixName = filterArgs.value<DataObjectNameParameter::ValueType>(k_CreatedAttrMatrixName_Key);
 
   return InterpolateValuesToUnstructuredGrid(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }
