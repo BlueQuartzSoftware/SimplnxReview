@@ -398,14 +398,14 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
     avgQuatIdx = neighborFeature * 4;
     QuatD q2(m_AvgQuats[avgQuatIdx], m_AvgQuats[avgQuatIdx + 1], m_AvgQuats[avgQuatIdx + 2], m_AvgQuats[avgQuatIdx + 3]);
 
-    uint32 phase1 = m_CrystalStructures[m_FeaturePhases[referenceFeature]];
-    uint32 phase2 = m_CrystalStructures[m_FeaturePhases[neighborFeature]];
-    if(phase1 == phase2 && (phase1 == EbsdLib::CrystalStructure::Hexagonal_High))
+    uint32 laueClass1 = m_CrystalStructures[m_FeaturePhases[referenceFeature]];
+    uint32 laueClass2 = m_CrystalStructures[m_FeaturePhases[neighborFeature]];
+    if(laueClass1 == laueClass2 && (laueClass1 == EbsdLib::CrystalStructure::Hexagonal_High))
     {
-      OrientationD ax = m_OrientationOps[phase1]->calculateMisorientation(q1, q2);
+      OrientationD ax = m_OrientationOps[laueClass1]->calculateMisorientation(q1, q2);
 
       auto rod = OrientationTransformation::ax2ro<OrientationD, OrientationD>(ax);
-      rod = m_OrientationOps[phase1]->getMDFFZRod(rod);
+      rod = m_OrientationOps[laueClass1]->getMDFFZRod(rod);
       ax = OrientationTransformation::ro2ax<OrientationD, OrientationD>(rod);
 
       w = ax[3] * (Constants::k_180OverPiD);
@@ -446,7 +446,7 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
         return true;
       }
     }
-    else if(EbsdLib::CrystalStructure::Cubic_High == phase2 && EbsdLib::CrystalStructure::Hexagonal_High == phase1)
+    else if(EbsdLib::CrystalStructure::Cubic_High == laueClass2 && EbsdLib::CrystalStructure::Hexagonal_High == laueClass1)
     {
       colony = check_for_burgers(q2, q1, m_AngleTolerance);
       if(colony)
@@ -455,7 +455,7 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
         return true;
       }
     }
-    else if(EbsdLib::CrystalStructure::Cubic_High == phase1 && EbsdLib::CrystalStructure::Hexagonal_High == phase2)
+    else if(EbsdLib::CrystalStructure::Cubic_High == laueClass1 && EbsdLib::CrystalStructure::Hexagonal_High == laueClass2)
     {
       colony = check_for_burgers(q1, q2, m_AngleTolerance);
       if(colony)
