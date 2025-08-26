@@ -47,7 +47,7 @@ Result<> ComputeMicroTextureRegions::operator()()
   std::vector<float32> microTextureRegionZMins(numMicroTextureRegions, spacing[2] * static_cast<float32>(zPoints));
   std::vector<float32> microTextureRegionZMaxs(numMicroTextureRegions, 0.0f);
 
-  std::for_each(featureIds.begin(), featureIds.end(), [&microTextureRegionNumCells](const int32 id) mutable { microTextureRegionNumCells[id]++; });
+  std::for_each(featureIds.begin(), featureIds.end(), [&microTextureRegionNumCells](const int32 id) mutable { microTextureRegionNumCells[id].inc(); });
 
   float32 x, y, z;
   usize zStride, yStride;

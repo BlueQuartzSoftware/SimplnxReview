@@ -274,7 +274,7 @@ int GroupMicroTextureRegions::getSeed(int32 newFid)
       // dividing by the magnitudes (they would be 1)
       MatrixMath::Normalize3x1(c1.data());
       MatrixMath::Copy3x1(c1.data(), m_AvgCAxes.data());
-      MatrixMath::Multiply3x1withConstant(m_AvgCAxes.data(), volumes[voxelSeed]);
+      MatrixMath::Multiply3x1withConstant(m_AvgCAxes.data(), volumes.getValue(voxelSeed));
     }
   }
 
@@ -355,7 +355,7 @@ bool GroupMicroTextureRegions::determineGrouping(int32 referenceFeature, int32 n
         if(m_InputValues->UseRunningAverage)
         {
           auto& volumes = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->VolumesArrayPath);
-          MatrixMath::Multiply3x1withConstant(c2.data(), volumes[neighborFeature]);
+          MatrixMath::Multiply3x1withConstant(c2.data(), volumes.getValue(neighborFeature));
           MatrixMath::Add3x1s(m_AvgCAxes.data(), c2.data(), m_AvgCAxes.data());
         }
         return true;

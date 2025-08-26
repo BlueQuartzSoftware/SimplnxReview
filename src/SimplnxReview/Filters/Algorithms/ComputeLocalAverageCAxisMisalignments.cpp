@@ -72,7 +72,7 @@ public:
 
       if constexpr(MisalignmentArguments::CalculatingBiasedAverage)
       {
-        m_NumFeaturesPerParent[parentId]++;
+        m_NumFeaturesPerParent[parentId].inc();
         m_LocalCAxisMisalignments[parentId] += m_AvgCAxisMisalignments[i];
       }
     }
