@@ -34,7 +34,6 @@ set(FilterList
   GroupMicroTextureRegionsFilter
   InterpolateValuesToUnstructuredGridFilter
   MergeColoniesFilter
-    ReadZeissTxmFileFilter
 )
   
 set(ActionList
@@ -52,7 +51,6 @@ set(AlgorithmList
   GroupMicroTextureRegions
   InterpolateValuesToUnstructuredGrid
   MergeColonies
-  ReadZeissTxmFile
 )
 
 
@@ -109,23 +107,14 @@ target_link_libraries(simplnx PUBLIC EbsdLib::EbsdLib)
 # ------------------------------------------------------------------------------
 # Extra Sources
 # ------------------------------------------------------------------------------
-
 set(PLUGIN_EXTRA_SOURCES
-  ${${PLUGIN_NAME}_SOURCE_DIR}/src/oless/oless/oless_common.hpp
-  ${${PLUGIN_NAME}_SOURCE_DIR}/src/oless/oless/oless.cpp
-  ${${PLUGIN_NAME}_SOURCE_DIR}/src/oless/oless/oless.h
-  ${${PLUGIN_NAME}_SOURCE_DIR}/src/oless/oless/pole.cpp
-  ${${PLUGIN_NAME}_SOURCE_DIR}/src/oless/oless/pole.h
+
 )
 target_sources(${PLUGIN_NAME} 
   PRIVATE
     ${PLUGIN_EXTRA_SOURCES}
 )
 
-source_group(TREE "${${PLUGIN_NAME}_SOURCE_DIR}/src/oless" 
-            PREFIX ${PLUGIN_NAME} 
-            FILES ${PLUGIN_EXTRA_SOURCES}
-            )
 #------------------------------------------------------------------------------
 # If there are additional library packages that need to be found, this is where
 # to do that using the usual find_package(....) call
@@ -240,23 +229,3 @@ if(${PLUGIN_NAME}_INSTALL_DATA_FILES)
     COMPONENT Applications
   )
 endif()
-
-
-
-add_executable(txm_reader ${PLUGIN_EXTRA_SOURCES} ${${PLUGIN_NAME}_SOURCE_DIR}/src/oless/txm_reader.cpp)
-target_include_directories(txm_reader PRIVATE ${oless_SOURCE_DIR})
-
-target_compile_features(txm_reader
-                        PUBLIC
-                        cxx_std_17
-)
-
-set_target_properties(txm_reader
-                      PROPERTIES
-                      DEBUG_POSTFIX "_d"
-)
-target_include_directories(txm_reader
-  PUBLIC
-    ${${PLUGIN_NAME}_SOURCE_DIR}/src/oless
-)
-
