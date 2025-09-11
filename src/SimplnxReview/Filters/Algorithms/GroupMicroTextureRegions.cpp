@@ -2,10 +2,10 @@
 
 #include "simplnx/Common/Constants.hpp"
 #include "simplnx/DataStructure/DataArray.hpp"
-#include "simplnx/DataStructure/DataGroup.hpp"
 #include "simplnx/DataStructure/NeighborList.hpp"
 #include "simplnx/Utilities/Math/GeometryMath.hpp"
 #include "simplnx/Utilities/Math/MatrixMath.hpp"
+#include "simplnx/Utilities/MessageHelper.hpp"
 
 #include "EbsdLib/LaueOps/LaueOps.h"
 
@@ -81,35 +81,38 @@ bool GroupMicroTextureRegions::growGrouping(int32_t referenceFeature, int32_t ne
 // -----------------------------------------------------------------------------
 void GroupMicroTextureRegions::execute()
 {
-  NeighborList<int32>& neighborlist = m_DataStructure.getDataRefAs<NeighborList<int32>>(m_InputValues->ContiguousNeighborListArrayPath);
+  MessageHelper messageHelper(m_MessageHandler);
+  ThrottledMessenger throttledMessenger = messageHelper.createThrottledMessenger();
+
+  NeighborList<int32>& featureNeighborListRef = m_DataStructure.getDataRefAs<NeighborList<int32>>(m_InputValues->ContiguousNeighborListArrayPath);
   NeighborList<int32>* nonContigNeighList = nullptr;
   if(m_InputValues->UseNonContiguousNeighbors)
   {
     nonContigNeighList = m_DataStructure.getDataAs<NeighborList<int32>>(m_InputValues->NonContiguousNeighborListArrayPath);
   }
 
-  std::vector<int32> grouplist;
+  std::vector<int32> groupList;
 
-  int32 parentcount = 0;
-  int32 seed = 0;
-  int32 list1size = 0, list2size = 0, listsize = 0;
+  int32 parentCount = 0;
+  int32 featureSeed = 0;
+  int32 list1size = 0, list2size = 0, listSize = 0;
   int32 neigh = 0;
   bool patchGrouping = false;
 
-  while(seed >= 0)
+  while(featureSeed >= 0)
   {
-    parentcount++;
-    seed = getSeed(parentcount);
-    if(seed >= 0)
+    parentCount++;
+    featureSeed = getSeed(parentCount);
+    if(featureSeed >= 0)
     {
-      grouplist.push_back(seed);
-      for(std::vector<int32>::size_type j = 0; j < grouplist.size(); j++)
+      groupList.push_back(featureSeed);
+      for(std::vector<int32>::size_type j = 0; j < groupList.size(); j++)
       {
-        int32 firstfeature = grouplist[j];
-        list1size = int32(neighborlist[firstfeature].size());
+        int32 firstFeature = groupList[j];
+        list1size = static_cast<int32>(featureNeighborListRef[firstFeature].size());
         if(m_InputValues->UseNonContiguousNeighbors)
         {
-          list2size = nonContigNeighList->getListSize(firstfeature);
+          list2size = nonContigNeighList->getListSize(firstFeature);
         }
         for(int32 k = 0; k < 2; k++)
         {
@@ -119,30 +122,30 @@ void GroupMicroTextureRegions::execute()
           }
           if(k == 0)
           {
-            listsize = list1size;
+            listSize = list1size;
           }
           else if(k == 1)
           {
-            listsize = list2size;
+            listSize = list2size;
           }
-          for(int32 l = 0; l < listsize; l++)
+          for(int32 l = 0; l < listSize; l++)
           {
             if(k == 0)
             {
-              neigh = neighborlist[firstfeature][l];
+              neigh = featureNeighborListRef[firstFeature][l];
             }
             else if(k == 1)
             {
               bool ok = false;
-              neigh = nonContigNeighList->getValue(firstfeature, l, ok);
+              neigh = nonContigNeighList->getValue(firstFeature, l, ok);
             }
-            if(neigh != firstfeature)
+            if(neigh != firstFeature)
             {
-              if(determineGrouping(firstfeature, neigh, parentcount))
+              if(determineGrouping(firstFeature, neigh, parentCount))
               {
                 if(!patchGrouping)
                 {
-                  grouplist.push_back(neigh);
+                  groupList.push_back(neigh);
                 }
               }
             }
@@ -151,35 +154,39 @@ void GroupMicroTextureRegions::execute()
       }
       if(patchGrouping)
       {
-        if(growPatch(parentcount))
+        if(growPatch(parentCount))
         {
-          for(std::vector<int32_t>::size_type j = 0; j < grouplist.size(); j++)
+          for(std::vector<int32_t>::size_type j = 0; j < groupList.size(); j++)
           {
-            int32_t firstfeature = grouplist[j];
-            listsize = int32_t(neighborlist[firstfeature].size());
-            for(int32_t l = 0; l < listsize; l++)
+            int32_t firstFeature = groupList[j];
+            listSize = static_cast<int32_t>(featureNeighborListRef[firstFeature].size());
+            for(int32_t l = 0; l < listSize; l++)
             {
-              neigh = neighborlist[firstfeature][l];
-              if(neigh != firstfeature)
+              neigh = featureNeighborListRef[firstFeature][l];
+              if(neigh != firstFeature)
               {
-                if(growGrouping(firstfeature, neigh, parentcount))
+                if(growGrouping(firstFeature, neigh, parentCount))
                 {
-                  grouplist.push_back(neigh);
+                  groupList.push_back(neigh);
                 }
               }
             }
           }
         }
       }
+
+      throttledMessenger.sendThrottledMessage([&]() { return fmt::format("Parent Count: {}", parentCount); });
     }
-    grouplist.clear();
+    groupList.clear();
   }
 }
 
 // -----------------------------------------------------------------------------
 Result<> GroupMicroTextureRegions::operator()()
 {
-  m_Generator = std::mt19937_64(m_InputValues->SeedValue);
+  MessageHelper messageHelper(m_MessageHandler);
+
+  m_Generator = std::mt19937_64(std::mt19937::default_seed);
   m_Distribution = std::uniform_real_distribution<float32>(0.0f, 1.0f);
 
   m_AvgCAxes[0] = 0.0f;
@@ -187,6 +194,9 @@ Result<> GroupMicroTextureRegions::operator()()
   m_AvgCAxes[2] = 0.0f;
   auto& featureParentIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeatureParentIdsArrayName);
   featureParentIds.fill(-1);
+
+  // Execute the main grouping algorithm
+  messageHelper.sendMessage(fmt::format("Starting Grouping....."));
 
   execute();
 
@@ -206,8 +216,8 @@ Result<> GroupMicroTextureRegions::operator()()
   }
 
   // By default we randomize grains !!! COMMENT OUT FOR DEMONSTRATION !!!
-  m_MessageHandler(IFilter::Message::Type::Info, "Randomizing Parent Ids");
-  RandomizeFeatureIds(totalPoints, m_NumTuples, cellParentIds, featureParentIds, featureIds, m_InputValues->SeedValue);
+  // m_MessageHandler(IFilter::Message::Type::Info, "Randomizing Parent Ids");
+  // RandomizeFeatureIds(totalPoints, m_NumTuples, cellParentIds, featureParentIds, featureIds, m_InputValues->SeedValue);
 
   return {};
 }
@@ -220,16 +230,24 @@ int GroupMicroTextureRegions::getSeed(int32 newFid)
 
   usize numFeatures = featurePhases.getNumberOfTuples();
 
-  float32 g1[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
-  float32 g1t[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
-  int32 voxelSeed = -1;
+  float32 g1[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+  float32 g1t[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+  int32 featureIdSeed = -1;
 
   // Precalculate some constants
-  int32 totalFMinus1 = numFeatures - 1;
+  const int32 totalFMinus1 = static_cast<int32>(numFeatures) - 1;
 
   usize counter = 0;
+  // This section finds a feature id that has not been grouped yet. It starts by
+  // randomly selecting a feature id between 0 and numFeatures-1. We then start
+  // looping. If the initial random value is valid then we exit the loop after
+  // a single iteration. If that feature has already been grouped, then we add one
+  // to the `randFeature` value and try again. If we get to the end of the range of
+  // featureIds then the algorithm will loop back to featureId = 0 and start incrementing
+  // from there. This is reasonably efficient as we only generate random numbers
+  // as needed.
   auto randFeature = static_cast<int32>(m_Distribution(m_Generator) * static_cast<float32>(totalFMinus1));
-  while(voxelSeed == -1 && counter < numFeatures)
+  while(featureIdSeed == -1 && counter < numFeatures)
   {
     if(randFeature > totalFMinus1)
     {
@@ -237,7 +255,7 @@ int GroupMicroTextureRegions::getSeed(int32 newFid)
     }
     if(featureParentIds[randFeature] == -1)
     {
-      voxelSeed = randFeature;
+      featureIdSeed = randFeature;
     }
     randFeature++;
     counter++;
@@ -251,9 +269,9 @@ int GroupMicroTextureRegions::getSeed(int32 newFid)
   //    fout << fmt::format("Feature Parent Id: {} | X: {}, Y: {}\n", voxelSeed, centroids.getComponent(voxelSeed, 0), centroids.getComponent(voxelSeed, 1));
   //  }
 
-  if(voxelSeed >= 0)
+  if(featureIdSeed >= 0)
   {
-    featureParentIds[voxelSeed] = newFid;
+    featureParentIds[featureIdSeed] = newFid;
     m_NumTuples = newFid + 1;
 
     if(m_InputValues->UseRunningAverage)
@@ -261,7 +279,7 @@ int GroupMicroTextureRegions::getSeed(int32 newFid)
       auto& volumes = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->VolumesArrayPath);
       auto& avgQuats = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->AvgQuatsArrayPath);
 
-      usize index = voxelSeed * 4;
+      usize index = featureIdSeed * 4;
       OrientationTransformation::qu2om<QuatF, OrientationF>({avgQuats[index + 0], avgQuats[index + 1], avgQuats[index + 2], avgQuats[index + 3]}).toGMatrix(g1);
 
       std::array<float32, 3> c1 = {0.0f, 0.0f, 0.0f};
@@ -274,21 +292,34 @@ int GroupMicroTextureRegions::getSeed(int32 newFid)
       // dividing by the magnitudes (they would be 1)
       MatrixMath::Normalize3x1(c1.data());
       MatrixMath::Copy3x1(c1.data(), m_AvgCAxes.data());
-      MatrixMath::Multiply3x1withConstant(m_AvgCAxes.data(), volumes.getValue(voxelSeed));
+      MatrixMath::Multiply3x1withConstant(m_AvgCAxes.data(), volumes.getValue(featureIdSeed));
     }
   }
 
-  return voxelSeed;
+  return featureIdSeed;
 }
 
 // -----------------------------------------------------------------------------
 bool GroupMicroTextureRegions::determineGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid)
 {
   uint32 phase1 = 0;
-  float32 g1[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
-  float32 g2[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
-  float32 g1t[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
-  float32 g2t[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+  /**
+   * referenceFeature is Cubic Phase
+   * neighborFeature is Hex Phase
+   * m_InputValues->UseRunningAverage = TRUE
+   * First `if` check is passed
+   * Second `if` check is passed, `phase1` stays at HEX
+   * Third `if` check will pass because the 2nd phase is HEX
+   * Probably should not be happening?
+   * Solution: Properly initialize the `phase` outside of all checks or just before the `phase2` initialization
+   * Bug introduced JAN 30, 2014 by J. Tucker commit `7e49e52f362005e44ea9bf21b7a717277b2af04e` in Original DREAM3D repository
+
+  */
+
+  float32 g1[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+  float32 g2[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+  float32 g1t[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+  float32 g2t[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
   std::array<float32, 3> c1 = {0.0f, 0.0f, 0.0f};
   std::array<float32, 3> caxis = {0.0f, 0.0f, 1.0f};
 
@@ -301,7 +332,6 @@ bool GroupMicroTextureRegions::determineGrouping(int32 referenceFeature, int32 n
     if(!m_InputValues->UseRunningAverage)
     {
       usize index = referenceFeature * 4;
-      phase1 = crystalStructures[featurePhases[referenceFeature]];
       OrientationTransformation::qu2om<QuatF, Orientation<float32>>({avgQuats[index + 0], avgQuats[index + 1], avgQuats[index + 2], avgQuats[index + 3]}).toGMatrix(g1);
 
       // transpose the g matrix so when c-axis is multiplied by it,
@@ -312,6 +342,7 @@ bool GroupMicroTextureRegions::determineGrouping(int32 referenceFeature, int32 n
       // dividing by the magnitudes (they would be 1)
       MatrixMath::Normalize3x1(c1.data());
     }
+    phase1 = crystalStructures[featurePhases[referenceFeature]];
     uint32 phase2 = crystalStructures[featurePhases[neighborFeature]];
     if(phase1 == phase2 && (phase1 == EbsdLib::CrystalStructure::Hexagonal_High))
     {
