@@ -62,16 +62,15 @@ Parameters GroupMicroTextureRegionsFilter::parameters() const
   params.insert(std::make_unique<NeighborListSelectionParameter>(k_ContiguousNeighborListArrayPath_Key, "Contiguous Neighbor List", "List of contiguous neighbors for each Feature.", DataPath{},
                                                                  NeighborListSelectionParameter::AllowedTypes{DataType::int32}));
 
-  params.insertSeparator(Parameters::Separator{"Non-Contiguous Neighborhood Option"});  
+  params.insertSeparator(Parameters::Separator{"Non-Contiguous Neighborhood Option"});
   params.insertLinkableParameter(std::make_unique<BoolParameter>(k_UseNonContiguousNeighbors_Key, "Use Non-Contiguous Neighbors", "Use non-contiguous neighborhoods", false));
   params.insert(std::make_unique<NeighborListSelectionParameter>(k_NonContiguousNeighborListArrayPath_Key, "Non-Contiguous Neighbor List", "List of non-contiguous neighbors for each Feature.",
                                                                  DataPath{}, NeighborListSelectionParameter::AllowedTypes{DataType::int32}));
 
-
   params.insertSeparator(Parameters::Separator{"Random Number Seed Parameters"});
   params.insertLinkableParameter(std::make_unique<BoolParameter>(k_UseSeed_Key, "Use Seed for Random Generation", "When true the user will be able to put in a seed for random generation", false));
   params.insert(std::make_unique<NumberParameter<uint64>>(k_SeedValue_Key, "Seed", "The seed fed into the random generator", std::mt19937::default_seed));
-  params.insert(std::make_unique<DataObjectNameParameter>(k_SeedArrayName_Key, "Stored Seed Value Array Name", "", "_Group_MicroTexture_Regions_Seed_Value_"));
+  params.insert(std::make_unique<DataObjectNameParameter>(k_SeedArrayName_Key, "Stored Seed Value Array Name", "Name of array holding the seed value", "_Group_MicroTexture_Regions_Seed_Value_"));
 
   params.insertSeparator(Parameters::Separator{"Input Cell Data"});
   params.insert(std::make_unique<ArraySelectionParameter>(k_FeatureIdsArrayPath_Key, "Cell Feature Ids", "Data Array that specifies to which Feature each Element belongs", DataPath{},
@@ -246,5 +245,4 @@ Result<Arguments> GroupMicroTextureRegionsFilter::FromSIMPLJson(const nlohmann::
 
   return ConvertResultTo<Arguments>(std::move(conversionResult), std::move(args));
 }
-
 } // namespace nx::core

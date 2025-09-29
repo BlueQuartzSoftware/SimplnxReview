@@ -147,5 +147,4 @@ Result<Arguments> ComputeSaltykovSizesFilter::FromSIMPLJson(const nlohmann::json
 
   return ConvertResultTo<Arguments>(std::move(conversionResult), std::move(args));
 }
-
 } // namespace nx::core

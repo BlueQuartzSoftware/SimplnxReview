@@ -172,5 +172,4 @@ Result<Arguments> InterpolateValuesToUnstructuredGridFilter::FromSIMPLJson(const
 
   return ConvertResultTo<Arguments>(std::move(conversionResult), std::move(args));
 }
-
 } // namespace nx::core

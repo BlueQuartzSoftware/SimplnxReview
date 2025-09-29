@@ -250,5 +250,4 @@ Result<Arguments> MergeColoniesFilter::FromSIMPLJson(const nlohmann::json& json)
 
   return ConvertResultTo<Arguments>(std::move(conversionResult), std::move(args));
 }
-
 } // namespace nx::core
