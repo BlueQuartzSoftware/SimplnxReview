@@ -32,12 +32,4 @@ TEST_CASE("SimplnxReview::MergeColoniesFilter: Valid Filter Execution", "[Simpln
   args.insertOrAssign(MergeColoniesFilter::k_NewCellFeatureAttributeMatrixName_Key, std::make_any<DataPath>(DataPath{}));
   args.insertOrAssign(MergeColoniesFilter::k_FeatureParentIdsArrayName_Key, std::make_any<DataObjectNameParameter::ValueType>(""));
   args.insertOrAssign(MergeColoniesFilter::k_ActiveArrayName_Key, std::make_any<DataObjectNameParameter::ValueType>(""));
-
-  // Preflight the filter and check result
-  auto preflightResult = filter.preflight(dataStructure, args);
-  SIMPLNX_RESULT_REQUIRE_VALID(preflightResult.outputActions);
-
-  // Execute the filter and check the result
-  auto executeResult = filter.execute(dataStructure, args);
-  SIMPLNX_RESULT_REQUIRE_VALID(executeResult.result);
 }

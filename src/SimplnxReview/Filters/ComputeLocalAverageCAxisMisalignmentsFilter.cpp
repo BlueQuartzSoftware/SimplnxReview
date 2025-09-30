@@ -62,24 +62,28 @@ Parameters ComputeLocalAverageCAxisMisalignmentsFilter::parameters() const
 
   // Create the parameter descriptors that are needed for this filter
   params.insertSeparator(Parameters::Separator{"Input Parameter(s)"});
-  params.insertLinkableParameter(std::make_unique<BoolParameter>(k_CalcUnbiasedAvg_Key, "Calculate Unbiased Local C-Axis Misalignments", "", false));
-  params.insertLinkableParameter(std::make_unique<BoolParameter>(k_CalcBiasedAvg_Key, "Calculate Local C-Axis Misalignments", "", false));
+  params.insertLinkableParameter(std::make_unique<BoolParameter>(k_CalcUnbiasedAvg_Key, "Calculate Unbiased Local C-Axis Mis-alignments", "Calculate Unbiased Local C-Axis Mis-alignments", false));
+  params.insertLinkableParameter(std::make_unique<BoolParameter>(k_CalcBiasedAvg_Key, "Calculate Local C-Axis Mis-alignments", "Calculate Local C-Axis Mis-alignments", false));
 
   params.insertSeparator(Parameters::Separator{"Input Feature Data"});
-  params.insert(std::make_unique<ArraySelectionParameter>(k_FeatureParentIdsPath_Key, "Feature Parent Ids", "", DataPath{}, ArraySelectionParameter::AllowedTypes{DataType::int32},
-                                                          ArraySelectionParameter::AllowedComponentShapes{{1}}));
-  params.insert(std::make_unique<NeighborListSelectionParameter>(k_NeighborListPath_Key, "Neighbor List", "", DataPath{}, NeighborListSelectionParameter::AllowedTypes{DataType::int32}));
+  params.insert(std::make_unique<ArraySelectionParameter>(k_FeatureParentIdsPath_Key, "Feature Parent Ids", "Input feature based ParentIds data array", DataPath{},
+                                                          ArraySelectionParameter::AllowedTypes{DataType::int32}, ArraySelectionParameter::AllowedComponentShapes{{1}}));
   params.insert(
-      std::make_unique<NeighborListSelectionParameter>(k_CAxisMisalignmentListPath_Key, "C-Axis Misalignment List", "", DataPath{}, NeighborListSelectionParameter::AllowedTypes{DataType::float32}));
-  params.insert(std::make_unique<ArraySelectionParameter>(k_AvgCAxisMisalignmentsPath_Key, "Average C-Axis Misalignments", "", DataPath{}, ArraySelectionParameter::AllowedTypes{DataType::int32},
-                                                          ArraySelectionParameter::AllowedComponentShapes{{1}}));
+      std::make_unique<NeighborListSelectionParameter>(k_NeighborListPath_Key, "Neighbor List", "Feature based Neighbors", DataPath{}, NeighborListSelectionParameter::AllowedTypes{DataType::int32}));
+  params.insert(std::make_unique<NeighborListSelectionParameter>(k_CAxisMisalignmentListPath_Key, "C-Axis Mis-alignment NeighborList", "Input feature based C-Axis Mis-alignment NeighborList",
+                                                                 DataPath{}, NeighborListSelectionParameter::AllowedTypes{DataType::float32}));
+  params.insert(std::make_unique<ArraySelectionParameter>(k_AvgCAxisMisalignmentsPath_Key, "Average C-Axis Mis-alignments", "Input feature based Average C-Axis Mis-alignments", DataPath{},
+                                                          ArraySelectionParameter::AllowedTypes{DataType::int32}, ArraySelectionParameter::AllowedComponentShapes{{1}}));
 
   params.insertSeparator(Parameters::Separator{"Output Feature Data"});
-  params.insert(std::make_unique<DataGroupSelectionParameter>(k_NewCellFeatureAttributeMatrixPath_Key, "New Cell Feature Attribute Matrix Name", "", DataPath{},
-                                                              DataGroupSelectionParameter::AllowedTypes{BaseGroup::GroupType::AttributeMatrix}));
-  params.insert(std::make_unique<DataObjectNameParameter>(k_NumFeaturesPerParentName_Key, "Number of Features Per Parent Array Name", "", "NumFeaturesPerParent"));
-  params.insert(std::make_unique<DataObjectNameParameter>(k_LocalCAxisMisalignmentsName_Key, "Local C-Axis Misalignments Array Name", "", "LocalCAxisMisalignments"));
-  params.insert(std::make_unique<DataObjectNameParameter>(k_UnbiasedLocalCAxisMisalignmentsName_Key, "Unbiased Local CAxis Misalignments Array Name", "", "UnbiasedLocalCAxisMisalignments"));
+  params.insert(std::make_unique<DataGroupSelectionParameter>(k_NewCellFeatureAttributeMatrixPath_Key, "New Feature Attribute Matrix Name", "Output Feature Attribute Matrix to hold results",
+                                                              DataPath{}, DataGroupSelectionParameter::AllowedTypes{BaseGroup::GroupType::AttributeMatrix}));
+  params.insert(std::make_unique<DataObjectNameParameter>(k_NumFeaturesPerParentName_Key, "Number of Features Per Parent Array Name", "Output feature data array to hold number of features per parent",
+                                                          "NumFeaturesPerParent"));
+  params.insert(std::make_unique<DataObjectNameParameter>(k_LocalCAxisMisalignmentsName_Key, "Local C-Axis Mis-alignments Array Name",
+                                                          "Output feature data array to hold the local c-axis mis-alignments", "LocalCAxisMisalignments"));
+  params.insert(std::make_unique<DataObjectNameParameter>(k_UnbiasedLocalCAxisMisalignmentsName_Key, "Unbiased Local CAxis Mis-alignments Array Name",
+                                                          "Output feature data array to hold the unbiased local c-axis mis-alignments", "UnbiasedLocalCAxisMisalignments"));
 
   // Associate the Linkable Parameter(s) to the children parameters that they control
   params.linkParameters(k_CalcBiasedAvg_Key, k_LocalCAxisMisalignmentsName_Key, true);
@@ -124,7 +128,7 @@ IFilter::PreflightResult ComputeLocalAverageCAxisMisalignmentsFilter::preflightI
 
   if(!pCalcBiasedAvgValue && !pCalcUnbiasedAvgValue)
   {
-    return MakePreflightErrorResult(-43160, "Since both Calculate Local C-Axis Misalignments and Calculate Unbiased Local C-Axis Misalignments are false, nothing will be done in this filter, "
+    return MakePreflightErrorResult(-43160, "Since both Calculate Local C-Axis Mis-alignments and Calculate Unbiased Local C-Axis Misalignments are false, nothing will be done in this filter, "
                                             "consider making one or both true or remove filter from pipeline.");
   }
 
