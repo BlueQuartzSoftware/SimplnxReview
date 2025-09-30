@@ -6,7 +6,7 @@
 #include "simplnx/DataStructure/DataPath.hpp"
 #include "simplnx/Filter/Actions/CreateArrayAction.hpp"
 #include "simplnx/Parameters/ArraySelectionParameter.hpp"
-#include "simplnx/Parameters/DataGroupSelectionParameter.hpp"
+#include "simplnx/Parameters/DataGroupCreationParameter.hpp"
 #include "simplnx/Parameters/DataObjectNameParameter.hpp"
 #include "simplnx/Parameters/GeometrySelectionParameter.hpp"
 
@@ -51,14 +51,18 @@ Parameters ComputeMicroTextureRegionsFilter::parameters() const
 
   // Create the parameter descriptors that are needed for this filter
   params.insertSeparator(Parameters::Separator{"Input Data"});
-  params.insert(std::make_unique<GeometrySelectionParameter>(k_ImageGeomPath_Key, "Selected Image Geometry", "", DataPath{}, GeometrySelectionParameter::AllowedTypes{IGeometry::Type::Image}));
-  params.insert(std::make_unique<ArraySelectionParameter>(k_FeatureIdsArrayPath_Key, "Cell Feature Ids", "", DataPath{}, nx::core::GetAllDataTypes()));
+  params.insert(
+      std::make_unique<GeometrySelectionParameter>(k_ImageGeomPath_Key, "Image Geometry", "The selected image geometry", DataPath{}, GeometrySelectionParameter::AllowedTypes{IGeometry::Type::Image}));
+  params.insert(std::make_unique<ArraySelectionParameter>(k_FeatureIdsArrayPath_Key, "Cell Feature Ids", "Data Array that specifies to which Feature each Element belongs", DataPath{},
+                                                          ArraySelectionParameter::AllowedTypes{DataType::int32}, ArraySelectionParameter::AllowedComponentShapes{{1}}));
+  params.insert(std::make_unique<DataGroupSelectionParameter>(k_CellFeatureAttributeMatrixPath_Key, "Parent Feature Attribute Matrix", "Input Feature Attribute Matrix for microtexture regions",
+                                                              DataPath{}, DataGroupSelectionParameter::AllowedTypes{BaseGroup::GroupType::AttributeMatrix}));
 
-  params.insertSeparator(Parameters::Separator{"Output Data Object(s)"});
-  params.insert(std::make_unique<DataGroupSelectionParameter>(k_CellFeatureAttributeMatrixPath_Key, "Parent Cell Feature Attribute Matrix", "", DataPath{},
-                                                              DataGroupSelectionParameter::AllowedTypes{BaseGroup::GroupType::AttributeMatrix}));
-  params.insert(std::make_unique<DataObjectNameParameter>(k_MicroTextureRegionNumCellsArrayName_Key, "Micro Texture Region Number of Cells Array Name", "", "MT Region Number of Cells"));
-  params.insert(std::make_unique<DataObjectNameParameter>(k_MicroTextureRegionFractionOccupiedArrayName_Key, "Micro Texture Region Fraction Occupied Array Name", "", "MT Region Fraction Occupied"));
+  params.insertSeparator(Parameters::Separator{"Output Feature Data"});
+  params.insert(std::make_unique<DataObjectNameParameter>(k_MicroTextureRegionNumCellsArrayName_Key, "Micro Texture Region Number of Cells Array Name",
+                                                          "Output Number of cells per microtexture region", "MT Region Number of Cells"));
+  params.insert(std::make_unique<DataObjectNameParameter>(k_MicroTextureRegionFractionOccupiedArrayName_Key, "Micro Texture Region Fraction Occupied Array Name",
+                                                          "Output Region Fraction occupied data array", "MT Region Fraction Occupied"));
 
   return params;
 }

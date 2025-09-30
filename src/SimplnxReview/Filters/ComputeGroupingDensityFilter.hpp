@@ -24,10 +24,10 @@ public:
   ComputeGroupingDensityFilter& operator=(ComputeGroupingDensityFilter&&) noexcept = delete;
 
   // Parameter Keys
-  static inline constexpr StringLiteral k_VolumesPath_Key = "volumes_path";
-  static inline constexpr StringLiteral k_ContiguousNLPath_Key = "contiguous_neighbor_list_path";
+  static inline constexpr StringLiteral k_VolumesArrayPath_Key = "volumes_path";
+  static inline constexpr StringLiteral k_ContiguousNeighborListArrayPath_Key = "contiguous_neighbor_list_path";
   static inline constexpr StringLiteral k_UseNonContiguousNeighbors_Key = "use_non_contiguous_neighbors";
-  static inline constexpr StringLiteral k_NonContiguousNLPath_Key = "non_contiguous_neighbor_list_path";
+  static inline constexpr StringLiteral k_NonContiguousNeighborListArrayPath_Key = "non_contiguous_neighbor_list_path";
   static inline constexpr StringLiteral k_ParentIdsPath_Key = "parent_ids_path";
   static inline constexpr StringLiteral k_ParentVolumesPath_Key = "parent_volumes_path";
   static inline constexpr StringLiteral k_FindCheckedFeatures_Key = "find_checked_features";

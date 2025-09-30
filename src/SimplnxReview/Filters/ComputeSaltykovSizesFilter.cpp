@@ -57,11 +57,12 @@ Parameters ComputeSaltykovSizesFilter::parameters() const
   params.insert(std::make_unique<NumberParameter<uint64>>(k_SeedValue_Key, "Seed", "The seed fed into the random generator", std::mt19937::default_seed));
 
   params.insertSeparator(Parameters::Separator{"Input Feature Data"});
-  params.insert(std::make_unique<ArraySelectionParameter>(k_EquivalentDiametersArrayPath_Key, "Equivalent Diameters", "", DataPath{}, ArraySelectionParameter::AllowedTypes{DataType::float32},
-                                                          ArraySelectionParameter::AllowedComponentShapes{{1}}));
+  params.insert(std::make_unique<ArraySelectionParameter>(k_EquivalentDiametersArrayPath_Key, "Equivalent Diameters", "Input feature based Equivalent Diameters", DataPath{},
+                                                          ArraySelectionParameter::AllowedTypes{DataType::float32}, ArraySelectionParameter::AllowedComponentShapes{{1}}));
 
   params.insertSeparator(Parameters::Separator{"Output Feature Data"});
-  params.insert(std::make_unique<DataObjectNameParameter>(k_SaltykovEquivalentDiametersName_Key, "Saltykov Equivalent Diameters Name", "", "Saltykov Equivalent Diameters"));
+  params.insert(std::make_unique<DataObjectNameParameter>(k_SaltykovEquivalentDiametersName_Key, "Saltykov Equivalent Diameters Name", "Output feature based Equivalent Diameters data array",
+                                                          "Saltykov Equivalent Diameters"));
 
   return params;
 }
