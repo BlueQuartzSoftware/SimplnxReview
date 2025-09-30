@@ -57,7 +57,7 @@ jobs:
           cmake --preset ci-windows-${{matrix.toolset}} -T ${{matrix.toolset}} -DSIMPLNX_EXTRA_PLUGINS="SimplnxReview" -DSIMPLNX_PLUGIN_ENABLE_SimplnxReview=ON -DSIMPLNX_SimplnxReview_SOURCE_DIR=${{github.workspace}} ${{github.workspace}}/../../simplnx
       - name: Build
         run: |
-          cmake --build --preset ci-windows-${{matrix.toolset}}
+          cmake --build ${{github.workspace}}/../../simplnx/build --config Release
       - name: Test
         run: |
           ctest --output-on-failure --test-dir ${{github.workspace}}/../../simplnx/build --build-config Release
