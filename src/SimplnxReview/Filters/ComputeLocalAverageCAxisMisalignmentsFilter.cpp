@@ -11,6 +11,7 @@
 #include "simplnx/Parameters/DataGroupSelectionParameter.hpp"
 #include "simplnx/Parameters/DataObjectNameParameter.hpp"
 #include "simplnx/Parameters/NeighborListSelectionParameter.hpp"
+#include "simplnx/Utilities/SIMPLConversion.hpp"
 
 using namespace nx::core;
 
@@ -254,7 +255,16 @@ namespace
 {
 namespace SIMPL
 {
-
+constexpr StringLiteral k_AvgCAxisMisalignmentsArrayPathKey = "AvgCAxisMisalignmentsArrayPath";
+constexpr StringLiteral k_CAxisMisalignmentListArrayPathKey = "CAxisMisalignmentListArrayPath";
+constexpr StringLiteral k_CalcBiasedAvgKey = "CalcBiasedAvg";
+constexpr StringLiteral k_CalcUnbiasedAvgKey = "CalcUnbiasedAvg";
+constexpr StringLiteral k_FeatureParentIdsArrayPathKey = "FeatureParentIdsArrayPath";
+constexpr StringLiteral k_LocalCAxisMisalignmentsArrayNameKey = "LocalCAxisMisalignmentsArrayName";
+constexpr StringLiteral k_NeighborListArrayPathKey = "NeighborListArrayPath";
+constexpr StringLiteral k_NumFeaturesPerParentArrayNameKey = "NumFeaturesPerParentArrayName";
+constexpr StringLiteral k_NewCellFeatureAttributeMatrixNameKey = "NewCellFeatureAttributeMatrixName";
+constexpr StringLiteral k_UnbiasedLocalCAxisMisalignmentsArrayNameKey = "UnbiasedLocalCAxisMisalignmentsArrayName";
 } // namespace SIMPL
 } // namespace
 
@@ -263,6 +273,23 @@ Result<Arguments> ComputeLocalAverageCAxisMisalignmentsFilter::FromSIMPLJson(con
   Arguments args = ComputeLocalAverageCAxisMisalignmentsFilter().getDefaultArguments();
 
   std::vector<Result<>> results;
+
+  results.push_back(
+      SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_AvgCAxisMisalignmentsArrayPathKey, k_AvgCAxisMisalignmentsPath_Key));
+  results.push_back(
+      SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_CAxisMisalignmentListArrayPathKey, k_CAxisMisalignmentListPath_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedBooleanFilterParameterConverter>(args, json, SIMPL::k_CalcBiasedAvgKey, k_CalcBiasedAvg_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedBooleanFilterParameterConverter>(args, json, SIMPL::k_CalcUnbiasedAvgKey, k_CalcUnbiasedAvg_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_FeatureParentIdsArrayPathKey, k_FeatureParentIdsPath_Key));
+  results.push_back(
+      SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, SIMPL::k_LocalCAxisMisalignmentsArrayNameKey, k_LocalCAxisMisalignmentsName_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_NeighborListArrayPathKey, k_NeighborListPath_Key));
+  results.push_back(
+      SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, SIMPL::k_NumFeaturesPerParentArrayNameKey, k_NumFeaturesPerParentName_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataContainerSelectionFilterParameterConverter>(args, json, SIMPL::k_NewCellFeatureAttributeMatrixNameKey,
+                                                                                                                       k_NewCellFeatureAttributeMatrixPath_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, SIMPL::k_UnbiasedLocalCAxisMisalignmentsArrayNameKey,
+                                                                                                                   k_UnbiasedLocalCAxisMisalignmentsName_Key));
 
   Result<> conversionResult = MergeResults(std::move(results));
 

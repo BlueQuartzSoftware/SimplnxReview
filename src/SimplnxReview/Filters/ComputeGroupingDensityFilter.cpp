@@ -11,6 +11,7 @@
 #include "simplnx/Parameters/BoolParameter.hpp"
 #include "simplnx/Parameters/DataObjectNameParameter.hpp"
 #include "simplnx/Parameters/NeighborListSelectionParameter.hpp"
+#include "simplnx/Utilities/SIMPLConversion.hpp"
 
 using namespace nx::core;
 
@@ -216,7 +217,15 @@ namespace
 {
 namespace SIMPL
 {
-
+constexpr StringLiteral k_CheckedFeaturesArrayNameKey = "CheckedFeaturesArrayName";
+constexpr StringLiteral k_ContiguousNeighborListArrayPathKey = "ContiguousNeighborListArrayPath";
+constexpr StringLiteral k_FindCheckedFeaturesKey = "FindCheckedFeatures";
+constexpr StringLiteral k_NonContiguousNeighborListArrayPathKey = "NonContiguousNeighborListArrayPath";
+constexpr StringLiteral k_ParentDensitiesArrayNameKey = "ParentDensitiesArrayName";
+constexpr StringLiteral k_ParentIdsArrayPathKey = "ParentIdsArrayPath";
+constexpr StringLiteral k_ParentVolumesArrayPathKey = "ParentVolumesArrayPath";
+constexpr StringLiteral k_UseNonContiguousNeighborsKey = "UseNonContiguousNeighbors";
+constexpr StringLiteral k_VolumesArrayPathKey = "VolumesArrayPath";
 } // namespace SIMPL
 } // namespace
 
@@ -225,6 +234,17 @@ Result<Arguments> ComputeGroupingDensityFilter::FromSIMPLJson(const nlohmann::js
   Arguments args = ComputeGroupingDensityFilter().getDefaultArguments();
 
   std::vector<Result<>> results;
+
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, SIMPL::k_CheckedFeaturesArrayNameKey, k_CheckedFeaturesName_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_ContiguousNeighborListArrayPathKey, k_ContiguousNLPath_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedBooleanFilterParameterConverter>(args, json, SIMPL::k_FindCheckedFeaturesKey, k_FindCheckedFeatures_Key));
+  results.push_back(
+      SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_NonContiguousNeighborListArrayPathKey, k_NonContiguousNLPath_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, SIMPL::k_ParentDensitiesArrayNameKey, k_GroupingDensitiesName_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_ParentIdsArrayPathKey, k_ParentIdsPath_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_ParentVolumesArrayPathKey, k_ParentVolumesPath_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedBooleanFilterParameterConverter>(args, json, SIMPL::k_UseNonContiguousNeighborsKey, k_UseNonContiguousNeighbors_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_VolumesArrayPathKey, k_VolumesPath_Key));
 
   Result<> conversionResult = MergeResults(std::move(results));
 
