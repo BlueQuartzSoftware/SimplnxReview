@@ -139,7 +139,7 @@ IFilter::PreflightResult GroupMicroTextureRegionsFilter::preflightImpl(const Dat
   }
 
   {
-    auto createAction = std::make_unique<CreateAttributeMatrixAction>(pNewCellFeatureAMPath, AttributeMatrix::ShapeType{1});
+    auto createAction = std::make_unique<CreateAttributeMatrixAction>(pNewCellFeatureAMPath, ShapeType{1});
     resultOutputActions.value().appendAction(std::move(createAction));
   }
   {

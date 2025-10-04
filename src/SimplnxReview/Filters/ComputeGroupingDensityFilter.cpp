@@ -150,7 +150,7 @@ IFilter::PreflightResult ComputeGroupingDensityFilter::preflightImpl(const DataS
   else
   {
     {
-      auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::int32, std::vector<usize>{1}, std::vector<usize>{1}, k_ThrowawayCheckedFeatures);
+      auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::int32, ShapeType{1}, ShapeType{1}, k_ThrowawayCheckedFeatures);
       resultOutputActions.value().appendAction(std::move(createArrayAction));
     }
     {
@@ -162,7 +162,7 @@ IFilter::PreflightResult ComputeGroupingDensityFilter::preflightImpl(const DataS
   if(!pUseNonContiguousNeighbors)
   {
     {
-      auto createArrayAction = std::make_unique<CreateNeighborListAction>(nx::core::DataType::int32, 1, k_ThrowawayNonContiguous);
+      auto createArrayAction = std::make_unique<CreateNeighborListAction>(nx::core::DataType::int32, ShapeType{1}, k_ThrowawayNonContiguous);
       resultOutputActions.value().appendAction(std::move(createArrayAction));
     }
     {
