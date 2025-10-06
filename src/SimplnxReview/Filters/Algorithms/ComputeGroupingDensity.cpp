@@ -2,6 +2,7 @@
 
 #include "simplnx/DataStructure/DataArray.hpp"
 #include "simplnx/DataStructure/NeighborList.hpp"
+#include "simplnx/Utilities/MessageHelper.hpp"
 
 using namespace nx::core;
 
@@ -66,30 +67,13 @@ public:
       // Default value-initialized to zeroes: https://en.cppreference.com/w/cpp/named_req/DefaultInsertable
       checkedFeatureVolumes.resize(numFeatures);
     }
-    int32_t progInt = 0;
-    usize prevParentId = 1;
-    usize currentParentId = 1;
-    auto start = std::chrono::steady_clock::now();
+    MessageHelper messageHelper(m_MessageHandler);
+    ThrottledMessenger throttledMessenger = messageHelper.createThrottledMessenger();
 
     for(usize parentIdx = 1; parentIdx < numParents; parentIdx++)
     {
-      progInt = static_cast<float>(parentIdx) / static_cast<float>(numParents) * 100.0f;
-      auto now = std::chrono::steady_clock::now();
-      // Only send updates every 1 second
-      if(std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count() > 1000)
-      {
-        currentParentId = parentIdx;
-        auto totalParentIds = currentParentId - prevParentId;
-        auto rate = static_cast<float>(totalParentIds) / static_cast<float>(std::chrono::duration_cast<std::chrono::seconds>(now - start).count());
+      throttledMessenger.sendThrottledMessage([&]() { return fmt::format("[{}%]", CalculatePercentComplete(parentIdx, numParents)); });
 
-        auto remainingParents = numParents - parentIdx;
-        auto minutesRemain = (remainingParents / rate) / 60; // Convert to minutes
-
-        std::string message = fmt::format("{}/{} [{}%] at {} parents/sec. Time Remain: {:.2f} Minutes", parentIdx, numParents, progInt, rate, minutesRemain);
-        m_MessageHandler(nx::core::IFilter::ProgressMessage{nx::core::IFilter::Message::Type::Info, message, progInt});
-        start = std::chrono::steady_clock::now();
-        prevParentId = currentParentId;
-      }
       if(m_ShouldCancel)
       {
         return {};
