@@ -10,6 +10,7 @@
 #include "simplnx/Parameters/DataGroupSelectionParameter.hpp"
 #include "simplnx/Parameters/DataObjectNameParameter.hpp"
 #include "simplnx/Parameters/NumberParameter.hpp"
+#include "simplnx/Utilities/SIMPLConversion.hpp"
 
 #include <random>
 
@@ -121,4 +122,30 @@ Result<> ComputeSaltykovSizesFilter::executeImpl(DataStructure& dataStructure, c
 
   return ComputeSaltykovSizes(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }
+
+namespace
+{
+namespace SIMPL
+{
+constexpr StringLiteral k_EquivalentDiametersArrayPathKey = "EquivalentDiametersArrayPath";
+constexpr StringLiteral k_SaltykovEquivalentDiametersArrayPathKey = "SaltykovEquivalentDiametersArrayPath";
+} // namespace SIMPL
+} // namespace
+
+Result<Arguments> ComputeSaltykovSizesFilter::FromSIMPLJson(const nlohmann::json& json)
+{
+  Arguments args = ComputeSaltykovSizesFilter().getDefaultArguments();
+
+  std::vector<Result<>> results;
+
+  results.push_back(
+      SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_EquivalentDiametersArrayPathKey, k_EquivalentDiametersArrayPath_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArrayCreationToDataObjectNameFilterParameterConverter>(args, json, SIMPL::k_SaltykovEquivalentDiametersArrayPathKey,
+                                                                                                                                  k_SaltykovEquivalentDiametersName_Key));
+
+  Result<> conversionResult = MergeResults(std::move(results));
+
+  return ConvertResultTo<Arguments>(std::move(conversionResult), std::move(args));
+}
+
 } // namespace nx::core

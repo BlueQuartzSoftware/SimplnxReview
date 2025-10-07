@@ -9,6 +9,7 @@
 #include "simplnx/Parameters/DataGroupCreationParameter.hpp"
 #include "simplnx/Parameters/DataObjectNameParameter.hpp"
 #include "simplnx/Parameters/GeometrySelectionParameter.hpp"
+#include "simplnx/Utilities/SIMPLConversion.hpp"
 
 using namespace nx::core;
 
@@ -128,4 +129,35 @@ Result<> ComputeMicroTextureRegionsFilter::executeImpl(DataStructure& dataStruct
 
   return ComputeMicroTextureRegions(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }
+
+namespace
+{
+namespace SIMPL
+{
+constexpr StringLiteral k_CellFeatureAttributeMatrixNameKey = "CellFeatureAttributeMatrixName";
+constexpr StringLiteral k_MicroTextureRegionFractionOccupiedArrayNameKey = "MicroTextureRegionFractionOccupiedArrayName";
+constexpr StringLiteral k_MicroTextureRegionNumCellsArrayNameKey = "MicroTextureRegionNumCellsArrayName";
+constexpr StringLiteral k_FeatureIdsArrayPathKey = "FeatureIdsArrayPath";
+} // namespace SIMPL
+} // namespace
+
+Result<Arguments> ComputeMicroTextureRegionsFilter::FromSIMPLJson(const nlohmann::json& json)
+{
+  Arguments args = ComputeMicroTextureRegionsFilter().getDefaultArguments();
+
+  std::vector<Result<>> results;
+
+  results.push_back(
+      SIMPLConversion::ConvertParameter<SIMPLConversion::DataContainerSelectionFilterParameterConverter>(args, json, SIMPL::k_CellFeatureAttributeMatrixNameKey, k_CellFeatureAttributeMatrixPath_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, SIMPL::k_MicroTextureRegionFractionOccupiedArrayNameKey,
+                                                                                                                   k_MicroTextureRegionFractionOccupiedArrayName_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, SIMPL::k_MicroTextureRegionNumCellsArrayNameKey,
+                                                                                                                   k_MicroTextureRegionNumCellsArrayName_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_FeatureIdsArrayPathKey, k_FeatureIdsArrayPath_Key));
+
+  Result<> conversionResult = MergeResults(std::move(results));
+
+  return ConvertResultTo<Arguments>(std::move(conversionResult), std::move(args));
+}
+
 } // namespace nx::core
