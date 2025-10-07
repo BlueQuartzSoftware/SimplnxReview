@@ -81,10 +81,10 @@ public:
         currentParentId = parentIdx;
         auto totalParentIds = currentParentId - prevParentId;
         auto rate = static_cast<float>(totalParentIds) / static_cast<float>(std::chrono::duration_cast<std::chrono::seconds>(now - start).count());
-      
+
         auto remainingParents = numParents - parentIdx;
         auto minutesRemain = (remainingParents / rate) / 60; // Convert to minutes
-      
+
         std::string message = fmt::format("{}/{} [{}%] at {} parents/sec. Time Remain: {:.2f} Minutes", parentIdx, numParents, progInt, rate, minutesRemain);
         m_MessageHandler(nx::core::IFilter::ProgressMessage{nx::core::IFilter::Message::Type::Info, message, progInt});
         start = std::chrono::steady_clock::now();
