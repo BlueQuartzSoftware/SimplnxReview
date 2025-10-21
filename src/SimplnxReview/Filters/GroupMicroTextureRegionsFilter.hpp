@@ -24,23 +24,23 @@ public:
   GroupMicroTextureRegionsFilter& operator=(GroupMicroTextureRegionsFilter&&) noexcept = delete;
 
   // Parameter Keys
-  static inline constexpr StringLiteral k_UseNonContiguousNeighbors_Key = "use_non_contiguous_neighbors";
-  static inline constexpr StringLiteral k_NonContiguousNeighborListArrayPath_Key = "non_contiguous_neighbor_list_array_path";
-  static inline constexpr StringLiteral k_ContiguousNeighborListArrayPath_Key = "contiguous_neighbor_list_array_path";
-  static inline constexpr StringLiteral k_UseRunningAverage_Key = "use_running_average";
-  static inline constexpr StringLiteral k_CAxisTolerance_Key = "c_axis_tolerance";
-  static inline constexpr StringLiteral k_FeatureIdsArrayPath_Key = "feature_ids_array_path";
-  static inline constexpr StringLiteral k_FeaturePhasesArrayPath_Key = "feature_phases_array_path";
-  static inline constexpr StringLiteral k_VolumesArrayPath_Key = "volumes_array_path";
-  static inline constexpr StringLiteral k_AvgQuatsArrayPath_Key = "avg_quats_array_path";
-  static inline constexpr StringLiteral k_CrystalStructuresArrayPath_Key = "crystal_structures_array_path";
-  static inline constexpr StringLiteral k_NewCellFeatureAttributeMatrixName_Key = "new_cell_feature_attribute_matrix_path";
-  static inline constexpr StringLiteral k_CellParentIdsArrayName_Key = "cell_parent_ids_array_name";
-  static inline constexpr StringLiteral k_FeatureParentIdsArrayName_Key = "feature_parent_ids_array_name";
-  static inline constexpr StringLiteral k_ActiveArrayName_Key = "active_array_name";
-  static inline constexpr StringLiteral k_SeedArrayName_Key = "seed_array_name";
-  static inline constexpr StringLiteral k_UseSeed_Key = "use_seed";
-  static inline constexpr StringLiteral k_SeedValue_Key = "seed_value";
+  static constexpr StringLiteral k_UseNonContiguousNeighbors_Key = "use_non_contiguous_neighbors";
+  static constexpr StringLiteral k_NonContiguousNeighborListArrayPath_Key = "non_contiguous_neighbor_list_array_path";
+  static constexpr StringLiteral k_ContiguousNeighborListArrayPath_Key = "contiguous_neighbor_list_array_path";
+  static constexpr StringLiteral k_UseRunningAverage_Key = "use_running_average";
+  static constexpr StringLiteral k_CAxisTolerance_Key = "c_axis_tolerance";
+  static constexpr StringLiteral k_FeatureIdsArrayPath_Key = "feature_ids_array_path";
+  static constexpr StringLiteral k_FeaturePhasesArrayPath_Key = "feature_phases_array_path";
+  static constexpr StringLiteral k_VolumesArrayPath_Key = "volumes_array_path";
+  static constexpr StringLiteral k_AvgQuatsArrayPath_Key = "avg_quats_array_path";
+  static constexpr StringLiteral k_CrystalStructuresArrayPath_Key = "crystal_structures_array_path";
+  static constexpr StringLiteral k_NewCellFeatureAttributeMatrixName_Key = "new_cell_feature_attribute_matrix_path";
+  static constexpr StringLiteral k_CellParentIdsArrayName_Key = "cell_parent_ids_array_name";
+  static constexpr StringLiteral k_FeatureParentIdsArrayName_Key = "feature_parent_ids_array_name";
+  static constexpr StringLiteral k_ActiveArrayName_Key = "active_array_name";
+  static constexpr StringLiteral k_SeedArrayName_Key = "seed_array_name";
+  static constexpr StringLiteral k_UseSeed_Key = "use_seed";
+  static constexpr StringLiteral k_SeedValue_Key = "seed_value";
 
   /**
    * @brief Reads SIMPL json and converts it simplnx Arguments.

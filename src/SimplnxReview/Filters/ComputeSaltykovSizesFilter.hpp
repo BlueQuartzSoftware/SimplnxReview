@@ -24,10 +24,10 @@ public:
   ComputeSaltykovSizesFilter& operator=(ComputeSaltykovSizesFilter&&) noexcept = delete;
 
   // Parameter Keys
-  static inline constexpr StringLiteral k_UseSeed_Key = "use_seed";
-  static inline constexpr StringLiteral k_SeedValue_Key = "seed_value";
-  static inline constexpr StringLiteral k_EquivalentDiametersArrayPath_Key = "equivalent_diameters_array_path";
-  static inline constexpr StringLiteral k_SaltykovEquivalentDiametersName_Key = "saltykov_equivalent_diameters_name";
+  static constexpr StringLiteral k_UseSeed_Key = "use_seed";
+  static constexpr StringLiteral k_SeedValue_Key = "seed_value";
+  static constexpr StringLiteral k_EquivalentDiametersArrayPath_Key = "equivalent_diameters_array_path";
+  static constexpr StringLiteral k_SaltykovEquivalentDiametersName_Key = "saltykov_equivalent_diameters_name";
 
   /**
    * @brief Reads SIMPL json and converts it simplnx Arguments.
