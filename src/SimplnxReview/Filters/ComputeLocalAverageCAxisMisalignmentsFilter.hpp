@@ -24,16 +24,16 @@ public:
   ComputeLocalAverageCAxisMisalignmentsFilter& operator=(ComputeLocalAverageCAxisMisalignmentsFilter&&) noexcept = delete;
 
   // Parameter Keys
-  static inline constexpr StringLiteral k_CalcBiasedAvg_Key = "calc_biased_avg";
-  static inline constexpr StringLiteral k_CalcUnbiasedAvg_Key = "calc_unbiased_avg";
-  static inline constexpr StringLiteral k_NeighborListPath_Key = "neighbor_list_path";
-  static inline constexpr StringLiteral k_CAxisMisalignmentListPath_Key = "c_axis_misalignment_list_path";
-  static inline constexpr StringLiteral k_AvgCAxisMisalignmentsPath_Key = "avg_c_axis_misalignments_path";
-  static inline constexpr StringLiteral k_FeatureParentIdsPath_Key = "feature_parent_ids_path";
-  static inline constexpr StringLiteral k_NewCellFeatureAttributeMatrixPath_Key = "new_cell_feature_attribute_matrix_path";
-  static inline constexpr StringLiteral k_NumFeaturesPerParentName_Key = "num_features_per_parent_name";
-  static inline constexpr StringLiteral k_LocalCAxisMisalignmentsName_Key = "local_c_axis_misalignments_name";
-  static inline constexpr StringLiteral k_UnbiasedLocalCAxisMisalignmentsName_Key = "unbiased_local_c_axis_misalignments_name";
+  static constexpr StringLiteral k_CalcBiasedAvg_Key = "calc_biased_avg";
+  static constexpr StringLiteral k_CalcUnbiasedAvg_Key = "calc_unbiased_avg";
+  static constexpr StringLiteral k_NeighborListPath_Key = "neighbor_list_path";
+  static constexpr StringLiteral k_CAxisMisalignmentListPath_Key = "c_axis_misalignment_list_path";
+  static constexpr StringLiteral k_AvgCAxisMisalignmentsPath_Key = "avg_c_axis_misalignments_path";
+  static constexpr StringLiteral k_FeatureParentIdsPath_Key = "feature_parent_ids_path";
+  static constexpr StringLiteral k_NewCellFeatureAttributeMatrixPath_Key = "new_cell_feature_attribute_matrix_path";
+  static constexpr StringLiteral k_NumFeaturesPerParentName_Key = "num_features_per_parent_name";
+  static constexpr StringLiteral k_LocalCAxisMisalignmentsName_Key = "local_c_axis_misalignments_name";
+  static constexpr StringLiteral k_UnbiasedLocalCAxisMisalignmentsName_Key = "unbiased_local_c_axis_misalignments_name";
 
   /**
    * @brief Reads SIMPL json and converts it simplnx Arguments.

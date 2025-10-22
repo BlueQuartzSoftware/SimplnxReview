@@ -24,15 +24,15 @@ public:
   ComputeGroupingDensityFilter& operator=(ComputeGroupingDensityFilter&&) noexcept = delete;
 
   // Parameter Keys
-  static inline constexpr StringLiteral k_VolumesArrayPath_Key = "volumes_path";
-  static inline constexpr StringLiteral k_ContiguousNeighborListArrayPath_Key = "contiguous_neighbor_list_path";
-  static inline constexpr StringLiteral k_UseNonContiguousNeighbors_Key = "use_non_contiguous_neighbors";
-  static inline constexpr StringLiteral k_NonContiguousNeighborListArrayPath_Key = "non_contiguous_neighbor_list_path";
-  static inline constexpr StringLiteral k_ParentIdsPath_Key = "parent_ids_path";
-  static inline constexpr StringLiteral k_ParentVolumesPath_Key = "parent_volumes_path";
-  static inline constexpr StringLiteral k_FindCheckedFeatures_Key = "find_checked_features";
-  static inline constexpr StringLiteral k_CheckedFeaturesName_Key = "checked_features_name";
-  static inline constexpr StringLiteral k_GroupingDensitiesName_Key = "grouping_densities_name";
+  static constexpr StringLiteral k_VolumesArrayPath_Key = "volumes_path";
+  static constexpr StringLiteral k_ContiguousNeighborListArrayPath_Key = "contiguous_neighbor_list_path";
+  static constexpr StringLiteral k_UseNonContiguousNeighbors_Key = "use_non_contiguous_neighbors";
+  static constexpr StringLiteral k_NonContiguousNeighborListArrayPath_Key = "non_contiguous_neighbor_list_path";
+  static constexpr StringLiteral k_ParentIdsPath_Key = "parent_ids_path";
+  static constexpr StringLiteral k_ParentVolumesPath_Key = "parent_volumes_path";
+  static constexpr StringLiteral k_FindCheckedFeatures_Key = "find_checked_features";
+  static constexpr StringLiteral k_CheckedFeaturesName_Key = "checked_features_name";
+  static constexpr StringLiteral k_GroupingDensitiesName_Key = "grouping_densities_name";
 
   /**
    * @brief Reads SIMPL json and converts it simplnx Arguments.
