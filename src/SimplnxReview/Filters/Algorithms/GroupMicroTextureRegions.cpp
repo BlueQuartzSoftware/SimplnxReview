@@ -54,6 +54,11 @@ GroupMicroTextureRegions::GroupMicroTextureRegions(DataStructure& dataStructure,
 , m_InputValues(inputValues)
 , m_ShouldCancel(shouldCancel)
 , m_MessageHandler(mesgHandler)
+, m_FeaturePhases(m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeaturePhasesArrayPath))
+, m_FeatureParentIds(m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeatureParentIdsArrayName))
+, m_CrystalStructures(m_DataStructure.getDataRefAs<UInt32Array>(m_InputValues->CrystalStructuresArrayPath))
+, m_AvgQuats(m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->AvgQuatsArrayPath))
+, m_Volumes(m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->VolumesArrayPath))
 {
 }
 
@@ -192,8 +197,7 @@ Result<> GroupMicroTextureRegions::operator()()
   m_AvgCAxes[0] = 0.0f;
   m_AvgCAxes[1] = 0.0f;
   m_AvgCAxes[2] = 0.0f;
-  auto& featureParentIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeatureParentIdsArrayName);
-  featureParentIds.fill(-1);
+  m_FeatureParentIds.fill(-1);
 
   // Execute the main grouping algorithm
   messageHelper.sendMessage(fmt::format("Starting Grouping....."));
@@ -212,12 +216,12 @@ Result<> GroupMicroTextureRegions::operator()()
   usize totalPoints = featureIds.getNumberOfTuples();
   for(usize k = 0; k < totalPoints; k++)
   {
-    cellParentIds[k] = featureParentIds[featureIds[k]];
+    cellParentIds[k] = m_FeatureParentIds[featureIds[k]];
   }
 
   // By default we randomize grains !!! COMMENT OUT FOR DEMONSTRATION !!!
   // m_MessageHandler(IFilter::Message::Type::Info, "Randomizing Parent Ids");
-  // RandomizeFeatureIds(totalPoints, m_NumTuples, cellParentIds, featureParentIds, featureIds, m_InputValues->SeedValue);
+  // RandomizeFeatureIds(totalPoints, m_NumTuples, cellParentIds, m_FeatureParentIds, featureIds, m_InputValues->SeedValue);
 
   return {};
 }
@@ -225,10 +229,7 @@ Result<> GroupMicroTextureRegions::operator()()
 // -----------------------------------------------------------------------------
 int GroupMicroTextureRegions::getSeed(int32 newFid)
 {
-  auto& featureParentIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeatureParentIdsArrayName);
-  auto& featurePhases = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeaturePhasesArrayPath);
-
-  usize numFeatures = featurePhases.getNumberOfTuples();
+  usize numFeatures = m_FeaturePhases.getNumberOfTuples();
 
   float32 g1[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
   float32 g1t[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
@@ -253,7 +254,7 @@ int GroupMicroTextureRegions::getSeed(int32 newFid)
     {
       randFeature = randFeature - numFeatures;
     }
-    if(featureParentIds[randFeature] == -1)
+    if(m_FeatureParentIds.getValue(randFeature) == -1)
     {
       featureIdSeed = randFeature;
     }
@@ -271,16 +272,14 @@ int GroupMicroTextureRegions::getSeed(int32 newFid)
 
   if(featureIdSeed >= 0)
   {
-    featureParentIds[featureIdSeed] = newFid;
+    m_FeatureParentIds[featureIdSeed] = newFid;
     m_NumTuples = newFid + 1;
 
     if(m_InputValues->UseRunningAverage)
     {
-      auto& volumes = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->VolumesArrayPath);
-      auto& avgQuats = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->AvgQuatsArrayPath);
-
       usize index = featureIdSeed * 4;
-      OrientationTransformation::qu2om<QuatF, OrientationF>({avgQuats[index + 0], avgQuats[index + 1], avgQuats[index + 2], avgQuats[index + 3]}).toGMatrix(g1);
+      OrientationTransformation::qu2om<QuatF, OrientationF>({m_AvgQuats.getValue(index + 0), m_AvgQuats.getValue(index + 1), m_AvgQuats.getValue(index + 2), m_AvgQuats.getValue(index + 3)})
+          .toGMatrix(g1);
 
       std::array<float32, 3> c1 = {0.0f, 0.0f, 0.0f};
       std::array<float32, 3> cAxis = {0.0f, 0.0f, 1.0f};
@@ -292,7 +291,7 @@ int GroupMicroTextureRegions::getSeed(int32 newFid)
       // dividing by the magnitudes (they would be 1)
       MatrixMath::Normalize3x1(c1.data());
       MatrixMath::Copy3x1(c1.data(), m_AvgCAxes.data());
-      MatrixMath::Multiply3x1withConstant(m_AvgCAxes.data(), volumes.getValue(featureIdSeed));
+      MatrixMath::Multiply3x1withConstant(m_AvgCAxes.data(), m_Volumes.getValue(featureIdSeed));
     }
   }
 
@@ -323,16 +322,16 @@ bool GroupMicroTextureRegions::determineGrouping(int32 referenceFeature, int32 n
   std::array<float32, 3> c1 = {0.0f, 0.0f, 0.0f};
   std::array<float32, 3> caxis = {0.0f, 0.0f, 1.0f};
 
-  auto& featurePhases = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeaturePhasesArrayPath);
-  auto& featureParentIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeatureParentIdsArrayName);
-  auto& crystalStructures = m_DataStructure.getDataRefAs<UInt32Array>(m_InputValues->CrystalStructuresArrayPath);
-  if(featureParentIds[neighborFeature] == -1 && featurePhases[referenceFeature] > 0 && featurePhases[neighborFeature] > 0)
+  int32 neighborParentId = m_FeatureParentIds.getValue(neighborFeature);
+  int32 referenceFeaturePhase = m_FeaturePhases.getValue(referenceFeature);
+  int32 neighborFeaturePhase = m_FeaturePhases.getValue(neighborFeature);
+
+  if(neighborParentId == -1 && referenceFeaturePhase > 0 && neighborFeaturePhase > 0)
   {
-    auto& avgQuats = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->AvgQuatsArrayPath);
     if(!m_InputValues->UseRunningAverage)
     {
       usize index = referenceFeature * 4;
-      OrientationTransformation::qu2om<QuatF, Orientation<float32>>({avgQuats[index + 0], avgQuats[index + 1], avgQuats[index + 2], avgQuats[index + 3]}).toGMatrix(g1);
+      OrientationTransformation::qu2om<QuatF, Orientation<float32>>({m_AvgQuats[index + 0], m_AvgQuats[index + 1], m_AvgQuats[index + 2], m_AvgQuats[index + 3]}).toGMatrix(g1);
 
       // transpose the g matrix so when c-axis is multiplied by it,
       // it will give the sample direction that the c-axis is along
@@ -342,12 +341,12 @@ bool GroupMicroTextureRegions::determineGrouping(int32 referenceFeature, int32 n
       // dividing by the magnitudes (they would be 1)
       MatrixMath::Normalize3x1(c1.data());
     }
-    phase1 = crystalStructures[featurePhases[referenceFeature]];
-    uint32 phase2 = crystalStructures[featurePhases[neighborFeature]];
+    phase1 = m_CrystalStructures.getValue(referenceFeaturePhase);
+    uint32 phase2 = m_CrystalStructures.getValue(neighborFeaturePhase);
     if(phase1 == phase2 && (phase1 == EbsdLib::CrystalStructure::Hexagonal_High))
     {
       usize index = neighborFeature * 4;
-      OrientationTransformation::qu2om<QuatF, OrientationF>({avgQuats[index + 0], avgQuats[index + 1], avgQuats[index + 2], avgQuats[index + 3]}).toGMatrix(g2);
+      OrientationTransformation::qu2om<QuatF, OrientationF>({m_AvgQuats[index + 0], m_AvgQuats[index + 1], m_AvgQuats[index + 2], m_AvgQuats[index + 3]}).toGMatrix(g2);
 
       std::array<float32, 3> c2 = {0.0f, 0.0f, 0.0f};
       // transpose the g matrix so when c-axis is multiplied by it,
@@ -368,25 +367,16 @@ bool GroupMicroTextureRegions::determineGrouping(int32 referenceFeature, int32 n
         w = GeometryMath::CosThetaBetweenVectors(Point3Df{c1}, Point3Df{c2});
       }
 
-      if(w < -1.0f)
-      {
-        w = -1.0f;
-      }
-      else if(w > 1.0f)
-      {
-        w = 1.0f;
-      }
-      w = std::acos(w);
+      w = std::acos(std::clamp(w, -1.0f, 1.0f));
 
       // Convert user defined tolerance to radians.
       float32 cAxisToleranceRad = m_InputValues->CAxisTolerance * nx::core::Constants::k_PiD / 180.0f;
       if(w <= cAxisToleranceRad || (nx::core::Constants::k_PiD - w) <= cAxisToleranceRad)
       {
-        featureParentIds[neighborFeature] = newFid;
+        m_FeatureParentIds.setValue(neighborFeature, newFid);
         if(m_InputValues->UseRunningAverage)
         {
-          auto& volumes = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->VolumesArrayPath);
-          MatrixMath::Multiply3x1withConstant(c2.data(), volumes.getValue(neighborFeature));
+          MatrixMath::Multiply3x1withConstant(c2.data(), m_Volumes.getValue(neighborFeature));
           MatrixMath::Add3x1s(m_AvgCAxes.data(), c2.data(), m_AvgCAxes.data());
         }
         return true;

@@ -177,7 +177,7 @@ Result<> GroupMicroTextureRegionsFilter::executeImpl(DataStructure& dataStructur
 
   GroupMicroTextureRegionsInputValues inputValues;
 
-  inputValues.UseNonContiguousNeighbors = true; // filterArgs.value<bool>(k_UseNonContiguousNeighbors_Key);
+  inputValues.UseNonContiguousNeighbors = filterArgs.value<bool>(k_UseNonContiguousNeighbors_Key);
   inputValues.NonContiguousNeighborListArrayPath = filterArgs.value<DataPath>(k_NonContiguousNeighborListArrayPath_Key);
   inputValues.ContiguousNeighborListArrayPath = filterArgs.value<DataPath>(k_ContiguousNeighborListArrayPath_Key);
   inputValues.UseRunningAverage = filterArgs.value<bool>(k_UseRunningAverage_Key);
