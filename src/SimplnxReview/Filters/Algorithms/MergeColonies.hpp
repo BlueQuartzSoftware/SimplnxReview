@@ -11,7 +11,7 @@
 #include "simplnx/Parameters/ArraySelectionParameter.hpp"
 #include "simplnx/Parameters/NumberParameter.hpp"
 
-#include "EbsdLib/LaueOps/LaueOps.h"
+#include <EbsdLib/LaueOps/LaueOps.h>
 
 namespace nx::core
 {
@@ -43,7 +43,7 @@ struct SIMPLNXREVIEW_EXPORT MergeColoniesInputValues
 
 class SIMPLNXREVIEW_EXPORT MergeColonies
 {
-  using LaueOpsShPtrType = std::shared_ptr<LaueOps>;
+  using LaueOpsShPtrType = std::shared_ptr<ebsdlib::LaueOps>;
   using LaueOpsContainer = std::vector<LaueOpsShPtrType>;
 
 public:

@@ -7,7 +7,7 @@
 #include "simplnx/Utilities/Math/GeometryMath.hpp"
 #include "simplnx/Utilities/Math/MatrixMath.hpp"
 
-#include "EbsdLib/LaueOps/LaueOps.h"
+#include <EbsdLib/LaueOps/LaueOps.h>
 
 #include <random>
 
@@ -220,8 +220,8 @@ int GroupMicroTextureRegions::getSeed(int32 newFid)
 
   usize numFeatures = featurePhases.getNumberOfTuples();
 
-  float32 g1[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
-  float32 g1t[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+  // float32 g1[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+  // float32 g1t[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
   int32 voxelSeed = -1;
 
   // Precalculate some constants
@@ -262,19 +262,17 @@ int GroupMicroTextureRegions::getSeed(int32 newFid)
       auto& avgQuats = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->AvgQuatsArrayPath);
 
       usize index = voxelSeed * 4;
-      OrientationTransformation::qu2om<QuatF, OrientationF>({avgQuats[index + 0], avgQuats[index + 1], avgQuats[index + 2], avgQuats[index + 3]}).toGMatrix(g1);
+      ebsdlib::Matrix3X3D g1 = ebsdlib::QuaternionDType(avgQuats[index + 0], avgQuats[index + 1], avgQuats[index + 2], avgQuats[index + 3]).toOrientationMatrix().toGMatrix();
 
-      std::array<float32, 3> c1 = {0.0f, 0.0f, 0.0f};
-      std::array<float32, 3> cAxis = {0.0f, 0.0f, 1.0f};
+      ebsdlib::Matrix3X1D cAxis = {0.0, 0.0, 1.0};
       // transpose the g matrix so when c-axis is multiplied by it,
       // it will give the sample direction that the c-axis is along
-      MatrixMath::Transpose3x3(g1, g1t);
-      MatrixMath::Multiply3x3with3x1(g1t, cAxis.data(), c1.data());
+      ebsdlib::Matrix3X3D g1t = g1.transpose();
+      ebsdlib::Matrix3X1D c1 = g1t * cAxis;
       // normalize so that the dot product can be taken below without
       // dividing by the magnitudes (they would be 1)
-      MatrixMath::Normalize3x1(c1.data());
-      MatrixMath::Copy3x1(c1.data(), m_AvgCAxes.data());
-      MatrixMath::Multiply3x1withConstant(m_AvgCAxes.data(), volumes.getValue(voxelSeed));
+      c1 = c1.normalize();
+      m_AvgCAxes = c1 * volumes.getValue(voxelSeed);
     }
   }
 
@@ -285,12 +283,12 @@ int GroupMicroTextureRegions::getSeed(int32 newFid)
 bool GroupMicroTextureRegions::determineGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid)
 {
   uint32 phase1 = 0;
-  float32 g1[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
-  float32 g2[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
-  float32 g1t[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
-  float32 g2t[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
-  std::array<float32, 3> c1 = {0.0f, 0.0f, 0.0f};
-  std::array<float32, 3> caxis = {0.0f, 0.0f, 1.0f};
+  // float32 g1[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+  // float32 g2[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+  // float32 g1t[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+  // float32 g2t[3][3] = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+  ebsdlib::Matrix3X1D c1 = {0.0, 0.0, 0.0};
+  ebsdlib::Matrix3X1D caxis = {0.0f, 0.0f, 1.0f};
 
   auto& featurePhases = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeaturePhasesArrayPath);
   auto& featureParentIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeatureParentIdsArrayName);
@@ -302,49 +300,42 @@ bool GroupMicroTextureRegions::determineGrouping(int32 referenceFeature, int32 n
     {
       usize index = referenceFeature * 4;
       phase1 = crystalStructures[featurePhases[referenceFeature]];
-      OrientationTransformation::qu2om<QuatF, Orientation<float32>>({avgQuats[index + 0], avgQuats[index + 1], avgQuats[index + 2], avgQuats[index + 3]}).toGMatrix(g1);
+      ebsdlib::Matrix3X3D g1 = ebsdlib::QuaternionDType(avgQuats[index + 0], avgQuats[index + 1], avgQuats[index + 2], avgQuats[index + 3]).toOrientationMatrix().toGMatrix();
 
       // transpose the g matrix so when c-axis is multiplied by it,
       // it will give the sample direction that the c-axis is along
-      MatrixMath::Transpose3x3(g1, g1t);
-      MatrixMath::Multiply3x3with3x1(g1t, caxis.data(), c1.data());
+      ebsdlib::Matrix3X3D g1t = g1.transpose();
+      c1 = g1t * caxis;
       // normalize so that the dot product can be taken below without
       // dividing by the magnitudes (they would be 1)
-      MatrixMath::Normalize3x1(c1.data());
+      c1 = c1.normalize();
     }
     uint32 phase2 = crystalStructures[featurePhases[neighborFeature]];
-    if(phase1 == phase2 && (phase1 == EbsdLib::CrystalStructure::Hexagonal_High))
+    if(phase1 == phase2 && (phase1 == ebsdlib::CrystalStructure::Hexagonal_High))
     {
       usize index = neighborFeature * 4;
-      OrientationTransformation::qu2om<QuatF, OrientationF>({avgQuats[index + 0], avgQuats[index + 1], avgQuats[index + 2], avgQuats[index + 3]}).toGMatrix(g2);
+      ebsdlib::Matrix3X3D g2 = ebsdlib::QuaternionDType(avgQuats[index + 0], avgQuats[index + 1], avgQuats[index + 2], avgQuats[index + 3]).toOrientationMatrix().toGMatrix();
 
-      std::array<float32, 3> c2 = {0.0f, 0.0f, 0.0f};
       // transpose the g matrix so when c-axis is multiplied by it,
       // it will give the sample direction that the c-axis is along
-      MatrixMath::Transpose3x3(g2, g2t);
-      MatrixMath::Multiply3x3with3x1(g2t, caxis.data(), c2.data());
+      ebsdlib::Matrix3X3D g2t = g2.transpose();
+      ebsdlib::Matrix3X1D c2 = g2t * caxis;
+
       // normalize so that the dot product can be taken below without
       // dividing by the magnitudes (they would be 1)
-      MatrixMath::Normalize3x1(c2.data());
+      c2 = c2.normalize();
 
-      float32 w;
+      double w;
       if(m_InputValues->UseRunningAverage)
       {
-        w = GeometryMath::CosThetaBetweenVectors(Point3Df{m_AvgCAxes}, Point3Df{c2});
+        w = GeometryMath::CosThetaBetweenVectors(m_AvgCAxes.data(), c2.data());
       }
       else
       {
-        w = GeometryMath::CosThetaBetweenVectors(Point3Df{c1}, Point3Df{c2});
+        w = GeometryMath::CosThetaBetweenVectors(c1.data(), c2.data());
       }
 
-      if(w < -1.0f)
-      {
-        w = -1.0f;
-      }
-      else if(w > 1.0f)
-      {
-        w = 1.0f;
-      }
+      w = std::clamp(w, -1.0, 1.0);
       w = std::acos(w);
 
       // Convert user defined tolerance to radians.
@@ -355,8 +346,8 @@ bool GroupMicroTextureRegions::determineGrouping(int32 referenceFeature, int32 n
         if(m_InputValues->UseRunningAverage)
         {
           auto& volumes = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->VolumesArrayPath);
-          MatrixMath::Multiply3x1withConstant(c2.data(), volumes.getValue(neighborFeature));
-          MatrixMath::Add3x1s(m_AvgCAxes.data(), c2.data(), m_AvgCAxes.data());
+          c2 = c2 * volumes.getValue(neighborFeature);
+          m_AvgCAxes = m_AvgCAxes + c2;
         }
         return true;
       }

@@ -8,13 +8,14 @@
 #include "simplnx/Utilities/Math/GeometryMath.hpp"
 #include "simplnx/Utilities/Math/MatrixMath.hpp"
 
-#include "EbsdLib/Core/EbsdLibConstants.h"
-#include "EbsdLib/Core/Orientation.hpp"
-#include "EbsdLib/Core/OrientationTransformation.hpp"
-#include "EbsdLib/Core/Quaternion.hpp"
+#include <EbsdLib/Core/EbsdLibConstants.h>
+#include <EbsdLib/Core/Orientation.hpp>
+#include <EbsdLib/Math/Matrix3X3.hpp>
+#include <EbsdLib/Orientation/OrientationFwd.hpp>
+#include <EbsdLib/Orientation/Quaternion.hpp>
 
 using namespace nx::core;
-using LaueOpsShPtrType = std::shared_ptr<LaueOps>;
+using LaueOpsShPtrType = std::shared_ptr<ebsdlib::LaueOps>;
 using LaueOpsContainer = std::vector<LaueOpsShPtrType>;
 
 namespace
@@ -24,69 +25,55 @@ const float64 unit111 = 1.0 / std::sqrt(3.0);
 const float64 unit112_1 = 1.0 / std::sqrt(6.0);
 const float64 unit112_2 = 2.0 / std::sqrt(6.0);
 
-float64 crystalDirections[12][3][3] = {{{unit111, unit112_1, unit110}, {-unit111, -unit112_1, unit110}, {unit111, -unit112_2, 0}},
-
-                                       {{-unit111, unit112_1, unit110}, {unit111, -unit112_1, unit110}, {unit111, unit112_2, 0}},
-
-                                       {{unit111, -unit112_1, unit110}, {unit111, -unit112_1, -unit110}, {unit111, unit112_2, 0}},
-
-                                       {{unit111, unit112_1, unit110}, {unit111, unit112_1, -unit110}, {-unit111, unit112_2, 0}},
-
-                                       {{unit111, unit112_1, unit110}, {unit111, -unit112_2, 0}, {unit111, unit112_1, -unit110}},
-
-                                       {{unit111, -unit112_1, unit110}, {-unit111, -unit112_2, 0}, {unit111, -unit112_1, -unit110}},
-
-                                       {{unit111, -unit112_1, unit110}, {unit111, unit112_2, 0}, {-unit111, unit112_1, unit110}},
-
-                                       {{-unit111, -unit112_1, unit110}, {unit111, -unit112_2, 0}, {unit111, unit112_1, unit110}},
-
-                                       {{unit111, -unit112_2, 0}, {unit111, unit112_1, unit110}, {-unit111, -unit112_1, unit110}},
-
-                                       {{unit111, unit112_2, 0}, {-unit111, unit112_1, unit110}, {unit111, -unit112_1, unit110}},
-
-                                       {{unit111, unit112_2, 0}, {unit111, -unit112_1, unit110}, {unit111, -unit112_1, -unit110}},
-
-                                       {{-unit111, unit112_2, 0}, {unit111, unit112_1, unit110}, {unit111, unit112_1, -unit110}}};
+std::vector<ebsdlib::Matrix3X3D> crystalDirections = {
+    {unit111, unit112_1, unit110, -unit111, -unit112_1, unit110, unit111, -unit112_2, 0}, {-unit111, unit112_1, unit110, unit111, -unit112_1, unit110, unit111, unit112_2, 0},
+    {unit111, -unit112_1, unit110, unit111, -unit112_1, -unit110, unit111, unit112_2, 0}, {unit111, unit112_1, unit110, unit111, unit112_1, -unit110, -unit111, unit112_2, 0},
+    {unit111, unit112_1, unit110, unit111, -unit112_2, 0, unit111, unit112_1, -unit110},  {unit111, -unit112_1, unit110, -unit111, -unit112_2, 0, unit111, -unit112_1, -unit110},
+    {unit111, -unit112_1, unit110, unit111, unit112_2, 0, -unit111, unit112_1, unit110},  {-unit111, -unit112_1, unit110, unit111, -unit112_2, 0, unit111, unit112_1, unit110},
+    {unit111, -unit112_2, 0, unit111, unit112_1, unit110, -unit111, -unit112_1, unit110}, {unit111, unit112_2, 0, -unit111, unit112_1, unit110, unit111, -unit112_1, unit110},
+    {unit111, unit112_2, 0, unit111, -unit112_1, unit110, unit111, -unit112_1, -unit110}, {-unit111, unit112_2, 0, unit111, unit112_1, unit110, unit111, unit112_1, -unit110}};
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool check_for_burgers(const QuatD& betaQuat, const QuatD& alphaQuat, float64 angleTolerance)
+bool check_for_burgers(const ebsdlib::QuatD& betaQuat, const ebsdlib::QuatD& alphaQuat, float64 angleTolerance)
 {
   float64 dP = 0.0;
   float64 angle = 0.0;
-  float64 radToDeg = 180.0 / Constants::k_PiD;
+  float64 radToDeg = 180.0 / nx::core::Constants::k_PiD;
 
-  float64 gBeta[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
-  float64 gBetaT[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
-  OrientationTransformation::qu2om<QuatD, OrientationD>(betaQuat).toGMatrix(gBeta);
+  // float64 gBeta[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  // float64 gBetaT[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  ebsdlib::Matrix3X3D gBeta = ebsdlib::QuaternionDType(betaQuat).toOrientationMatrix().toGMatrix();
   // transpose gBeta so the sample direction is the output when
   // gBeta is multiplied by the crystal directions below
-  MatrixMath::Transpose3x3(gBeta, gBetaT);
+  ebsdlib::Matrix3X3D gBetaT = gBeta.transpose();
 
-  float64 gAlpha[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
-  float64 gAlphaT[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
-  OrientationTransformation::qu2om<QuatD, OrientationD>(alphaQuat).toGMatrix(gAlpha);
+  ebsdlib::Matrix3X3D gAlpha = ebsdlib::QuaternionDType(alphaQuat).toOrientationMatrix().toGMatrix();
+
   // transpose gBeta so the sample direction is the output when
   // gBeta is multiplied by the crystal directions below
-  MatrixMath::Transpose3x3(gAlpha, gAlphaT);
+  ebsdlib::Matrix3X3D gAlphaT = gAlpha.transpose();
 
-  float64 mat[3][3] = {{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}};
+  ebsdlib::Matrix3X3D mat;
   for(int32 i = 0; i < 12; i++)
   {
-    MatrixMath::Multiply3x3with3x3(gBetaT, crystalDirections[i], mat);
-    Point3Dd a = Point3Dd(mat[0][2], mat[1][2], mat[2][2]);
-    Point3Dd b = Point3Dd(gAlphaT[0][2], gAlphaT[1][2], gAlphaT[2][2]);
+    ebsdlib::Matrix3X3D crystalDirection(crystalDirections[i]);
+    mat = gBetaT * crystalDirection;
+
+    Point3Dd a = Point3Dd(mat[2], mat[5], mat[8]);
+    Point3Dd b = Point3Dd(gAlphaT[2], gAlphaT[5], gAlphaT[8]);
     dP = GeometryMath::CosThetaBetweenVectors(a, b);
+    dP = std::clamp(dP, -1.0, 1.0);
     angle = std::acos(dP);
     if((angle * radToDeg) < angleTolerance || (180.0f - (angle * radToDeg)) < angleTolerance)
     {
-      a[0] = mat[0][0];
-      a[1] = mat[1][0];
-      a[2] = mat[2][0];
-      b[0] = gAlphaT[0][0];
-      b[1] = gAlphaT[1][0];
-      b[2] = gAlphaT[2][0];
+      a[0] = mat[0];
+      a[1] = mat[3];
+      a[2] = mat[6];
+      b[0] = gAlphaT[0];
+      b[1] = gAlphaT[3];
+      b[2] = gAlphaT[6];
       dP = GeometryMath::CosThetaBetweenVectors(a, b);
       angle = std::acos(dP);
       if((angle * radToDeg) < angleTolerance)
@@ -97,9 +84,9 @@ bool check_for_burgers(const QuatD& betaQuat, const QuatD& alphaQuat, float64 an
       {
         return true;
       }
-      b[0] = -0.5 * gAlphaT[0][0] + 0.866025 * gAlphaT[0][1];
-      b[1] = -0.5 * gAlphaT[1][0] + 0.866025 * gAlphaT[1][1];
-      b[2] = -0.5 * gAlphaT[2][0] + 0.866025 * gAlphaT[2][1];
+      b[0] = -0.5 * gAlphaT[0] + 0.866025 * gAlphaT[1];
+      b[1] = -0.5 * gAlphaT[3] + 0.866025 * gAlphaT[4];
+      b[2] = -0.5 * gAlphaT[6] + 0.866025 * gAlphaT[7];
       dP = GeometryMath::CosThetaBetweenVectors(a, b);
       angle = std::acos(dP);
       if((angle * radToDeg) < angleTolerance)
@@ -110,9 +97,9 @@ bool check_for_burgers(const QuatD& betaQuat, const QuatD& alphaQuat, float64 an
       {
         return true;
       }
-      b[0] = -0.5 * gAlphaT[0][0] - 0.866025 * gAlphaT[0][1];
-      b[1] = -0.5 * gAlphaT[1][0] - 0.866025 * gAlphaT[1][1];
-      b[2] = -0.5 * gAlphaT[2][0] - 0.866025 * gAlphaT[2][1];
+      b[0] = -0.5 * gAlphaT[0] - 0.866025 * gAlphaT[1];
+      b[1] = -0.5 * gAlphaT[3] - 0.866025 * gAlphaT[4];
+      b[2] = -0.5 * gAlphaT[6] - 0.866025 * gAlphaT[7];
       dP = GeometryMath::CosThetaBetweenVectors(a, b);
       angle = std::acos(dP);
       if((angle * radToDeg) < angleTolerance)
@@ -135,7 +122,7 @@ MergeColonies::MergeColonies(DataStructure& dataStructure, const IFilter::Messag
 , m_InputValues(inputValues)
 , m_ShouldCancel(shouldCancel)
 , m_MessageHandler(mesgHandler)
-, m_OrientationOps(LaueOps::GetAllOrientationOps())
+, m_OrientationOps(ebsdlib::LaueOps::GetAllOrientationOps())
 , m_FeatureParentIds(dataStructure.getDataRefAs<Int32Array>(inputValues->FeatureParentIdsPath))
 , m_FeaturePhases(dataStructure.getDataRefAs<Int32Array>(inputValues->FeaturePhasesPath))
 , m_AvgQuats(dataStructure.getDataRefAs<Float32Array>(inputValues->AvgQuatsPath))
@@ -394,19 +381,19 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
   if(m_FeatureParentIds[neighborFeature] == -1 && m_FeaturePhases[referenceFeature] > 0 && m_FeaturePhases[neighborFeature] > 0)
   {
     usize avgQuatIdx = referenceFeature * 4;
-    QuatD q1(m_AvgQuats[avgQuatIdx], m_AvgQuats[avgQuatIdx + 1], m_AvgQuats[avgQuatIdx + 2], m_AvgQuats[avgQuatIdx + 3]);
+    ebsdlib::QuatD q1(m_AvgQuats[avgQuatIdx], m_AvgQuats[avgQuatIdx + 1], m_AvgQuats[avgQuatIdx + 2], m_AvgQuats[avgQuatIdx + 3]);
     avgQuatIdx = neighborFeature * 4;
-    QuatD q2(m_AvgQuats[avgQuatIdx], m_AvgQuats[avgQuatIdx + 1], m_AvgQuats[avgQuatIdx + 2], m_AvgQuats[avgQuatIdx + 3]);
+    ebsdlib::QuatD q2(m_AvgQuats[avgQuatIdx], m_AvgQuats[avgQuatIdx + 1], m_AvgQuats[avgQuatIdx + 2], m_AvgQuats[avgQuatIdx + 3]);
 
     uint32 laueClass1 = m_CrystalStructures[m_FeaturePhases[referenceFeature]];
     uint32 laueClass2 = m_CrystalStructures[m_FeaturePhases[neighborFeature]];
-    if(laueClass1 == laueClass2 && (laueClass1 == EbsdLib::CrystalStructure::Hexagonal_High))
+    if(laueClass1 == laueClass2 && (laueClass1 == ebsdlib::CrystalStructure::Hexagonal_High))
     {
-      OrientationD ax = m_OrientationOps[laueClass1]->calculateMisorientation(q1, q2);
+      ebsdlib::AxisAngleDType ax = m_OrientationOps[laueClass1]->calculateMisorientation(q1, q2);
 
-      auto rod = OrientationTransformation::ax2ro<OrientationD, OrientationD>(ax);
+      auto rod = ax.toRodrigues();
       rod = m_OrientationOps[laueClass1]->getMDFFZRod(rod);
-      ax = OrientationTransformation::ro2ax<OrientationD, OrientationD>(rod);
+      ax = rod.toAxisAngle();
 
       w = ax[3] * (Constants::k_180OverPiD);
       float angdiff1 = std::fabs(w - 10.53f);
@@ -446,7 +433,7 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
         return true;
       }
     }
-    else if(EbsdLib::CrystalStructure::Cubic_High == laueClass2 && EbsdLib::CrystalStructure::Hexagonal_High == laueClass1)
+    else if(ebsdlib::CrystalStructure::Cubic_High == laueClass2 && ebsdlib::CrystalStructure::Hexagonal_High == laueClass1)
     {
       colony = check_for_burgers(q2, q1, m_AngleTolerance);
       if(colony)
@@ -455,7 +442,7 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
         return true;
       }
     }
-    else if(EbsdLib::CrystalStructure::Cubic_High == laueClass1 && EbsdLib::CrystalStructure::Hexagonal_High == laueClass2)
+    else if(ebsdlib::CrystalStructure::Cubic_High == laueClass1 && ebsdlib::CrystalStructure::Hexagonal_High == laueClass2)
     {
       colony = check_for_burgers(q1, q2, m_AngleTolerance);
       if(colony)

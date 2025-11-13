@@ -16,7 +16,7 @@
 
 namespace fs = std::filesystem;
 
-namespace EbsdLib
+namespace ebsdlib
 {
 namespace Ang
 {
@@ -35,7 +35,7 @@ inline const std::string CrystalStructures("CrystalStructures");
 inline const std::string LatticeConstants("LatticeConstants");
 inline const std::string MaterialName("MaterialName");
 } // namespace EnsembleData
-} // namespace EbsdLib
+} // namespace ebsdlib
 
 namespace nx::core
 {
