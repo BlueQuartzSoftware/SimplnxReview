@@ -6,10 +6,8 @@
 #include "simplnx/DataStructure/DataPath.hpp"
 #include "simplnx/DataStructure/DataStructure.hpp"
 #include "simplnx/Filter/IFilter.hpp"
-#include "simplnx/Parameters/ArraySelectionParameter.hpp"
-#include "simplnx/Parameters/BoolParameter.hpp"
-#include "simplnx/Parameters/NumberParameter.hpp"
-#include "simplnx/Parameters/StringParameter.hpp"
+
+#include "EbsdLib/Math/Matrix3X1.hpp"
 
 #include <random>
 
@@ -57,7 +55,7 @@ public:
 protected:
   int getSeed(int32 newFid);
   bool determineGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid);
-  void execute();
+  Result<> execute();
   bool growPatch(int32 currentPatch);
   bool growGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid);
 
@@ -68,7 +66,7 @@ private:
   const IFilter::MessageHandler& m_MessageHandler;
 
   usize m_NumTuples = 0;
-  std::array<float32, 3> m_AvgCAxes = {0.0f, 0.0f, 0.0f};
+  EbsdLib::Matrix3X1F m_AvgCAxes = {0.0f, 0.0f, 0.0f};
   std::mt19937_64 m_Generator = {};
   std::uniform_real_distribution<float32> m_Distribution = {};
 
