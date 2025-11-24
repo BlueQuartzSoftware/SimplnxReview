@@ -9,11 +9,10 @@
 
 #include "EbsdLib/Core/EbsdLibConstants.h"
 #include "EbsdLib/Core/Orientation.hpp"
-#include "EbsdLib/Core/OrientationTransformation.hpp"
-#include "EbsdLib/Core/Quaternion.hpp"
+#include "EbsdLib/Orientation/Quaternion.hpp"
 
 using namespace nx::core;
-using LaueOpsShPtrType = std::shared_ptr<LaueOps>;
+using LaueOpsShPtrType = std::shared_ptr<ebsdlib::LaueOps>;
 using LaueOpsContainer = std::vector<LaueOpsShPtrType>;
 
 namespace
@@ -23,7 +22,7 @@ const float64 unit111 = 1.0 / std::sqrt(3.0);
 const float64 unit112_1 = 1.0 / std::sqrt(6.0);
 const float64 unit112_2 = 2.0 / std::sqrt(6.0);
 
-std::vector<EbsdLib::Matrix3X3D> crystalDirections = {
+std::vector<ebsdlib::Matrix3X3D> crystalDirections = {
     {unit111, unit112_1, unit110, -unit111, -unit112_1, unit110, unit111, -unit112_2, 0}, {-unit111, unit112_1, unit110, unit111, -unit112_1, unit110, unit111, unit112_2, 0},
     {unit111, -unit112_1, unit110, unit111, -unit112_1, -unit110, unit111, unit112_2, 0}, {unit111, unit112_1, unit110, unit111, unit112_1, -unit110, -unit111, unit112_2, 0},
     {unit111, unit112_1, unit110, unit111, -unit112_2, 0, unit111, unit112_1, -unit110},  {unit111, -unit112_1, unit110, -unit111, -unit112_2, 0, unit111, -unit112_1, -unit110},
@@ -34,7 +33,7 @@ std::vector<EbsdLib::Matrix3X3D> crystalDirections = {
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool check_for_burgers(const QuatD& betaQuat, const QuatD& alphaQuat, float64 angleTolerance)
+bool check_for_burgers(const ebsdlib::QuatD& betaQuat, const ebsdlib::QuatD& alphaQuat, float64 angleTolerance)
 {
   float64 dP = 0.0;
   float64 angle = 0.0;
@@ -42,18 +41,17 @@ bool check_for_burgers(const QuatD& betaQuat, const QuatD& alphaQuat, float64 an
 
   // transpose gBeta so the sample direction is the output when
   // gBeta is multiplied by the crystal directions below
-  const EbsdLib::Matrix3X3D gBetaT = OrientationTransformation::qu2om<QuatD, OrientationD>(betaQuat).toGMatrixObj().transpose();
-
+  const ebsdlib::Matrix3X3D gBetaT = betaQuat.toOrientationMatrix().transpose().toGMatrix();
   // transpose gBeta so the sample direction is the output when
   // gBeta is multiplied by the crystal directions below
-  EbsdLib::Matrix3X3D gAlphaT = OrientationTransformation::qu2om<QuatD, OrientationD>(alphaQuat).toGMatrixObj().transpose();
+  ebsdlib::Matrix3X3D gAlphaT = alphaQuat.toOrientationMatrix().transpose().toGMatrix();
 
   for(int32 i = 0; i < 12; i++)
   {
-    EbsdLib::Matrix3X3D mat = gBetaT * crystalDirections[i];
+    ebsdlib::Matrix3X3D mat = gBetaT * crystalDirections[i];
 
-    EbsdLib::Matrix3X1D a(mat[2], mat[5], mat[8]);
-    EbsdLib::Matrix3X1D b(gAlphaT[2], gAlphaT[5], gAlphaT[8]);
+    ebsdlib::Matrix3X1D a(mat[2], mat[5], mat[8]);
+    ebsdlib::Matrix3X1D b(gAlphaT[2], gAlphaT[5], gAlphaT[8]);
 
     dP = a.cosTheta(b);
     dP = std::clamp(dP, -1.0, 1.0);
@@ -118,7 +116,7 @@ MergeColonies::MergeColonies(DataStructure& dataStructure, const IFilter::Messag
 , m_InputValues(inputValues)
 , m_ShouldCancel(shouldCancel)
 , m_MessageHandler(mesgHandler)
-, m_OrientationOps(LaueOps::GetAllOrientationOps())
+, m_OrientationOps(ebsdlib::LaueOps::GetAllOrientationOps())
 , m_FeatureParentIds(dataStructure.getDataRefAs<Int32Array>(inputValues->FeatureParentIdsPath))
 , m_FeaturePhases(dataStructure.getDataRefAs<Int32Array>(inputValues->FeaturePhasesPath))
 , m_AvgQuats(dataStructure.getDataRefAs<Float32Array>(inputValues->AvgQuatsPath))
@@ -403,20 +401,20 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
   if(m_FeatureParentIds[neighborFeature] == -1 && m_FeaturePhases[referenceFeature] > 0 && m_FeaturePhases[neighborFeature] > 0)
   {
     usize avgQuatIdx = referenceFeature * 4;
-    const QuatD q1(m_AvgQuats[avgQuatIdx], m_AvgQuats[avgQuatIdx + 1], m_AvgQuats[avgQuatIdx + 2], m_AvgQuats[avgQuatIdx + 3]);
+    const ebsdlib::QuatD q1(m_AvgQuats[avgQuatIdx], m_AvgQuats[avgQuatIdx + 1], m_AvgQuats[avgQuatIdx + 2], m_AvgQuats[avgQuatIdx + 3]);
     avgQuatIdx = neighborFeature * 4;
-    const QuatD q2(m_AvgQuats[avgQuatIdx], m_AvgQuats[avgQuatIdx + 1], m_AvgQuats[avgQuatIdx + 2], m_AvgQuats[avgQuatIdx + 3]);
+    const ebsdlib::QuatD q2(m_AvgQuats[avgQuatIdx], m_AvgQuats[avgQuatIdx + 1], m_AvgQuats[avgQuatIdx + 2], m_AvgQuats[avgQuatIdx + 3]);
 
     // Make sure both features are of the same Laue class and the Laue class is hexagonal
     const uint32 laueClass1 = m_CrystalStructures[m_FeaturePhases[referenceFeature]];
     const uint32 laueClass2 = m_CrystalStructures[m_FeaturePhases[neighborFeature]];
-    if(laueClass1 == laueClass2 && (laueClass1 == EbsdLib::CrystalStructure::Hexagonal_High))
+    if(laueClass1 == laueClass2 && (laueClass1 == ebsdlib::CrystalStructure::Hexagonal_High))
     {
-      OrientationD ax = m_OrientationOps[laueClass1]->calculateMisorientation(q1, q2);
+      ebsdlib::AxisAngleDType ax = m_OrientationOps[laueClass1]->calculateMisorientation(q1, q2);
 
-      auto rod = OrientationTransformation::ax2ro<OrientationD, OrientationD>(ax);
+      ebsdlib::Rodrigues<double> rod = ax.toRodrigues();
       rod = m_OrientationOps[laueClass1]->getMDFFZRod(rod);
-      ax = OrientationTransformation::ro2ax<OrientationD, OrientationD>(rod);
+      ax = rod.toAxisAngle();
       const float32 w = ax[3] * (Constants::k_180OverPiD); // Convert to degrees
 
       // Test each of the special Axis-Angle relationships
@@ -465,7 +463,7 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
         return true;
       }
     }
-    else if(EbsdLib::CrystalStructure::Cubic_High == laueClass2 && EbsdLib::CrystalStructure::Hexagonal_High == laueClass1)
+    else if(ebsdlib::CrystalStructure::Cubic_High == laueClass2 && ebsdlib::CrystalStructure::Hexagonal_High == laueClass1)
     {
       if(check_for_burgers(q2, q1, m_AngleTolerance))
       {
@@ -473,7 +471,7 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
         return true;
       }
     }
-    else if(EbsdLib::CrystalStructure::Cubic_High == laueClass1 && EbsdLib::CrystalStructure::Hexagonal_High == laueClass2)
+    else if(ebsdlib::CrystalStructure::Cubic_High == laueClass1 && ebsdlib::CrystalStructure::Hexagonal_High == laueClass2)
     {
       if(check_for_burgers(q1, q2, m_AngleTolerance))
       {

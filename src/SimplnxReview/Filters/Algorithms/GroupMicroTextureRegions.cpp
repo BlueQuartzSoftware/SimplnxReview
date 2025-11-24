@@ -255,15 +255,14 @@ int GroupMicroTextureRegions::getSeed(int32 newFid)
     {
       usize index = featureIdSeed * 4;
       // Get the orientation matrix (which is passive) and then transpose it to make it active transform
-      EbsdLib::Matrix3X3F g1t =
-          OrientationTransformation::qu2om<QuatF, OrientationF>({m_AvgQuats.getValue(index + 0), m_AvgQuats.getValue(index + 1), m_AvgQuats.getValue(index + 2), m_AvgQuats.getValue(index + 3)})
-              .toGMatrixObj()
-              .transpose();
-
-      EbsdLib::Matrix3X1F cAxis(0.0f, 0.0f, 1.0f);
+      ebsdlib::Matrix3X3F g1t = ebsdlib::Quaternion<float32>(m_AvgQuats.getValue(index + 0), m_AvgQuats.getValue(index + 1), m_AvgQuats.getValue(index + 2), m_AvgQuats.getValue(index + 3))
+                                    .toOrientationMatrix()
+                                    .toGMatrix()
+                                    .transpose();
+      ebsdlib::Matrix3X1F cAxis(0.0f, 0.0f, 1.0f);
       // normalize so that the dot product can be taken below without
       // dividing by the magnitudes (they would be 1)
-      const EbsdLib::Matrix3X1F c1 = (g1t * cAxis).normalize();
+      const ebsdlib::Matrix3X1F c1 = (g1t * cAxis).normalize();
 
       m_AvgCAxes = c1 * m_Volumes.getValue(featureIdSeed);
     }
@@ -281,8 +280,8 @@ bool GroupMicroTextureRegions::determineGrouping(int32 referenceFeature, int32 n
 
   if(neighborParentId == -1 && referenceFeaturePhase > 0 && neighborFeaturePhase > 0)
   {
-    EbsdLib::Matrix3X1F c1 = {0.0f, 0.0f, 0.0f};
-    EbsdLib::Matrix3X1F cAxis(0.0f, 0.0f, 1.0f);
+    ebsdlib::Matrix3X1F c1 = {0.0f, 0.0f, 0.0f};
+    ebsdlib::Matrix3X1F cAxis(0.0f, 0.0f, 1.0f);
 
     if(!m_InputValues->UseRunningAverage)
     {
@@ -290,21 +289,25 @@ bool GroupMicroTextureRegions::determineGrouping(int32 referenceFeature, int32 n
       // Get the orientation matrix (which is passive) and then transpose it to make it active transform
       // transpose the g matrix so when c-axis is multiplied by it,
       // it will give the sample direction that the c-axis is along
-      EbsdLib::Matrix3X3F g1t =
-          OrientationTransformation::qu2om<QuatF, Orientation<float32>>({m_AvgQuats[index + 0], m_AvgQuats[index + 1], m_AvgQuats[index + 2], m_AvgQuats[index + 3]}).toGMatrixObj().transpose();
+      ebsdlib::Matrix3X3F g1t = ebsdlib::Quaternion<float32>(m_AvgQuats.getValue(index + 0), m_AvgQuats.getValue(index + 1), m_AvgQuats.getValue(index + 2), m_AvgQuats.getValue(index + 3))
+                                    .toOrientationMatrix()
+                                    .toGMatrix()
+                                    .transpose();
       c1 = (g1t * cAxis).normalize();
     }
     uint32 phase1 = m_CrystalStructures.getValue(referenceFeaturePhase);
     uint32 phase2 = m_CrystalStructures.getValue(neighborFeaturePhase);
-    if(phase1 == phase2 && (phase1 == EbsdLib::CrystalStructure::Hexagonal_High))
+    if(phase1 == phase2 && (phase1 == ebsdlib::CrystalStructure::Hexagonal_High))
     {
       const usize index = neighborFeature * 4;
       // Get the orientation matrix (which is passive) and then transpose it to make it active transform
       // transpose the g matrix so when c-axis is multiplied by it,
       // it will give the sample direction that the c-axis is along
-      EbsdLib::Matrix3X3F g2t =
-          OrientationTransformation::qu2om<QuatF, Orientation<float32>>({m_AvgQuats[index + 0], m_AvgQuats[index + 1], m_AvgQuats[index + 2], m_AvgQuats[index + 3]}).toGMatrixObj().transpose();
-      EbsdLib::Matrix3X1F c2 = (g2t * cAxis).normalize();
+      ebsdlib::Matrix3X3F g2t = ebsdlib::Quaternion<float32>(m_AvgQuats.getValue(index + 0), m_AvgQuats.getValue(index + 1), m_AvgQuats.getValue(index + 2), m_AvgQuats.getValue(index + 3))
+                                    .toOrientationMatrix()
+                                    .toGMatrix()
+                                    .transpose();
+      ebsdlib::Matrix3X1F c2 = (g2t * cAxis).normalize();
 
       float32 w;
       if(m_InputValues->UseRunningAverage)
