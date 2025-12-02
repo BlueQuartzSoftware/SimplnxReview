@@ -11,6 +11,8 @@
 #include "EbsdLib/Core/Orientation.hpp"
 #include "EbsdLib/Orientation/Quaternion.hpp"
 
+#include <cmath>
+
 using namespace nx::core;
 using LaueOpsShPtrType = std::shared_ptr<ebsdlib::LaueOps>;
 using LaueOpsContainer = std::vector<LaueOpsShPtrType>;
@@ -420,7 +422,7 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
       // Test each of the special Axis-Angle relationships
       // c = <0001>
       float angdiff1 = std::fabs(w - 10.529f);
-      float axisdiff1 = std::acosf(std::fabs(ax[2]));
+      float axisdiff1 = std::acos(std::fabs(ax[2]));
       if(angdiff1 < m_AngleTolerance && axisdiff1 < m_AxisToleranceRad)
       {
         m_FeatureParentIds[neighborFeature] = newFid;
@@ -429,7 +431,7 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
 
       // a2 = <-12-10>
       float angdiff3 = std::fabs(w - 60.00f);
-      float axisdiff3 = std::acosf(std::fabs(ax[0]));
+      float axisdiff3 = std::acos(std::fabs(ax[0]));
       if(angdiff3 < m_AngleTolerance && axisdiff3 < m_AxisToleranceRad)
       {
         m_FeatureParentIds[neighborFeature] = newFid;
@@ -438,7 +440,7 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
 
       // d1 at 80.97 degrees from c in the plane of (d3,c)
       float angdiff4 = std::fabs(w - 60.83f);
-      float axisdiff4 = std::acosf(std::fabs(ax[0]) * 0.9834f + std::fabs(ax[1]) * 0.0905f + std::fabs(ax[2]) * 0.1570f);
+      float axisdiff4 = std::acos(std::fabs(ax[0]) * 0.9834f + std::fabs(ax[1]) * 0.0905f + std::fabs(ax[2]) * 0.1570f);
       if(angdiff4 < m_AngleTolerance && axisdiff4 < m_AxisToleranceRad)
       {
         m_FeatureParentIds[neighborFeature] = newFid;
@@ -447,7 +449,7 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
 
       // d2 at 72.73 degrees from c in the plane of (a2,c)
       float angdiff5 = std::fabs(w - 63.26f);
-      float axisdiff5 = std::acosf(std::fabs(ax[0]) * 0.9549f + std::fabs(ax[2]) * 0.2969f);
+      float axisdiff5 = std::acos(std::fabs(ax[0]) * 0.9549f + std::fabs(ax[2]) * 0.2969f);
       if(angdiff5 < m_AngleTolerance && axisdiff5 < m_AxisToleranceRad)
       {
         m_FeatureParentIds[neighborFeature] = newFid;
@@ -456,7 +458,7 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
 
       // d3 at 5.26 degrees from a2 in the basal plane
       float angdiff2 = std::fabs(w - 90.00f);
-      float axisdiff2 = std::acosf(std::fabs(ax[0]) * 0.9958f + std::fabs(ax[1]) * 0.0917f);
+      float axisdiff2 = std::acos(std::fabs(ax[0]) * 0.9958f + std::fabs(ax[1]) * 0.0917f);
       if(angdiff2 < m_AngleTolerance && axisdiff2 < m_AxisToleranceRad)
       {
         m_FeatureParentIds[neighborFeature] = newFid;
