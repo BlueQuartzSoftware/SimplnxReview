@@ -13,6 +13,8 @@
 
 #include "EbsdLib/LaueOps/LaueOps.h"
 
+#include <random>
+
 namespace nx::core
 {
 struct SIMPLNXREVIEW_EXPORT MergeColoniesInputValues
@@ -43,7 +45,7 @@ struct SIMPLNXREVIEW_EXPORT MergeColoniesInputValues
 
 class SIMPLNXREVIEW_EXPORT MergeColonies
 {
-  using LaueOpsShPtrType = std::shared_ptr<LaueOps>;
+  using LaueOpsShPtrType = std::shared_ptr<ebsdlib::LaueOps>;
   using LaueOpsContainer = std::vector<LaueOpsShPtrType>;
 
 public:
@@ -57,12 +59,10 @@ public:
 
   Result<> operator()();
 
-  const std::atomic_bool& getCancel();
-
 protected:
   int getSeed(int32 newFid);
-  bool determineGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid);
-  void execute();
+  bool determineGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid) const;
+  Result<> execute();
   bool growPatch(int32 currentPatch);
   bool growGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid);
   void characterize_colonies();
@@ -80,5 +80,8 @@ private:
   UInt32Array& m_CrystalStructures;
   float32 m_AxisToleranceRad = 0.0;
   float32 m_AngleTolerance = 1.0;
+
+  std::mt19937_64 m_Generator = {};
+  std::uniform_real_distribution<float32> m_Distribution = {};
 };
 } // namespace nx::core

@@ -56,17 +56,21 @@ Parameters GroupMicroTextureRegionsFilter::parameters() const
 
   // Create the parameter descriptors that are needed for this filter
   params.insertSeparator(Parameters::Separator{"Input Parameter(s)"});
+
+  params.insert(std::make_unique<BoolParameter>(k_UseRunningAverage_Key, "Group C-Axes With Running Average", "Group C-Axes With Running Average", true));
+  params.insert(std::make_unique<Float32Parameter>(k_CAxisTolerance_Key, "C-Axis Alignment Tolerance (Degrees)", "C-Axis Alignment Tolerance (Degrees)", 0.0f));
+  params.insert(std::make_unique<NeighborListSelectionParameter>(k_ContiguousNeighborListArrayPath_Key, "Contiguous Neighbor List", "List of contiguous neighbors for each Feature.", DataPath{},
+                                                                 NeighborListSelectionParameter::AllowedTypes{DataType::int32}));
+
+  params.insertSeparator(Parameters::Separator{"Non-Contiguous Neighborhood Option"});
   params.insertLinkableParameter(std::make_unique<BoolParameter>(k_UseNonContiguousNeighbors_Key, "Use Non-Contiguous Neighbors", "Use non-contiguous neighborhoods", false));
   params.insert(std::make_unique<NeighborListSelectionParameter>(k_NonContiguousNeighborListArrayPath_Key, "Non-Contiguous Neighbor List", "List of non-contiguous neighbors for each Feature.",
                                                                  DataPath{}, NeighborListSelectionParameter::AllowedTypes{DataType::int32}));
-  params.insert(std::make_unique<NeighborListSelectionParameter>(k_ContiguousNeighborListArrayPath_Key, "Contiguous Neighbor List", "List of contiguous neighbors for each Feature.", DataPath{},
-                                                                 NeighborListSelectionParameter::AllowedTypes{DataType::int32}));
-  params.insert(std::make_unique<BoolParameter>(k_UseRunningAverage_Key, "Group C-Axes With Running Average", "Group C-Axes With Running Average", true));
-  params.insert(std::make_unique<Float32Parameter>(k_CAxisTolerance_Key, "C-Axis Alignment Tolerance (Degrees)", "C-Axis Alignment Tolerance (Degrees)", 0.0f));
 
   params.insertSeparator(Parameters::Separator{"Random Number Seed Parameters"});
   params.insertLinkableParameter(std::make_unique<BoolParameter>(k_UseSeed_Key, "Use Seed for Random Generation", "When true the user will be able to put in a seed for random generation", false));
   params.insert(std::make_unique<NumberParameter<uint64>>(k_SeedValue_Key, "Seed", "The seed fed into the random generator", std::mt19937::default_seed));
+  params.insert(std::make_unique<DataObjectNameParameter>(k_SeedArrayName_Key, "Stored Seed Value Array Name", "Name of array holding the seed value", "_Group_MicroTexture_Regions_Seed_Value_"));
 
   params.insertSeparator(Parameters::Separator{"Input Cell Data"});
   params.insert(std::make_unique<ArraySelectionParameter>(k_FeatureIdsArrayPath_Key, "Cell Feature Ids", "Data Array that specifies to which Feature each Element belongs", DataPath{},
@@ -90,8 +94,6 @@ Parameters GroupMicroTextureRegionsFilter::parameters() const
   params.insert(std::make_unique<DataGroupCreationParameter>(k_NewCellFeatureAttributeMatrixName_Key, "Created Microtexture Feature Attribute Matrix",
                                                              "Output Feature Attribute Matrix for Microtexture Regions", DataPath{}));
   params.insert(std::make_unique<DataObjectNameParameter>(k_ActiveArrayName_Key, "Active Array Name", "Output Active Array", "Active"));
-  params.insert(std::make_unique<DataObjectNameParameter>(k_SeedArrayName_Key, "Stored Seed Value Array Name", "Output data array to store the random number seed value",
-                                                          "_Group_MicroTexture_Regions_Seed_Value_"));
 
   // Associate the Linkable Parameter(s) to the children parameters that they control
   params.linkParameters(k_UseNonContiguousNeighbors_Key, k_NonContiguousNeighborListArrayPath_Key, true);
@@ -243,5 +245,4 @@ Result<Arguments> GroupMicroTextureRegionsFilter::FromSIMPLJson(const nlohmann::
 
   return ConvertResultTo<Arguments>(std::move(conversionResult), std::move(args));
 }
-
 } // namespace nx::core

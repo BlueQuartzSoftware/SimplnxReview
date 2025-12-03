@@ -159,5 +159,4 @@ Result<Arguments> ComputeMicroTextureRegionsFilter::FromSIMPLJson(const nlohmann
 
   return ConvertResultTo<Arguments>(std::move(conversionResult), std::move(args));
 }
-
 } // namespace nx::core
