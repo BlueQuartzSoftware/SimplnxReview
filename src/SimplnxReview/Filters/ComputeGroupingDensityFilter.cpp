@@ -18,7 +18,7 @@ using namespace nx::core;
 namespace
 {
 const DataPath k_ThrowawayCheckedFeatures = DataPath({"HiddenTempCheckedFeatures"});
-const DataPath k_ThrowawayNonContiguous = DataPath({"HiddenContiguousNL"});
+const DataPath k_ThrowawayNonContiguous = DataPath({"HiddenNonContiguousNL"});
 } // namespace
 
 namespace nx::core
@@ -50,7 +50,7 @@ std::string ComputeGroupingDensityFilter::humanName() const
 //------------------------------------------------------------------------------
 std::vector<std::string> ComputeGroupingDensityFilter::defaultTags() const
 {
-  return {className(), "Statistics", "Reconstruction"};
+  return {className(), "Statistics", "Reconstruction", "Microtexture"};
 }
 
 //------------------------------------------------------------------------------
@@ -66,23 +66,25 @@ Parameters ComputeGroupingDensityFilter::parameters() const
   params.insert(std::make_unique<NeighborListSelectionParameter>(k_NonContiguousNeighborListArrayPath_Key, "Non-Contiguous Neighborhoods", "List of non-contiguous neighbors for each Feature.",
                                                                  DataPath{}, NeighborListSelectionParameter::AllowedTypes{DataType::int32}));
 
-  params.insertSeparator(Parameters::Separator{"Input Cell Data"});
-  params.insert(std::make_unique<ArraySelectionParameter>(k_ParentIdsPath_Key, "Parent Ids", "Input Cell level ParentIds", DataPath{}, ArraySelectionParameter::AllowedTypes{DataType::int32},
+  params.insertSeparator(Parameters::Separator{"Input Feature Data"});
+  params.insert(std::make_unique<ArraySelectionParameter>(k_ParentIdsPath_Key, "Feature Parent Ids", "Input Feature level ParentIds", DataPath{}, ArraySelectionParameter::AllowedTypes{DataType::int32},
                                                           ArraySelectionParameter::AllowedComponentShapes{{1}}));
 
-  params.insertSeparator(Parameters::Separator{"Input Feature Data"});
-  params.insert(std::make_unique<ArraySelectionParameter>(k_VolumesArrayPath_Key, "Volumes", "The Feature Volumes Data Array", DataPath{},
+  params.insert(std::make_unique<ArraySelectionParameter>(k_VolumesArrayPath_Key, "Feature Volumes", "The Feature Volumes Data Array", DataPath{},
                                                           ArraySelectionParameter::AllowedTypes{nx::core::DataType::float32}, ArraySelectionParameter::AllowedComponentShapes{{1}}));
 
   params.insert(std::make_unique<NeighborListSelectionParameter>(k_ContiguousNeighborListArrayPath_Key, "Contiguous Neighbor List", "List of contiguous neighbors for each Feature.", DataPath{},
                                                                  NeighborListSelectionParameter::AllowedTypes{DataType::int32}));
 
-  params.insert(std::make_unique<ArraySelectionParameter>(k_ParentVolumesPath_Key, "Parent Volumes", "Input feature level parent volume data array", DataPath{},
+  params.insertSeparator(Parameters::Separator{"Input Parent Feature Data"});
+  params.insert(std::make_unique<ArraySelectionParameter>(k_ParentVolumesPath_Key, "Parent Volumes", "Input Parent feature level volumes data array", DataPath{},
                                                           ArraySelectionParameter::AllowedTypes{DataType::float32}, ArraySelectionParameter::AllowedComponentShapes{{1}}));
 
   params.insertSeparator(Parameters::Separator{"Output Feature Data"});
 
   params.insert(std::make_unique<DataObjectNameParameter>(k_CheckedFeaturesName_Key, "Checked Features Name", "Output feature level data array to hold 'Checked Features' values", "Checked Features"));
+
+  params.insertSeparator(Parameters::Separator{"Output Parent Feature Data"});
   params.insert(
       std::make_unique<DataObjectNameParameter>(k_GroupingDensitiesName_Key, "Grouping Densities Name", "Output feature level data array to hold 'Grouping Densities' values", "Grouping Densities"));
 
@@ -110,29 +112,43 @@ IFilter::PreflightResult ComputeGroupingDensityFilter::preflightImpl(const DataS
                                                                      const std::atomic_bool& shouldCancel, const ExecutionContext& executionContext) const
 {
   auto pParentIdsPath = filterArgs.value<DataPath>(k_ParentIdsPath_Key);
-  auto pParentVolumesPath = filterArgs.value<DataPath>(k_ParentVolumesPath_Key);
-  auto pContiguousNLPath = filterArgs.value<DataPath>(k_ContiguousNeighborListArrayPath_Key);
   auto pVolumesPath = filterArgs.value<DataPath>(k_VolumesArrayPath_Key);
-  auto pGroupingDensitiesName = filterArgs.value<std::string>(k_GroupingDensitiesName_Key);
+  auto pContiguousNLPath = filterArgs.value<DataPath>(k_ContiguousNeighborListArrayPath_Key);
+
+  auto pParentVolumesPath = filterArgs.value<DataPath>(k_ParentVolumesPath_Key);
 
   auto pUseNonContiguousNeighbors = filterArgs.value<bool>(k_UseNonContiguousNeighbors_Key);
   auto pNonContiguousNLPath = filterArgs.value<DataPath>(k_NonContiguousNeighborListArrayPath_Key);
+
   auto pFindCheckedFeatures = filterArgs.value<bool>(k_FindCheckedFeatures_Key);
   auto pCheckedFeaturesName = filterArgs.value<std::string>(k_CheckedFeaturesName_Key);
+  auto pGroupingDensitiesName = filterArgs.value<std::string>(k_GroupingDensitiesName_Key);
 
   Result<OutputActions> resultOutputActions;
   std::vector<PreflightValue> preflightUpdatedValues;
 
-  auto* pParentAM = dataStructure.getDataAs<AttributeMatrix>(pParentVolumesPath.getParent());
-  if(pParentAM == nullptr)
+
+  auto* parentIdsPtr = dataStructure.getDataAs<IDataArray>(pParentIdsPath);
+  auto* volumesPtr = dataStructure.getDataAs<IDataArray>(pVolumesPath);
+  auto* pContiguousNLPtr = dataStructure.getDataAs<INeighborList>(pContiguousNLPath);
+  auto* pNonContiguousNLPtr = dataStructure.getDataAs<INeighborList>(pNonContiguousNLPath);
+
+  // Make sure all these arrays and neighbor lists all come from the same attribute matrix or at least have the same number of tuples
+  if(parentIdsPtr != nullptr && volumesPtr != nullptr && pContiguousNLPtr != nullptr)
   {
-    return MakePreflightErrorResult(-15670, fmt::format("Parent Volumes [{}] must be stored in an Attribute Matrix.", pParentVolumesPath.toString()));
+    if(parentIdsPtr->getNumberOfTuples() != volumesPtr->getNumberOfTuples() || parentIdsPtr->getNumberOfTuples() != pContiguousNLPtr->getNumberOfTuples())
+    {
+      return MakePreflightErrorResult(-15671, fmt::format("All Input Feature level data arrays and neighbor lists MUST have the same number of tuples.", pParentVolumesPath.toString()));
+    }
   }
+  if(parentIdsPtr != nullptr && pNonContiguousNLPtr != nullptr)
   {
-    DataPath groupingDataPath = pParentVolumesPath.replaceName(pGroupingDensitiesName);
-    auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::float32, pParentAM->getShape(), std::vector<usize>{1}, groupingDataPath);
-    resultOutputActions.value().appendAction(std::move(createArrayAction));
+    if(parentIdsPtr->getNumberOfTuples() != pNonContiguousNLPtr->getNumberOfTuples())
+    {
+      return MakePreflightErrorResult(-15672, fmt::format("All Input Feature level data arrays and neighbor lists MUST have the same number of tuples.", pParentVolumesPath.toString()));
+    }
   }
+
 
   auto* pFeatureAM = dataStructure.getDataAs<AttributeMatrix>(pVolumesPath.getParent());
   if(pFeatureAM == nullptr)
@@ -142,9 +158,9 @@ IFilter::PreflightResult ComputeGroupingDensityFilter::preflightImpl(const DataS
 
   if(pFindCheckedFeatures)
   {
-    DataPath checkedFeaturesPath = pVolumesPath.replaceName(pCheckedFeaturesName);
     {
-      auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::int32, pFeatureAM->getShape(), std::vector<usize>{1}, checkedFeaturesPath);
+      DataPath checkedFeaturesPath = pVolumesPath.replaceName(pCheckedFeaturesName);
+      auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::int32, pFeatureAM->getShape(), ShapeType{1}, checkedFeaturesPath);
       resultOutputActions.value().appendAction(std::move(createArrayAction));
     }
   }
@@ -170,6 +186,18 @@ IFilter::PreflightResult ComputeGroupingDensityFilter::preflightImpl(const DataS
       auto removeAction = std::make_unique<DeleteDataAction>(k_ThrowawayNonContiguous);
       resultOutputActions.value().appendDeferredAction(std::move(removeAction));
     }
+  }
+
+  auto* pParentAM = dataStructure.getDataAs<AttributeMatrix>(pParentVolumesPath.getParent());
+  if(pParentAM == nullptr)
+  {
+    return MakePreflightErrorResult(-15670, fmt::format("Parent Volumes [{}] must be stored in an Attribute Matrix.", pParentVolumesPath.toString()));
+  }
+
+  {
+    DataPath groupingDataPath = pParentVolumesPath.replaceName(pGroupingDensitiesName);
+    auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::float32, pParentAM->getShape(), std::vector<usize>{1}, groupingDataPath);
+    resultOutputActions.value().appendAction(std::move(createArrayAction));
   }
 
   preflightUpdatedValues.push_back({"WARNING: This filter is experimental in nature and has not had any testing, validation or verification. Use at your own risk"});

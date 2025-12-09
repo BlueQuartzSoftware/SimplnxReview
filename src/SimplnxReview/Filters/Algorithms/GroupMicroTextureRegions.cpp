@@ -59,10 +59,10 @@ Result<> GroupMicroTextureRegions::execute()
   if(m_InputValues->UseNonContiguousNeighbors)
   {
     nonContigNeighListPtr = m_DataStructure.getDataAs<NeighborList<int32>>(m_InputValues->NonContiguousNeighborListArrayPath);
-  }
-  if(nullptr == nonContigNeighListPtr)
-  {
-    return MakeErrorResult(-99345, "There was an error getting the Non-contiguous neighborlist from the DataStructure");
+    if(nullptr == nonContigNeighListPtr)
+    {
+      return MakeErrorResult(-99345, "There was an error getting the Non-contiguous neighborlist from the DataStructure");
+    }
   }
 
   std::vector<int32> groupList;
