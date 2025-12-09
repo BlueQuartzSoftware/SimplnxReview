@@ -4,7 +4,7 @@
 
 #include <nlohmann/json.hpp>
 
-// clang-format off
+/* clang-format off */
 #include "SimplnxReview/Filters/GroupMicroTextureRegionsFilter.hpp"
 #include "SimplnxReview/Filters/MergeColoniesFilter.hpp"
 #include "SimplnxReview/Filters/ComputeSaltykovSizesFilter.hpp"
@@ -32,4 +32,4 @@ namespace nx::core
   };
 
 } // namespace nx::core
-// clang-format on
+/* clang-format on */
