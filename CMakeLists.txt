@@ -33,6 +33,7 @@ set(FilterList
   ComputeLocalAverageCAxisMisalignmentsFilter
   ComputeMicroTextureRegionsFilter
   ComputeSaltykovSizesFilter
+  EMsoftSO3SamplerFilter
   InterpolateValuesToUnstructuredGridFilter
   MergeColoniesFilter
 )
@@ -48,6 +49,7 @@ set(AlgorithmList
   ComputeLocalAverageCAxisMisalignments
   ComputeMicroTextureRegions
   ComputeSaltykovSizes
+  EMsoftSO3Sampler
   InterpolateValuesToUnstructuredGrid
   MergeColonies
 )
