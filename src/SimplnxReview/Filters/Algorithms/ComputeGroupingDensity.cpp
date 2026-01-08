@@ -53,13 +53,6 @@ public:
     usize numFeatures = featureVolumes.getNumberOfTuples();
     usize numParents = parentVolumes.getNumberOfTuples();
 
-    int kMax = 1;
-    if constexpr(FindDensitySpecializations::UsingNonContiguousNeighbors)
-    {
-      kMax = 2;
-    }
-
-    int32 numNeighbors = 0, numNeighborhoods = 0, numCurNeighborList = 0, neigh = 0;
     float32 totalFeatureCheckVolume = 0.0f;
     float32 curParentVolume = 0.0f;
     std::set<int32> totalFeatureCheckList = {};
@@ -76,7 +69,7 @@ public:
     // Start the Parent Outer Loop
     for(usize currentParentId = 1; currentParentId < numParents; currentParentId++)
     {
-      throttledMessenger.sendThrottledMessage([&]() { return fmt::format("[{}%]", CalculatePercentComplete(currentParentId, numParents)); });
+      throttledMessenger.sendThrottledMessage([&]() { return fmt::format("{}/{} {}%", currentParentId, numParents, CalculatePercentComplete(currentParentId, numParents)); });
 
       if(m_ShouldCancel)
       {
@@ -104,52 +97,10 @@ public:
               }
             }
           }
-          // Get the neighbors of the current feature
-          numNeighbors = m_ContiguousNL.getListSize(static_cast<int32>(currentFeatureId));
+          processNeighborListData(m_ContiguousNL, currentFeatureId, currentParentId, totalFeatureCheckList, totalFeatureCheckVolume, parentVolumes, checkedFeatureVolumes, outCheckedFeatures);
           if constexpr(FindDensitySpecializations::UsingNonContiguousNeighbors)
           {
-            numNeighborhoods = static_cast<int32>(m_NonContiguousNL[currentFeatureId].size());
-          }
-          for(int k = 0; k < kMax; k++)
-          {
-            if(k == 0)
-            {
-              numCurNeighborList = numNeighbors;
-            }
-            if constexpr(FindDensitySpecializations::UsingNonContiguousNeighbors)
-            {
-              if(k == 1)
-              {
-                numCurNeighborList = numNeighborhoods;
-              }
-            }
-            for(int32_t l = 0; l < numCurNeighborList; l++)
-            {
-              if(k == 0)
-              {
-                bool ok = false;
-                neigh = m_ContiguousNL.getValue(static_cast<int32>(currentFeatureId), l, ok);
-              }
-              else if(k == 1)
-              {
-                neigh = m_NonContiguousNL[currentFeatureId][l];
-              }
-              // If the current neighbor is NOT in the check list...
-              if(!totalFeatureCheckList.contains(neigh))
-              {
-                // update the volumes and the check list
-                totalFeatureCheckVolume += m_FeatureVolumes[neigh]; // Increment the total volume for this neighbor
-                totalFeatureCheckList.insert(neigh);
-                if constexpr(FindDensitySpecializations::FindingCheckedFeatures)
-                {
-                  if(parentVolumes[currentParentId] > checkedFeatureVolumes[neigh])
-                  {
-                    checkedFeatureVolumes[neigh] = parentVolumes[currentParentId];
-                    outCheckedFeatures[neigh] = static_cast<int32>(currentParentId);
-                  }
-                }
-              }
-            }
+            processNeighborListData(m_NonContiguousNL, currentFeatureId, currentParentId, totalFeatureCheckList, totalFeatureCheckVolume, parentVolumes, checkedFeatureVolumes, outCheckedFeatures);
           }
         }
       } // END OF FEATURE ID LOOP
@@ -168,6 +119,39 @@ public:
     } // END OF PARENT ID LOOP
 
     return {};
+  }
+
+  void processNeighborListData(const NeighborList<int32>& neighbor_list, const int32 currentFeatureId, const int32 currentParentId, std::set<int32>& totalFeatureCheckList,
+                               float32& totalFeatureCheckVolume, const AbstractDataStore<float>& parentVolumes, std::vector<float32>& checkedFeatureVolumes, AbstractDataStore<int>& outCheckedFeatures)
+  {
+    auto featureNeighborList = neighbor_list.at(currentFeatureId);
+    auto numCurNeighborList = static_cast<int32>(featureNeighborList.size());
+
+    for(int32_t l = 0; l < numCurNeighborList; l++)
+    {
+      // bool ok = false;
+      auto neigh = featureNeighborList.at(l);
+      // if(!ok)
+      // {
+      //   continue;
+      // }
+
+      // If the current neighbor is NOT in the check list...
+      if(!totalFeatureCheckList.contains(neigh))
+      {
+        // update the volumes and the check list
+        totalFeatureCheckVolume += m_FeatureVolumes[neigh]; // Increment the total volume for this neighbor
+        totalFeatureCheckList.insert(neigh);
+        if constexpr(FindDensitySpecializations::FindingCheckedFeatures)
+        {
+          if(parentVolumes[currentParentId] > checkedFeatureVolumes[neigh])
+          {
+            checkedFeatureVolumes[neigh] = parentVolumes[currentParentId];
+            outCheckedFeatures[neigh] = static_cast<int32>(currentParentId);
+          }
+        }
+      }
+    }
   }
 
 private:

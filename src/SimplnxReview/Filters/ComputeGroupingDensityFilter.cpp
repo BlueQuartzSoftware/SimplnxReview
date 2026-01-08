@@ -67,8 +67,8 @@ Parameters ComputeGroupingDensityFilter::parameters() const
                                                                  DataPath{}, NeighborListSelectionParameter::AllowedTypes{DataType::int32}));
 
   params.insertSeparator(Parameters::Separator{"Input Feature Data"});
-  params.insert(std::make_unique<ArraySelectionParameter>(k_ParentIdsPath_Key, "Feature Parent Ids", "Input Feature level ParentIds", DataPath{}, ArraySelectionParameter::AllowedTypes{DataType::int32},
-                                                          ArraySelectionParameter::AllowedComponentShapes{{1}}));
+  params.insert(std::make_unique<ArraySelectionParameter>(k_ParentIdsPath_Key, "Feature Parent Ids", "Input Feature level ParentIds", DataPath{},
+                                                          ArraySelectionParameter::AllowedTypes{DataType::int32}, ArraySelectionParameter::AllowedComponentShapes{{1}}));
 
   params.insert(std::make_unique<ArraySelectionParameter>(k_VolumesArrayPath_Key, "Feature Volumes", "The Feature Volumes Data Array", DataPath{},
                                                           ArraySelectionParameter::AllowedTypes{nx::core::DataType::float32}, ArraySelectionParameter::AllowedComponentShapes{{1}}));
@@ -127,7 +127,6 @@ IFilter::PreflightResult ComputeGroupingDensityFilter::preflightImpl(const DataS
   Result<OutputActions> resultOutputActions;
   std::vector<PreflightValue> preflightUpdatedValues;
 
-
   auto* parentIdsPtr = dataStructure.getDataAs<IDataArray>(pParentIdsPath);
   auto* volumesPtr = dataStructure.getDataAs<IDataArray>(pVolumesPath);
   auto* pContiguousNLPtr = dataStructure.getDataAs<INeighborList>(pContiguousNLPath);
@@ -148,7 +147,6 @@ IFilter::PreflightResult ComputeGroupingDensityFilter::preflightImpl(const DataS
       return MakePreflightErrorResult(-15672, fmt::format("All Input Feature level data arrays and neighbor lists MUST have the same number of tuples.", pParentVolumesPath.toString()));
     }
   }
-
 
   auto* pFeatureAM = dataStructure.getDataAs<AttributeMatrix>(pVolumesPath.getParent());
   if(pFeatureAM == nullptr)
