@@ -4,6 +4,8 @@
 #include "simplnx/DataStructure/NeighborList.hpp"
 #include "simplnx/Utilities/MessageHelper.hpp"
 
+#include <unordered_set>
+
 using namespace nx::core;
 
 namespace
@@ -19,13 +21,13 @@ template <class FindDensitySpecializations = FindDensitySpecializations<true, tr
 class FindDensityGrouping
 {
 public:
-  FindDensityGrouping(const std::atomic_bool& shouldCancel, const IFilter::MessageHandler& mesgHandler, const Int32Array& parentIds, const Float32Array& parentVolumes, const Float32Array& volumes,
-                      const Int32NeighborList& contiguousNL, Float32Array& groupingDensities, Int32NeighborList& nonContiguousNL, Int32Array& checkedFeatures)
+  FindDensityGrouping(const std::atomic_bool& shouldCancel, const IFilter::MessageHandler& mesgHandler, const Int32Array& parentIds, const Float32Array& parentVolumes,
+                      const Float32Array& featureVolumes, const Int32NeighborList& contiguousNL, Float32Array& groupingDensities, const Int32NeighborList& nonContiguousNL, Int32Array& checkedFeatures)
   : m_ShouldCancel(shouldCancel)
   , m_MessageHandler(mesgHandler)
   , m_ParentIds(parentIds)
   , m_ParentVolumes(parentVolumes)
-  , m_FeatureVolumes(volumes)
+  , m_FeatureVolumes(featureVolumes)
   , m_ContiguousNL(contiguousNL)
   , m_GroupingDensities(groupingDensities)
   , m_NonContiguousNL(nonContiguousNL)
@@ -42,20 +44,20 @@ public:
   Result<> operator()()
   {
     // This is feature data, from 2 different Feature Attribute Matrix
-    const auto& featureParentIds = m_ParentIds.getDataStoreRef();
-    const auto& parentVolumes = m_ParentVolumes.getDataStoreRef();
-    const auto& featureVolumes = m_FeatureVolumes.getDataStoreRef();
+    const auto& featureParentIdsRef = m_ParentIds.getDataStoreRef();
+    const auto& parentVolumesRef = m_ParentVolumes.getDataStoreRef();
+    const auto& featureVolumesRef = m_FeatureVolumes.getDataStoreRef();
 
     // These are output **Feature** level data arrays
-    auto& outCheckedFeatures = m_CheckedFeatures.getDataStoreRef();
-    auto& outGroupingDensities = m_GroupingDensities.getDataStoreRef();
+    auto& outCheckedFeaturesRef = m_CheckedFeatures.getDataStoreRef();
+    auto& outGroupingDensitiesRef = m_GroupingDensities.getDataStoreRef();
 
-    usize numFeatures = featureVolumes.getNumberOfTuples();
-    usize numParents = parentVolumes.getNumberOfTuples();
+    usize numFeatures = featureVolumesRef.getNumberOfTuples();
+    usize numParents = parentVolumesRef.getNumberOfTuples();
 
     float32 totalFeatureCheckVolume = 0.0f;
     float32 curParentVolume = 0.0f;
-    std::set<int32> totalFeatureCheckList = {};
+    std::unordered_set<int32> totalFeatureCheckList = {};
 
     std::vector<float32> checkedFeatureVolumes = {0.0f};
     if constexpr(FindDensitySpecializations::FindingCheckedFeatures)
@@ -81,38 +83,39 @@ public:
       {
         // If the currentParentId is the same as the parentIds[currentFeatureId] and we have not added it to the `totalCheckList`
         // then increment the volumes
-        if(featureParentIds[currentFeatureId] == currentParentId)
+        if(featureParentIdsRef[currentFeatureId] == currentParentId)
         {
-          if(totalFeatureCheckList.find(static_cast<int32>(currentFeatureId)) == totalFeatureCheckList.end())
+          if(!totalFeatureCheckList.contains(static_cast<int32>(currentFeatureId)))
           {
             totalFeatureCheckVolume += m_FeatureVolumes[currentFeatureId];      // Increment the checked volume by aggregating volumes from each feature that made up the parent feature
             totalFeatureCheckList.insert(static_cast<int32>(currentFeatureId)); // This is to the list of checked features
 
             if constexpr(FindDensitySpecializations::FindingCheckedFeatures)
             {
-              if(parentVolumes[currentParentId] > checkedFeatureVolumes[currentFeatureId])
+              if(parentVolumesRef[currentParentId] > checkedFeatureVolumes[currentFeatureId])
               {
-                checkedFeatureVolumes[currentFeatureId] = parentVolumes[currentParentId];
-                outCheckedFeatures[currentFeatureId] = static_cast<int32>(currentParentId);
+                checkedFeatureVolumes[currentFeatureId] = parentVolumesRef[currentParentId];
+                outCheckedFeaturesRef[currentFeatureId] = static_cast<int32>(currentParentId);
               }
             }
           }
-          processNeighborListData(m_ContiguousNL, currentFeatureId, currentParentId, totalFeatureCheckList, totalFeatureCheckVolume, parentVolumes, checkedFeatureVolumes, outCheckedFeatures);
+          processNeighborListData(m_ContiguousNL, currentFeatureId, currentParentId, totalFeatureCheckList, totalFeatureCheckVolume, parentVolumesRef, checkedFeatureVolumes, outCheckedFeaturesRef);
           if constexpr(FindDensitySpecializations::UsingNonContiguousNeighbors)
           {
-            processNeighborListData(m_NonContiguousNL, currentFeatureId, currentParentId, totalFeatureCheckList, totalFeatureCheckVolume, parentVolumes, checkedFeatureVolumes, outCheckedFeatures);
+            processNeighborListData(m_NonContiguousNL, currentFeatureId, currentParentId, totalFeatureCheckList, totalFeatureCheckVolume, parentVolumesRef, checkedFeatureVolumes,
+                                    outCheckedFeaturesRef);
           }
         }
       } // END OF FEATURE ID LOOP
 
-      curParentVolume = parentVolumes[currentParentId];
+      curParentVolume = parentVolumesRef[currentParentId];
       if(totalFeatureCheckVolume == 0.0f)
       {
-        outGroupingDensities[currentParentId] = -1.0f;
+        outGroupingDensitiesRef[currentParentId] = -1.0f;
       }
       else
       {
-        outGroupingDensities[currentParentId] = (curParentVolume / totalFeatureCheckVolume);
+        outGroupingDensitiesRef[currentParentId] = (curParentVolume / totalFeatureCheckVolume);
       }
       totalFeatureCheckList.clear();
       totalFeatureCheckVolume = 0.0f;
@@ -121,33 +124,29 @@ public:
     return {};
   }
 
-  void processNeighborListData(const NeighborList<int32>& neighbor_list, const int32 currentFeatureId, const int32 currentParentId, std::set<int32>& totalFeatureCheckList,
-                               float32& totalFeatureCheckVolume, const AbstractDataStore<float>& parentVolumes, std::vector<float32>& checkedFeatureVolumes, AbstractDataStore<int>& outCheckedFeatures)
+  void processNeighborListData(const NeighborList<int32>& neighborList, usize currentFeatureId, usize currentParentId, std::unordered_set<int32>& totalFeatureCheckList,
+                               float32& totalFeatureCheckVolume, const AbstractDataStore<float>& parentVolumesRef, std::vector<float32>& checkedFeatureVolumes,
+                               AbstractDataStore<int>& outCheckedFeaturesRef)
   {
-    auto featureNeighborList = neighbor_list.at(currentFeatureId);
-    auto numCurNeighborList = static_cast<int32>(featureNeighborList.size());
+    auto featureNeighbors = neighborList.at(currentFeatureId);
+    auto numNeighbors = static_cast<int32>(featureNeighbors.size());
 
-    for(int32_t l = 0; l < numCurNeighborList; l++)
+    for(int32 neighborIdx = 0; neighborIdx < numNeighbors; neighborIdx++)
     {
-      // bool ok = false;
-      auto neigh = featureNeighborList.at(l);
-      // if(!ok)
-      // {
-      //   continue;
-      // }
+      auto neighborId = featureNeighbors.at(neighborIdx);
 
       // If the current neighbor is NOT in the check list...
-      if(!totalFeatureCheckList.contains(neigh))
+      if(!totalFeatureCheckList.contains(neighborId))
       {
         // update the volumes and the check list
-        totalFeatureCheckVolume += m_FeatureVolumes[neigh]; // Increment the total volume for this neighbor
-        totalFeatureCheckList.insert(neigh);
+        totalFeatureCheckVolume += m_FeatureVolumes[neighborId]; // Increment the total volume for this neighbor
+        totalFeatureCheckList.insert(neighborId);
         if constexpr(FindDensitySpecializations::FindingCheckedFeatures)
         {
-          if(parentVolumes[currentParentId] > checkedFeatureVolumes[neigh])
+          if(parentVolumesRef[currentParentId] > checkedFeatureVolumes[neighborId])
           {
-            checkedFeatureVolumes[neigh] = parentVolumes[currentParentId];
-            outCheckedFeatures[neigh] = static_cast<int32>(currentParentId);
+            checkedFeatureVolumes[neighborId] = parentVolumesRef[currentParentId];
+            outCheckedFeaturesRef[neighborId] = static_cast<int32>(currentParentId);
           }
         }
       }
@@ -162,7 +161,7 @@ private:
   const Float32Array& m_FeatureVolumes;
   const Int32NeighborList& m_ContiguousNL;
   Float32Array& m_GroupingDensities;
-  Int32NeighborList& m_NonContiguousNL;
+  const Int32NeighborList& m_NonContiguousNL;
   Int32Array& m_CheckedFeatures;
 };
 } // namespace
@@ -188,33 +187,33 @@ Result<> ComputeGroupingDensity::operator()()
 {
   const auto& parentIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->ParentIdsPath);
   const auto& parentVolumes = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->ParentVolumesPath);
-  const auto& volumes = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->VolumesPath);
+  const auto& featureVolumes = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->VolumesPath);
   const auto& contiguousNL = m_DataStructure.getDataRefAs<NeighborList<int32>>(m_InputValues->ContiguousNLPath);
   auto& groupingDensities = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->GroupingDensitiesPath);
 
   // These may or may not be empty depending on the parameters
   // The filter created some temporary hidden data array and neighbor list that may or may not
   // get used for this. This setup does ensure the next 2 lines will actually return something.
-  auto& nonContiguousNL = m_DataStructure.getDataRefAs<NeighborList<int32>>(m_InputValues->NonContiguousNLPath);
+  const auto& nonContiguousNL = m_DataStructure.getDataRefAs<NeighborList<int32>>(m_InputValues->NonContiguousNLPath);
   auto& checkedFeatures = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->CheckedFeaturesPath);
 
   if(m_InputValues->UseNonContiguousNeighbors)
   {
     if(m_InputValues->FindCheckedFeatures)
     {
-      return ::FindDensityGrouping<FindDensitySpecializations<true, true>>(getCancel(), m_MessageHandler, parentIds, parentVolumes, volumes, contiguousNL, groupingDensities, nonContiguousNL,
+      return ::FindDensityGrouping<FindDensitySpecializations<true, true>>(getCancel(), m_MessageHandler, parentIds, parentVolumes, featureVolumes, contiguousNL, groupingDensities, nonContiguousNL,
                                                                            checkedFeatures)();
     }
-    return ::FindDensityGrouping<FindDensitySpecializations<true, false>>(getCancel(), m_MessageHandler, parentIds, parentVolumes, volumes, contiguousNL, groupingDensities, nonContiguousNL,
+    return ::FindDensityGrouping<FindDensitySpecializations<true, false>>(getCancel(), m_MessageHandler, parentIds, parentVolumes, featureVolumes, contiguousNL, groupingDensities, nonContiguousNL,
                                                                           checkedFeatures)();
   }
 
   if(m_InputValues->FindCheckedFeatures)
   {
-    return ::FindDensityGrouping<FindDensitySpecializations<false, true>>(getCancel(), m_MessageHandler, parentIds, parentVolumes, volumes, contiguousNL, groupingDensities, nonContiguousNL,
+    return ::FindDensityGrouping<FindDensitySpecializations<false, true>>(getCancel(), m_MessageHandler, parentIds, parentVolumes, featureVolumes, contiguousNL, groupingDensities, nonContiguousNL,
                                                                           checkedFeatures)();
   }
 
-  return ::FindDensityGrouping<FindDensitySpecializations<false, false>>(getCancel(), m_MessageHandler, parentIds, parentVolumes, volumes, contiguousNL, groupingDensities, nonContiguousNL,
+  return ::FindDensityGrouping<FindDensitySpecializations<false, false>>(getCancel(), m_MessageHandler, parentIds, parentVolumes, featureVolumes, contiguousNL, groupingDensities, nonContiguousNL,
                                                                          checkedFeatures)();
 }

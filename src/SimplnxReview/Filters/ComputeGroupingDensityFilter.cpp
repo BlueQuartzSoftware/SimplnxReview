@@ -127,26 +127,25 @@ IFilter::PreflightResult ComputeGroupingDensityFilter::preflightImpl(const DataS
   Result<OutputActions> resultOutputActions;
   std::vector<PreflightValue> preflightUpdatedValues;
 
-  auto* parentIdsPtr = dataStructure.getDataAs<IDataArray>(pParentIdsPath);
-  auto* featureVolumesPtr = dataStructure.getDataAs<IDataArray>(pFeatureVolumesPath);
-  auto* pContiguousNLPtr = dataStructure.getDataAs<INeighborList>(pContiguousNLPath);
-  auto* pNonContiguousNLPtr = dataStructure.getDataAs<INeighborList>(pNonContiguousNLPath);
+  // Selection parameters auto-validate existence, so use references directly
+  const auto& parentIds = dataStructure.getDataRefAs<IDataArray>(pParentIdsPath);
+  const auto& featureVolumes = dataStructure.getDataRefAs<IDataArray>(pFeatureVolumesPath);
+  const auto& contiguousNL = dataStructure.getDataRefAs<INeighborList>(pContiguousNLPath);
 
   // Make sure all these arrays and neighbor lists all come from the same attribute matrix or at least have the same number of tuples
-  if(parentIdsPtr != nullptr && featureVolumesPtr != nullptr && pContiguousNLPtr != nullptr)
+  if(parentIds.getNumberOfTuples() != featureVolumes.getNumberOfTuples() || parentIds.getNumberOfTuples() != contiguousNL.getNumberOfTuples())
   {
-    if(parentIdsPtr->getNumberOfTuples() != featureVolumesPtr->getNumberOfTuples() || parentIdsPtr->getNumberOfTuples() != pContiguousNLPtr->getNumberOfTuples())
-    {
-      return MakePreflightErrorResult(-15671, fmt::format("All Input Feature level data arrays and neighbor lists MUST have the same number of tuples.\n{}: {}\n{}: {}\n{}: {}",
-                                                          pParentIdsPath.toString(), parentIdsPtr->getNumberOfTuples(), pFeatureVolumesPath.toString(), featureVolumesPtr->getNumberOfTuples(),
-                                                          pContiguousNLPath.toString(), pContiguousNLPtr->getNumberOfTuples()));
-    }
+    return MakePreflightErrorResult(-15671, fmt::format("All Input Feature level data arrays and neighbor lists MUST have the same number of tuples.\n{}: {}\n{}: {}\n{}: {}",
+                                                        pParentIdsPath.toString(), parentIds.getNumberOfTuples(), pFeatureVolumesPath.toString(), featureVolumes.getNumberOfTuples(),
+                                                        pContiguousNLPath.toString(), contiguousNL.getNumberOfTuples()));
   }
-  if(parentIdsPtr != nullptr && pNonContiguousNLPtr != nullptr)
+  if(pUseNonContiguousNeighbors)
   {
-    if(parentIdsPtr->getNumberOfTuples() != pNonContiguousNLPtr->getNumberOfTuples())
+    const auto& nonContiguousNL = dataStructure.getDataRefAs<INeighborList>(pNonContiguousNLPath);
+    if(parentIds.getNumberOfTuples() != nonContiguousNL.getNumberOfTuples())
     {
-      return MakePreflightErrorResult(-15672, fmt::format("All Input Feature level data arrays and neighbor lists MUST have the same number of tuples.", pParentVolumesPath.toString()));
+      return MakePreflightErrorResult(-15672, fmt::format("All Input Feature level data arrays and neighbor lists MUST have the same number of tuples.\n{}: {}\n{}: {}", pParentIdsPath.toString(),
+                                                          parentIds.getNumberOfTuples(), pNonContiguousNLPath.toString(), nonContiguousNL.getNumberOfTuples()));
     }
   }
 
@@ -199,9 +198,6 @@ IFilter::PreflightResult ComputeGroupingDensityFilter::preflightImpl(const DataS
     auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::float32, pParentAM->getShape(), std::vector<usize>{1}, groupingDataPath);
     resultOutputActions.value().appendAction(std::move(createArrayAction));
   }
-
-  preflightUpdatedValues.push_back({"WARNING: This filter is experimental in nature and has not had any testing, validation or verification. Use at your own risk"});
-  resultOutputActions.warnings().push_back({-65432, "WARNING: This filter is experimental in nature and has not had any testing, validation or verification. Use at your own risk"});
 
   return {std::move(resultOutputActions), std::move(preflightUpdatedValues)};
 }
