@@ -24,7 +24,7 @@ struct SIMPLNXREVIEW_EXPORT ComputeGroupingDensityInputValues
 
 /**
  * @class ComputeGroupingDensity
- * @brief This filter determines the average C-axis location of each Feature.
+ * @brief Computes grouping densities for parent features in hierarchical reconstructions.
  */
 
 class SIMPLNXREVIEW_EXPORT ComputeGroupingDensity

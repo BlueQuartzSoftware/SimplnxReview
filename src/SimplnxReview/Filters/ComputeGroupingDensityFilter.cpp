@@ -70,7 +70,7 @@ Parameters ComputeGroupingDensityFilter::parameters() const
   params.insert(std::make_unique<ArraySelectionParameter>(k_ParentIdsPath_Key, "Feature Parent Ids", "Input Feature level ParentIds", DataPath{},
                                                           ArraySelectionParameter::AllowedTypes{DataType::int32}, ArraySelectionParameter::AllowedComponentShapes{{1}}));
 
-  params.insert(std::make_unique<ArraySelectionParameter>(k_VolumesArrayPath_Key, "Feature Volumes", "The Feature Volumes Data Array", DataPath{},
+  params.insert(std::make_unique<ArraySelectionParameter>(k_FeatureVolumesArrayPath_Key, "Feature Volumes", "The Feature Volumes Data Array", DataPath{},
                                                           ArraySelectionParameter::AllowedTypes{nx::core::DataType::float32}, ArraySelectionParameter::AllowedComponentShapes{{1}}));
 
   params.insert(std::make_unique<NeighborListSelectionParameter>(k_ContiguousNeighborListArrayPath_Key, "Contiguous Neighbor List", "List of contiguous neighbors for each Feature.", DataPath{},
@@ -112,7 +112,7 @@ IFilter::PreflightResult ComputeGroupingDensityFilter::preflightImpl(const DataS
                                                                      const std::atomic_bool& shouldCancel, const ExecutionContext& executionContext) const
 {
   auto pParentIdsPath = filterArgs.value<DataPath>(k_ParentIdsPath_Key);
-  auto pVolumesPath = filterArgs.value<DataPath>(k_VolumesArrayPath_Key);
+  auto pFeatureVolumesPath = filterArgs.value<DataPath>(k_FeatureVolumesArrayPath_Key);
   auto pContiguousNLPath = filterArgs.value<DataPath>(k_ContiguousNeighborListArrayPath_Key);
 
   auto pParentVolumesPath = filterArgs.value<DataPath>(k_ParentVolumesPath_Key);
@@ -128,16 +128,18 @@ IFilter::PreflightResult ComputeGroupingDensityFilter::preflightImpl(const DataS
   std::vector<PreflightValue> preflightUpdatedValues;
 
   auto* parentIdsPtr = dataStructure.getDataAs<IDataArray>(pParentIdsPath);
-  auto* volumesPtr = dataStructure.getDataAs<IDataArray>(pVolumesPath);
+  auto* featureVolumesPtr = dataStructure.getDataAs<IDataArray>(pFeatureVolumesPath);
   auto* pContiguousNLPtr = dataStructure.getDataAs<INeighborList>(pContiguousNLPath);
   auto* pNonContiguousNLPtr = dataStructure.getDataAs<INeighborList>(pNonContiguousNLPath);
 
   // Make sure all these arrays and neighbor lists all come from the same attribute matrix or at least have the same number of tuples
-  if(parentIdsPtr != nullptr && volumesPtr != nullptr && pContiguousNLPtr != nullptr)
+  if(parentIdsPtr != nullptr && featureVolumesPtr != nullptr && pContiguousNLPtr != nullptr)
   {
-    if(parentIdsPtr->getNumberOfTuples() != volumesPtr->getNumberOfTuples() || parentIdsPtr->getNumberOfTuples() != pContiguousNLPtr->getNumberOfTuples())
+    if(parentIdsPtr->getNumberOfTuples() != featureVolumesPtr->getNumberOfTuples() || parentIdsPtr->getNumberOfTuples() != pContiguousNLPtr->getNumberOfTuples())
     {
-      return MakePreflightErrorResult(-15671, fmt::format("All Input Feature level data arrays and neighbor lists MUST have the same number of tuples.", pParentVolumesPath.toString()));
+      return MakePreflightErrorResult(-15671, fmt::format("All Input Feature level data arrays and neighbor lists MUST have the same number of tuples.\n{}: {}\n{}: {}\n{}: {}",
+                                                          pParentIdsPath.toString(), parentIdsPtr->getNumberOfTuples(), pFeatureVolumesPath.toString(), featureVolumesPtr->getNumberOfTuples(),
+                                                          pContiguousNLPath.toString(), pContiguousNLPtr->getNumberOfTuples()));
     }
   }
   if(parentIdsPtr != nullptr && pNonContiguousNLPtr != nullptr)
@@ -148,16 +150,16 @@ IFilter::PreflightResult ComputeGroupingDensityFilter::preflightImpl(const DataS
     }
   }
 
-  auto* pFeatureAM = dataStructure.getDataAs<AttributeMatrix>(pVolumesPath.getParent());
+  auto* pFeatureAM = dataStructure.getDataAs<AttributeMatrix>(pFeatureVolumesPath.getParent());
   if(pFeatureAM == nullptr)
   {
-    return MakePreflightErrorResult(-15671, fmt::format("Feature Volumes [{}] must be stored in an Attribute Matrix.", pVolumesPath.toString()));
+    return MakePreflightErrorResult(-15673, fmt::format("Feature Volumes [{}] must be stored in an Attribute Matrix.", pFeatureVolumesPath.toString()));
   }
 
   if(pFindCheckedFeatures)
   {
     {
-      DataPath checkedFeaturesPath = pVolumesPath.replaceName(pCheckedFeaturesName);
+      DataPath checkedFeaturesPath = pFeatureVolumesPath.replaceName(pCheckedFeaturesName);
       auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::int32, pFeatureAM->getShape(), ShapeType{1}, checkedFeaturesPath);
       resultOutputActions.value().appendAction(std::move(createArrayAction));
     }
@@ -213,7 +215,7 @@ Result<> ComputeGroupingDensityFilter::executeImpl(DataStructure& dataStructure,
   inputValues.ParentIdsPath = filterArgs.value<DataPath>(k_ParentIdsPath_Key);
   inputValues.ParentVolumesPath = filterArgs.value<DataPath>(k_ParentVolumesPath_Key);
   inputValues.ContiguousNLPath = filterArgs.value<DataPath>(k_ContiguousNeighborListArrayPath_Key);
-  inputValues.VolumesPath = filterArgs.value<DataPath>(k_VolumesArrayPath_Key);
+  inputValues.VolumesPath = filterArgs.value<DataPath>(k_FeatureVolumesArrayPath_Key);
   inputValues.GroupingDensitiesPath = inputValues.ParentVolumesPath.replaceName(filterArgs.value<std::string>(k_GroupingDensitiesName_Key));
 
   inputValues.UseNonContiguousNeighbors = filterArgs.value<bool>(k_UseNonContiguousNeighbors_Key);
@@ -271,7 +273,7 @@ Result<Arguments> ComputeGroupingDensityFilter::FromSIMPLJson(const nlohmann::js
   results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_ParentIdsArrayPathKey, k_ParentIdsPath_Key));
   results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_ParentVolumesArrayPathKey, k_ParentVolumesPath_Key));
   results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedBooleanFilterParameterConverter>(args, json, SIMPL::k_UseNonContiguousNeighborsKey, k_UseNonContiguousNeighbors_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_VolumesArrayPathKey, k_VolumesArrayPath_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_VolumesArrayPathKey, k_FeatureVolumesArrayPath_Key));
 
   Result<> conversionResult = MergeResults(std::move(results));
 

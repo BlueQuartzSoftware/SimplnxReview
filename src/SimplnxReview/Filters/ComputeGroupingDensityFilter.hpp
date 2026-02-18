@@ -9,7 +9,7 @@ namespace nx::core
 {
 /**
  * @class ComputeGroupingDensityFilter
- * @brief This filter determines the average C-axis location of each Feature
+ * @brief Computes grouping densities for parent features in hierarchical reconstructions
  */
 class SIMPLNXREVIEW_EXPORT ComputeGroupingDensityFilter : public IFilter
 {
@@ -24,7 +24,7 @@ public:
   ComputeGroupingDensityFilter& operator=(ComputeGroupingDensityFilter&&) noexcept = delete;
 
   // Parameter Keys
-  static constexpr StringLiteral k_VolumesArrayPath_Key = "volumes_path";
+  static constexpr StringLiteral k_FeatureVolumesArrayPath_Key = "volumes_path";
   static constexpr StringLiteral k_ContiguousNeighborListArrayPath_Key = "contiguous_neighbor_list_path";
   static constexpr StringLiteral k_UseNonContiguousNeighbors_Key = "use_non_contiguous_neighbors";
   static constexpr StringLiteral k_NonContiguousNeighborListArrayPath_Key = "non_contiguous_neighbor_list_path";
