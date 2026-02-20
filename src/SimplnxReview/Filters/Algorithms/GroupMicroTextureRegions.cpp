@@ -4,7 +4,6 @@
 #include "simplnx/DataStructure/DataArray.hpp"
 #include "simplnx/DataStructure/NeighborList.hpp"
 #include "simplnx/Utilities/Math/GeometryMath.hpp"
-#include "simplnx/Utilities/Math/MatrixMath.hpp"
 #include "simplnx/Utilities/MessageHelper.hpp"
 
 #include "EbsdLib/LaueOps/LaueOps.h"
