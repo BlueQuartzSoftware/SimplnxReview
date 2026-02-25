@@ -6,10 +6,10 @@
 # ------------------------------------------------------------------------------
 # Define the list of unit test source files
 set(${PLUGIN_NAME}UnitTest_SRCS
-    MergeColoniesTest.cpp
+    ComputeGroupingDensityTest.cpp
     ComputeLocalAverageCAxisMisalignmentsTest.cpp
     ComputeMicroTextureRegionsTest.cpp
-    ComputeGroupingDensityTest.cpp
+    MergeColoniesTest.cpp
 )
 set(DISABLED_TESTS
 
@@ -59,7 +59,7 @@ if(EXISTS "${DREAM3D_DATA_DIR}" AND SIMPLNX_DOWNLOAD_TEST_FILES)
     file(MAKE_DIRECTORY "${DREAM3D_DATA_DIR}/TestFiles/")
   endif()
 
-#  download_test_data(DREAM3D_DATA_DIR ${DREAM3D_DATA_DIR} ARCHIVE_NAME 12_IN625_GBCD.tar.gz SHA512 f696a8af181505947e6fecfdb1a11fda6c762bba5e85fea8d484b1af00bf18643e1d930d48f092ee238d1c19c9ce7c4fb5a8092d17774bda867961a1400e9cea)
+  download_test_data(DREAM3D_DATA_DIR ${DREAM3D_DATA_DIR} ARCHIVE_NAME compute_grouping_densities.tar.gz SHA512 96066196d6aa5f87cc7b717f959848c2f3025b7129589abe1eded2a8d725c539a89b0a6290a388a56b5a401e0bd3041698fbd8e8cf37a1f18fdd937debd21531)
 
 endif()
 

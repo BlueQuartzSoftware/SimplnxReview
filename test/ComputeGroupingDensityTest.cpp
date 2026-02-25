@@ -25,8 +25,8 @@ const std::string k_VolumesName = "Volumes";
 const std::string k_ParentIdsName = "ParentIds";
 const std::string k_ContiguousNLName = "ContiguousNeighborList";
 const std::string k_NonContiguousNLName = "NonContiguousNeighborList";
-const std::string k_ParentVolumesName = "ParentVolumes";
-const std::string k_GroupingDensitiesName = "GroupingDensities";
+const std::string k_ParentVolumesName = "Volumes";
+const std::string k_ComputedGroupingDensitiesName = "Computed GroupingDensities";
 const std::string k_CheckedFeaturesName = "CheckedFeatures";
 
 const DataPath k_VolumesPath = DataPath({k_ImageGeomName, k_FeatureAMName, k_VolumesName});
@@ -34,21 +34,26 @@ const DataPath k_ParentIdsPath = DataPath({k_ImageGeomName, k_FeatureAMName, k_P
 const DataPath k_ContiguousNLPath = DataPath({k_ImageGeomName, k_FeatureAMName, k_ContiguousNLName});
 const DataPath k_NonContiguousNLPath = DataPath({k_ImageGeomName, k_FeatureAMName, k_NonContiguousNLName});
 const DataPath k_ParentVolumesPath = DataPath({k_ImageGeomName, k_ParentAMName, k_ParentVolumesName});
-const DataPath k_GroupingDensitiesPath = DataPath({k_ImageGeomName, k_ParentAMName, k_GroupingDensitiesName});
+const DataPath k_GroupingDensitiesPath = DataPath({k_ImageGeomName, k_ParentAMName, k_ComputedGroupingDensitiesName});
 const DataPath k_CheckedFeaturesPath = DataPath({k_ImageGeomName, k_FeatureAMName, k_CheckedFeaturesName});
 
-// Test data dimensions
-// 6 features (index 0 = placeholder, features 1-5)
-// 4 parents  (index 0 = placeholder, parents 1-3)
-// Features 1,2,3 → Parent 1
-// Features 4,5   → Parent 2
-// Parent 3 has NO features (tests density == -1.0 path)
+// Test data dimensions matching the 20x5 2D Image Geometry:
+//   6 features (index 0 = placeholder, features 1-5)
+//   3 parents  (index 0 = placeholder, parents 1-2)
+//   Features 1,2,3 -> Parent 1 (volume = 10+20+15 = 45)
+//   Features 4,5   -> Parent 2 (volume = 25+30 = 55)
 constexpr usize k_NumFeatures = 6;
-constexpr usize k_NumParents = 4;
+constexpr usize k_NumParents = 3;
 
 /**
  * @brief Builds a DataStructure with all input data needed for the ComputeGroupingDensity filter.
  * Optionally includes a non-contiguous neighbor list.
+ *
+ * Data matches the 20x5 2D Image Geometry worked example:
+ *   Feature Volumes: [0, 10, 20, 15, 25, 30]
+ *   Parent IDs:      [0,  1,  1,  1,  2,  2]
+ *   Parent Volumes:  [0, 45, 55]
+ *   Contiguous Neighbors: chain 1-2-3-4-5
  */
 DataStructure createTestDataStructure(bool includeNonContiguousNL)
 {
@@ -61,7 +66,7 @@ DataStructure createTestDataStructure(bool includeNonContiguousNL)
   // Feature-level AttributeMatrix (6 tuples: indices 0-5)
   auto* featureAM = AttributeMatrix::Create(dataStructure, k_FeatureAMName, {k_NumFeatures}, imageGeom->getId());
 
-  // Parent-level AttributeMatrix (4 tuples: indices 0-3)
+  // Parent-level AttributeMatrix (3 tuples: indices 0-2)
   auto* parentAM = AttributeMatrix::Create(dataStructure, k_ParentAMName, {k_NumParents}, imageGeom->getId());
 
   // --- Feature-level arrays ---
@@ -86,7 +91,7 @@ DataStructure createTestDataStructure(bool includeNonContiguousNL)
   parentIdsRef[4] = 2;
   parentIdsRef[5] = 2;
 
-  // Contiguous Neighbor List
+  // Contiguous Neighbor List (chain: 1-2-3-4-5)
   // Feature 0: {}
   // Feature 1: {2}
   // Feature 2: {1, 3}
@@ -121,13 +126,12 @@ DataStructure createTestDataStructure(bool includeNonContiguousNL)
 
   // --- Parent-level arrays ---
 
-  // Parent Volumes: [0, 200, 100, 50]
+  // Parent Volumes: [0, 45, 55] (sum of child feature cell volumes)
   auto* parentVolumes = UnitTest::CreateTestDataArray<float32>(dataStructure, k_ParentVolumesName, {k_NumParents}, {1}, parentAM->getId());
   auto& parentVolumesRef = parentVolumes->getDataStoreRef();
   parentVolumesRef[0] = 0.0f;
-  parentVolumesRef[1] = 200.0f;
-  parentVolumesRef[2] = 100.0f;
-  parentVolumesRef[3] = 50.0f;
+  parentVolumesRef[1] = 45.0f;
+  parentVolumesRef[2] = 55.0f;
 
   return dataStructure;
 }
@@ -146,16 +150,78 @@ Arguments createFilterArgs(bool useNonContiguous, bool findCheckedFeatures)
   args.insertOrAssign(ComputeGroupingDensityFilter::k_ParentVolumesPath_Key, std::make_any<DataPath>(k_ParentVolumesPath));
   args.insertOrAssign(ComputeGroupingDensityFilter::k_FindCheckedFeatures_Key, std::make_any<bool>(findCheckedFeatures));
   args.insertOrAssign(ComputeGroupingDensityFilter::k_CheckedFeaturesName_Key, std::make_any<std::string>(k_CheckedFeaturesName));
-  args.insertOrAssign(ComputeGroupingDensityFilter::k_GroupingDensitiesName_Key, std::make_any<std::string>(k_GroupingDensitiesName));
+  args.insertOrAssign(ComputeGroupingDensityFilter::k_GroupingDensitiesName_Key, std::make_any<std::string>(k_ComputedGroupingDensitiesName));
   return args;
 }
 } // namespace
 
 // =============================================================================
+// Exemplar-Based Test - Compare against DREAM3D-NX pipeline output
+// =============================================================================
+
+TEST_CASE("SimplnxReview::ComputeGroupingDensityFilter: Basic Density (contiguous, no checked features)", "[SimplnxReview][ComputeGroupingDensityFilter]")
+{
+
+  const std::string k_GroupingDensitiesName = "GroupingDensities (false, false)";
+  const DataPath k_ExemplarGroupingDensitiesPath = DataPath({k_ImageGeomName, k_ParentAMName, k_GroupingDensitiesName});
+
+  UnitTest::LoadPlugins();
+
+  const nx::core::UnitTest::TestFileSentinel testDataSentinel(nx::core::unit_test::k_TestFilesDir, "compute_grouping_densities.tar.gz", "compute_grouping_densities");
+
+  // Read Exemplar DREAM3D File Filter
+  auto exemplarFilePath = fs::path(fmt::format("{}/compute_grouping_densities/compute_grouping_densities.dream3d", unit_test::k_TestFilesDir));
+  DataStructure dataStructure = UnitTest::LoadDataStructure(exemplarFilePath);
+
+  ComputeGroupingDensityFilter filter;
+  Arguments args;
+  args.insertOrAssign(ComputeGroupingDensityFilter::k_FeatureVolumesArrayPath_Key, std::make_any<DataPath>(k_VolumesPath));
+  args.insertOrAssign(ComputeGroupingDensityFilter::k_ContiguousNeighborListArrayPath_Key, std::make_any<DataPath>(k_ContiguousNLPath));
+  args.insertOrAssign(ComputeGroupingDensityFilter::k_UseNonContiguousNeighbors_Key, std::make_any<bool>(false));
+  args.insertOrAssign(ComputeGroupingDensityFilter::k_NonContiguousNeighborListArrayPath_Key, std::make_any<DataPath>(DataPath{}));
+  args.insertOrAssign(ComputeGroupingDensityFilter::k_ParentIdsPath_Key, std::make_any<DataPath>(k_ParentIdsPath));
+  args.insertOrAssign(ComputeGroupingDensityFilter::k_ParentVolumesPath_Key, std::make_any<DataPath>(k_ParentVolumesPath));
+  args.insertOrAssign(ComputeGroupingDensityFilter::k_FindCheckedFeatures_Key, std::make_any<bool>(false));
+  args.insertOrAssign(ComputeGroupingDensityFilter::k_CheckedFeaturesName_Key, std::make_any<std::string>(k_CheckedFeaturesName));
+  args.insertOrAssign(ComputeGroupingDensityFilter::k_GroupingDensitiesName_Key, std::make_any<std::string>(k_ComputedGroupingDensitiesName));
+
+  // Preflight the filter and check result
+  auto preflightResult = filter.preflight(dataStructure, args);
+  SIMPLNX_RESULT_REQUIRE_VALID(preflightResult.outputActions)
+
+  auto executeResult = filter.execute(dataStructure, args, nullptr, IFilter::MessageHandler{[](const IFilter::Message& message) { fmt::print("{}\n", message.message); }});
+  SIMPLNX_RESULT_REQUIRE_VALID(executeResult.result);
+
+  // Compare computed densities against the exemplar from the DREAM3D-NX pipeline
+  REQUIRE_NOTHROW(dataStructure.getDataRefAs<Float32Array>(k_GroupingDensitiesPath));
+  REQUIRE_NOTHROW(dataStructure.getDataRefAs<Float32Array>(k_ExemplarGroupingDensitiesPath));
+
+  const auto& computedDensities = dataStructure.getDataRefAs<Float32Array>(k_GroupingDensitiesPath);
+  const auto& exemplarDensities = dataStructure.getDataRefAs<Float32Array>(k_ExemplarGroupingDensitiesPath);
+
+  REQUIRE(computedDensities.getNumberOfTuples() == exemplarDensities.getNumberOfTuples());
+  for(usize i = 0; i < computedDensities.getNumberOfTuples(); i++)
+  {
+    REQUIRE(computedDensities[i] == Approx(exemplarDensities[i]).epsilon(0.0001f));
+  }
+
+  // Verify against hand-calculated values:
+  //   Parent Volumes: [0, 45, 55]
+  //   Parent 1: children {1,2,3}, neighbors add feature 4
+  //     totalCheckVolume = 10 + 20 + 15 + 25 = 70
+  //     density = 45 / 70 = 0.642857
+  //   Parent 2: children {4,5}, neighbors add feature 3
+  //     totalCheckVolume = 25 + 30 + 15 = 70
+  //     density = 55 / 70 = 0.785714
+  REQUIRE(computedDensities[1] == Approx(45.0f / 70.0f).epsilon(0.0001f));
+  REQUIRE(computedDensities[2] == Approx(55.0f / 70.0f).epsilon(0.0001f));
+}
+
+// =============================================================================
 // Execution Tests - Exercise all 4 template specializations
 // =============================================================================
 
-TEST_CASE("SimplnxReview::ComputeGroupingDensityFilter: Basic Density (no non-contiguous, no checked features)", "[SimplnxReview][ComputeGroupingDensityFilter]")
+TEST_CASE("SimplnxReview::ComputeGroupingDensityFilter: Contiguous Only, No Checked Features", "[SimplnxReview][ComputeGroupingDensityFilter]")
 {
   UnitTest::LoadPlugins();
 
@@ -166,20 +232,17 @@ TEST_CASE("SimplnxReview::ComputeGroupingDensityFilter: Basic Density (no non-co
   auto executeResult = filter.execute(dataStructure, args, nullptr, IFilter::MessageHandler{[](const IFilter::Message& message) { fmt::print("{}\n", message.message); }});
   SIMPLNX_RESULT_REQUIRE_VALID(executeResult.result);
 
-  // Verify grouping densities
-  // Parent 1: features {1,2,3}, contiguous neighbors add feature 4
+  // Parent 1: children {1,2,3}, contiguous neighbors add feature 4
   //   totalCheckVolume = 10 + 20 + 15 + 25 = 70
-  //   density = 200 / 70 ≈ 2.857143
-  // Parent 2: features {4,5}, contiguous neighbors add feature 3
-  //   totalCheckVolume = 25 + 15 + 30 = 70
-  //   density = 100 / 70 ≈ 1.428571
-  // Parent 3: no features → density = -1.0
+  //   density = 45 / 70 = 0.642857
+  // Parent 2: children {4,5}, contiguous neighbors add feature 3
+  //   totalCheckVolume = 25 + 30 + 15 = 70
+  //   density = 55 / 70 = 0.785714
   REQUIRE_NOTHROW(dataStructure.getDataRefAs<Float32Array>(k_GroupingDensitiesPath));
   const auto& groupingDensities = dataStructure.getDataRefAs<Float32Array>(k_GroupingDensitiesPath);
 
-  REQUIRE(groupingDensities[1] == Approx(200.0f / 70.0f).epsilon(0.0001f));
-  REQUIRE(groupingDensities[2] == Approx(100.0f / 70.0f).epsilon(0.0001f));
-  REQUIRE(groupingDensities[3] == Approx(-1.0f));
+  REQUIRE(groupingDensities[1] == Approx(45.0f / 70.0f).epsilon(0.0001f));
+  REQUIRE(groupingDensities[2] == Approx(55.0f / 70.0f).epsilon(0.0001f));
 }
 
 TEST_CASE("SimplnxReview::ComputeGroupingDensityFilter: With Non-Contiguous Neighbors", "[SimplnxReview][ComputeGroupingDensityFilter]")
@@ -194,15 +257,13 @@ TEST_CASE("SimplnxReview::ComputeGroupingDensityFilter: With Non-Contiguous Neig
   SIMPLNX_RESULT_REQUIRE_VALID(executeResult.result);
 
   // With non-contiguous neighbors, all 5 features get checked for each parent
-  // Parent 1: totalCheckVolume = 10+20+25+15+30 = 100, density = 200/100 = 2.0
-  // Parent 2: totalCheckVolume = 25+15+30+10+20 = 100, density = 100/100 = 1.0
-  // Parent 3: no features → density = -1.0
+  // Parent 1: totalCheckVolume = 10+20+15+25+30 = 100, density = 45/100 = 0.45
+  // Parent 2: totalCheckVolume = 25+30+15+10+20 = 100, density = 55/100 = 0.55
   REQUIRE_NOTHROW(dataStructure.getDataRefAs<Float32Array>(k_GroupingDensitiesPath));
   const auto& groupingDensities = dataStructure.getDataRefAs<Float32Array>(k_GroupingDensitiesPath);
 
-  REQUIRE(groupingDensities[1] == Approx(2.0f).epsilon(0.0001f));
-  REQUIRE(groupingDensities[2] == Approx(1.0f).epsilon(0.0001f));
-  REQUIRE(groupingDensities[3] == Approx(-1.0f));
+  REQUIRE(groupingDensities[1] == Approx(45.0f / 100.0f).epsilon(0.0001f));
+  REQUIRE(groupingDensities[2] == Approx(55.0f / 100.0f).epsilon(0.0001f));
 }
 
 TEST_CASE("SimplnxReview::ComputeGroupingDensityFilter: With Checked Features", "[SimplnxReview][ComputeGroupingDensityFilter]")
@@ -216,28 +277,28 @@ TEST_CASE("SimplnxReview::ComputeGroupingDensityFilter: With Checked Features", 
   auto executeResult = filter.execute(dataStructure, args, nullptr, IFilter::MessageHandler{[](const IFilter::Message& message) { fmt::print("{}\n", message.message); }});
   SIMPLNX_RESULT_REQUIRE_VALID(executeResult.result);
 
-  // Densities same as basic case
+  // Densities same as contiguous-only case
   REQUIRE_NOTHROW(dataStructure.getDataRefAs<Float32Array>(k_GroupingDensitiesPath));
   const auto& groupingDensities = dataStructure.getDataRefAs<Float32Array>(k_GroupingDensitiesPath);
 
-  REQUIRE(groupingDensities[1] == Approx(200.0f / 70.0f).epsilon(0.0001f));
-  REQUIRE(groupingDensities[2] == Approx(100.0f / 70.0f).epsilon(0.0001f));
-  REQUIRE(groupingDensities[3] == Approx(-1.0f));
+  REQUIRE(groupingDensities[1] == Approx(45.0f / 70.0f).epsilon(0.0001f));
+  REQUIRE(groupingDensities[2] == Approx(55.0f / 70.0f).epsilon(0.0001f));
 
   // Checked features: each feature is assigned to the parent with the largest volume that checked it
-  // Parent 1 (vol=200) processes first and checks features 1,2,3,4 (feature 4 via neighbor of feature 3)
-  // Parent 2 (vol=100) processes second and checks features 3,4,5 (features 3,4 via neighbors of feature 4)
-  //   But parent 2 vol=100 < parent 1 vol=200, so features 3,4 stay assigned to parent 1
-  //   Feature 5 is only checked by parent 2
-  // Expected: [0, 1, 1, 1, 1, 2]
+  // Parent 1 (vol=45) processes first and checks features {1,2,3,4}
+  // Parent 2 (vol=55) processes second and checks features {3,4,5}
+  //   Feature 3: checked by Parent 1 (45) then Parent 2 (55 > 45) -> overridden to Parent 2
+  //   Feature 4: checked by Parent 1 (45) then Parent 2 (55 > 45) -> overridden to Parent 2
+  //   Feature 5: only checked by Parent 2
+  // Expected: [0, 1, 1, 2, 2, 2]
   REQUIRE_NOTHROW(dataStructure.getDataRefAs<Int32Array>(k_CheckedFeaturesPath));
   const auto& checkedFeatures = dataStructure.getDataRefAs<Int32Array>(k_CheckedFeaturesPath);
 
   REQUIRE(checkedFeatures[0] == 0);
   REQUIRE(checkedFeatures[1] == 1);
   REQUIRE(checkedFeatures[2] == 1);
-  REQUIRE(checkedFeatures[3] == 1);
-  REQUIRE(checkedFeatures[4] == 1);
+  REQUIRE(checkedFeatures[3] == 2);
+  REQUIRE(checkedFeatures[4] == 2);
   REQUIRE(checkedFeatures[5] == 2);
 }
 
@@ -252,29 +313,27 @@ TEST_CASE("SimplnxReview::ComputeGroupingDensityFilter: Both Options Enabled", "
   auto executeResult = filter.execute(dataStructure, args, nullptr, IFilter::MessageHandler{[](const IFilter::Message& message) { fmt::print("{}\n", message.message); }});
   SIMPLNX_RESULT_REQUIRE_VALID(executeResult.result);
 
-  // With non-contiguous neighbors, all features get checked in parent 1's pass
-  // Parent 1: density = 200/100 = 2.0
-  // Parent 2: density = 100/100 = 1.0
-  // Parent 3: density = -1.0
+  // With non-contiguous neighbors, all features get checked by both parents
+  // Parent 1: density = 45/100 = 0.45
+  // Parent 2: density = 55/100 = 0.55
   REQUIRE_NOTHROW(dataStructure.getDataRefAs<Float32Array>(k_GroupingDensitiesPath));
   const auto& groupingDensities = dataStructure.getDataRefAs<Float32Array>(k_GroupingDensitiesPath);
 
-  REQUIRE(groupingDensities[1] == Approx(2.0f).epsilon(0.0001f));
-  REQUIRE(groupingDensities[2] == Approx(1.0f).epsilon(0.0001f));
-  REQUIRE(groupingDensities[3] == Approx(-1.0f));
+  REQUIRE(groupingDensities[1] == Approx(45.0f / 100.0f).epsilon(0.0001f));
+  REQUIRE(groupingDensities[2] == Approx(55.0f / 100.0f).epsilon(0.0001f));
 
-  // Parent 1 (vol=200) processes first and checks ALL features (1-5) via non-contiguous links
-  // Parent 2 (vol=100) can't override any since 100 < 200
-  // Expected: [0, 1, 1, 1, 1, 1]
+  // Parent 1 (vol=45) checks ALL features {1,2,3,4,5} via non-contiguous links
+  // Parent 2 (vol=55) also checks ALL features, and 55 > 45 so all get overridden
+  // Expected: [0, 2, 2, 2, 2, 2]
   REQUIRE_NOTHROW(dataStructure.getDataRefAs<Int32Array>(k_CheckedFeaturesPath));
   const auto& checkedFeatures = dataStructure.getDataRefAs<Int32Array>(k_CheckedFeaturesPath);
 
   REQUIRE(checkedFeatures[0] == 0);
-  REQUIRE(checkedFeatures[1] == 1);
-  REQUIRE(checkedFeatures[2] == 1);
-  REQUIRE(checkedFeatures[3] == 1);
-  REQUIRE(checkedFeatures[4] == 1);
-  REQUIRE(checkedFeatures[5] == 1);
+  REQUIRE(checkedFeatures[1] == 2);
+  REQUIRE(checkedFeatures[2] == 2);
+  REQUIRE(checkedFeatures[3] == 2);
+  REQUIRE(checkedFeatures[4] == 2);
+  REQUIRE(checkedFeatures[5] == 2);
 }
 
 // =============================================================================
