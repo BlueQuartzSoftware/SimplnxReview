@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 
 /* clang-format off */
+#include "SimplnxReview/Filters/ComputeArrayNormFilter.hpp"
 #include "SimplnxReview/Filters/GroupMicroTextureRegionsFilter.hpp"
 #include "SimplnxReview/Filters/MergeColoniesFilter.hpp"
 #include "SimplnxReview/Filters/ComputeSaltykovSizesFilter.hpp"
@@ -21,6 +22,7 @@ namespace nx::core
   static const AbstractPlugin::SIMPLMapType k_SIMPL_to_SimplnxReview
   {
     // syntax std::make_pair {Dream3d UUID , Dream3dnx UUID, {}}}, // dream3d-class-name
+    {nx::core::Uuid::FromString("5d0cd577-3e3e-57b8-a36d-b215b834251f").value(), {nx::core::FilterTraits<ComputeArrayNormFilter>::uuid, &ComputeArrayNormFilter::FromSIMPLJson}}, // FindNorm
     {nx::core::Uuid::FromString("5e18a9e2-e342-56ac-a54e-3bd0ca8b9c53").value(), {nx::core::FilterTraits<GroupMicroTextureRegionsFilter>::uuid, &GroupMicroTextureRegionsFilter::FromSIMPLJson}}, // GroupMicroTextureRegions
     {nx::core::Uuid::FromString("2c4a6d83-6a1b-56d8-9f65-9453b28845b9").value(), {nx::core::FilterTraits<MergeColoniesFilter>::uuid, &MergeColoniesFilter::FromSIMPLJson}}, // MergeColonies
     {nx::core::Uuid::FromString("cc76cffe-81ad-5ece-be2a-ce127c5fa6d7").value(), {nx::core::FilterTraits<ComputeSaltykovSizesFilter>::uuid, &ComputeSaltykovSizesFilter::FromSIMPLJson}}, // FindSaltykovSizes
