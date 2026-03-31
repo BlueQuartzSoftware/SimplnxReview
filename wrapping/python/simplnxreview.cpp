@@ -1,11 +1,11 @@
-#include <CxPybind/CxPybind.hpp>
+#include <NxPybind/NxPybind.hpp>
 
 #include <SimplnxReview/SimplnxReviewPlugin.hpp>
 
 #include "SimplnxReview/SimplnxReviewFilterBinding.hpp"
 
 using namespace nx::core;
-using namespace nx::core::CxPybind;
+using namespace nx::core::NxPybind;
 namespace py = pybind11;
 
 using namespace pybind11::literals;
