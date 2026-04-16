@@ -1,0 +1,23 @@
+{
+  "PipelineBuilder": {
+    "Name": "Compute Saltykov Sizes Backwards Compatibility Test",
+    "Number_Filters": 1,
+    "Version": 6
+  },
+  "0": {
+    "Filter_Enabled": true,
+    "Filter_Human_Label": "Find Saltykov Sizes",
+    "Filter_Name": "FindSaltykovSizes",
+    "Filter_Uuid": "{cc76cffe-81ad-5ece-be2a-ce127c5fa6d7}",
+    "EquivalentDiametersArrayPath": {
+      "Data Container Name": "DataContainer",
+      "Attribute Matrix Name": "CellData",
+      "Data Array Name": "TestArray"
+    },
+    "SaltykovEquivalentDiametersArrayPath": {
+      "Data Container Name": "DataContainer",
+      "Attribute Matrix Name": "CellData",
+      "Data Array Name": "TestArray"
+    }
+  }
+}
