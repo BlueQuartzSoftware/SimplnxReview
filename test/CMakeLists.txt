@@ -9,6 +9,8 @@ set(${PLUGIN_NAME}UnitTest_SRCS
     MergeColoniesTest.cpp
     ComputeLocalAverageCAxisMisalignmentsTest.cpp
     ComputeMicroTextureRegionsTest.cpp
+    ComputeSaltykovSizesTest.cpp
+    GroupMicroTextureRegionsTest.cpp
 )
 set(DISABLED_TESTS
 

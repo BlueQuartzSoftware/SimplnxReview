@@ -1,0 +1,22 @@
+{
+  "PipelineBuilder": {
+    "Name": "Compute Micro Texture Regions 6.4 Backwards Compatibility Test",
+    "Number_Filters": 1,
+    "Version": 6
+  },
+  "0": {
+    "Filter_Enabled": true,
+    "Filter_Human_Label": "Find MicroTexture Regions",
+    "Filter_Name": "FindMicroTextureRegions",
+    "CellFeatureAttributeMatrixName": {
+      "Data Container Name": "DataContainer"
+    },
+    "MicroTextureRegionFractionOccupiedArrayName": "TestName",
+    "MicroTextureRegionNumCellsArrayName": "TestName",
+    "FeatureIdsArrayPath": {
+      "Data Container Name": "DataContainer",
+      "Attribute Matrix Name": "CellData",
+      "Data Array Name": "TestArray"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "PipelineBuilder": {
+    "Name": "Compute Local Average C-Axis Misalignments 6.4 Backwards Compatibility Test",
+    "Number_Filters": 1,
+    "Version": 6
+  },
+  "0": {
+    "Filter_Enabled": true,
+    "Filter_Human_Label": "Find Local Average C-Axis Misalignments",
+    "Filter_Name": "FindLocalAverageCAxisMisalignments",
+    "AvgCAxisMisalignmentsArrayPath": {
+      "Data Container Name": "DataContainer",
+      "Attribute Matrix Name": "CellData",
+      "Data Array Name": "TestArray"
+    },
+    "CAxisMisalignmentListArrayPath": {
+      "Data Container Name": "DataContainer",
+      "Attribute Matrix Name": "CellData",
+      "Data Array Name": "TestArray"
+    },
+    "CalcBiasedAvg": 1,
+    "CalcUnbiasedAvg": 1,
+    "FeatureParentIdsArrayPath": {
+      "Data Container Name": "DataContainer",
+      "Attribute Matrix Name": "CellData",
+      "Data Array Name": "TestArray"
+    },
+    "LocalCAxisMisalignmentsArrayName": "TestName",
+    "NeighborListArrayPath": {
+      "Data Container Name": "DataContainer",
+      "Attribute Matrix Name": "CellData",
+      "Data Array Name": "TestArray"
+    },
+    "NumFeaturesPerParentArrayName": "TestName",
+    "NewCellFeatureAttributeMatrixName": {
+      "Data Container Name": "DataContainer"
+    },
+    "UnbiasedLocalCAxisMisalignmentsArrayName": "TestName"
+  }
+}
