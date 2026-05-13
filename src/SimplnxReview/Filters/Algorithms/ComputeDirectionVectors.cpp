@@ -185,6 +185,7 @@ Result<> ExecuteComputeDirectionVectors(DataStructure& dataStructure, const Data
 
   // Parallelize the implementation method
   ParallelTaskAlgorithm taskRunner;
+  taskRunner.setParallelizationEnabled(false);
   auto& inputOrientationsArray = dataStructure.getDataRefAs<DataArray<T>>(inputOrientationsArrayPath);
   auto& outputArray = dataStructure.getDataRefAs<Float32Array>(outputArrayPath);
   taskRunner.template execute<>(ComputeDirectionVectorsImpl<T>(inputOrientationsArray, inputRepType, cartesian, outputArray, shouldCancel));
@@ -214,13 +215,14 @@ Result<> ComputeDirectionVectors::operator()()
   switch(m_InputValues->LatticeConstantsInputType)
   {
   case LatticeConstantsInputType::DataArrayPath: {
+    size_t phaseId = 1;
     auto& latticeConstantsArray = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->LatticeConstantsArrayPath);
-    latticeParametersLengths[0] = latticeConstantsArray[0];
-    latticeParametersLengths[1] = latticeConstantsArray[1];
-    latticeParametersLengths[2] = latticeConstantsArray[2];
-    latticeParametersAngles[0] = latticeConstantsArray[3];
-    latticeParametersAngles[1] = latticeConstantsArray[4];
-    latticeParametersAngles[2] = latticeConstantsArray[5];
+    latticeParametersLengths[0] = latticeConstantsArray[phaseId * 6 + 0];
+    latticeParametersLengths[1] = latticeConstantsArray[phaseId * 6 + 1];
+    latticeParametersLengths[2] = latticeConstantsArray[phaseId * 6 + 2];
+    latticeParametersAngles[0] = latticeConstantsArray[phaseId * 6 + 3];
+    latticeParametersAngles[1] = latticeConstantsArray[phaseId * 6 + 4];
+    latticeParametersAngles[2] = latticeConstantsArray[phaseId * 6 + 5];
     break;
   }
   case LatticeConstantsInputType::Manual: {
