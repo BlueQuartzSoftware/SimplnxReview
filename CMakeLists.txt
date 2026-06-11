@@ -33,7 +33,6 @@ set(FilterList
   ComputeLocalAverageCAxisMisalignmentsFilter
   ComputeMicroTextureRegionsFilter
   ComputeSaltykovSizesFilter
-  GroupMicroTextureRegionsFilter
   InterpolateValuesToUnstructuredGridFilter
   MergeColoniesFilter
 )
@@ -49,7 +48,6 @@ set(AlgorithmList
   ComputeLocalAverageCAxisMisalignments
   ComputeMicroTextureRegions
   ComputeSaltykovSizes
-  GroupMicroTextureRegions
   InterpolateValuesToUnstructuredGrid
   MergeColonies
 )
