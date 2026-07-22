@@ -11,6 +11,7 @@ set(${PLUGIN_NAME}UnitTest_SRCS
     ComputeMicroTextureRegionsTest.cpp
     ComputeSaltykovSizesTest.cpp
     EMsoftSO3SamplerTest.cpp
+    GlavicicTortureTest.cpp
 )
 set(DISABLED_TESTS
 

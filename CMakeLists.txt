@@ -34,6 +34,7 @@ set(FilterList
   ComputeMicroTextureRegionsFilter
   ComputeSaltykovSizesFilter
   EMsoftSO3SamplerFilter
+  GlavicicTortureFilter
   InterpolateValuesToUnstructuredGridFilter
   MergeColoniesFilter
 )
@@ -50,6 +51,7 @@ set(AlgorithmList
   ComputeMicroTextureRegions
   ComputeSaltykovSizes
   EMsoftSO3Sampler
+  GlavicicTorture
   InterpolateValuesToUnstructuredGrid
   MergeColonies
 )
