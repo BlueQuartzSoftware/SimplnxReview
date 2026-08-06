@@ -5,7 +5,7 @@
 #include "simplnx/DataStructure/DataArray.hpp"
 #include "simplnx/DataStructure/NeighborList.hpp"
 #include "simplnx/Utilities/Math/GeometryMath.hpp"
-#include "simplnx/Utilities/MessageHelper.hpp"
+#include "simplnx/Utilities/ThrottledMessageHandler.hpp"
 
 #include "EbsdLib/Core/EbsdLibConstants.h"
 #include "EbsdLib/Core/Orientation.hpp"
@@ -146,8 +146,7 @@ bool MergeColonies::growGrouping(int32_t referenceFeature, int32_t neighborFeatu
 // -----------------------------------------------------------------------------
 Result<> MergeColonies::execute()
 {
-  MessageHelper messageHelper(m_MessageHandler);
-  ThrottledMessenger throttledMessenger = messageHelper.createThrottledMessenger();
+  ThrottledMessageHandler throttledMessenger(m_MessageHandler);
 
   NeighborList<int32>& featureNeighborListRef = m_DataStructure.getDataRefAs<NeighborList<int32>>(m_InputValues->ContiguousNeighborListArrayPath);
   NeighborList<int32>* nonContigNeighListPtr = nullptr;
@@ -252,7 +251,7 @@ Result<> MergeColonies::execute()
         }
       }
 
-      throttledMessenger.sendThrottledMessage([&]() { return fmt::format("Parent Count: {}", parentCount); });
+      throttledMessenger.queueMessage("Parent Count: {}", parentCount);
     }
     groupList.clear();
   }
@@ -298,13 +297,13 @@ Result<> MergeColonies::operator()()
   }
   numParents += 1;
 
-  m_MessageHandler({IFilter::Message::Type::Info, "Characterizing Colonies Starting"});
+  m_MessageHandler.sendInfoMessage("Characterizing Colonies Starting");
   characterize_colonies();
-  m_MessageHandler({IFilter::Message::Type::Info, "Characterizing Colonies Complete"});
+  m_MessageHandler.sendInfoMessage("Characterizing Colonies Complete");
 
   if(m_InputValues->RandomizeParentIds)
   {
-    m_MessageHandler({IFilter::Message::Type::Info, "Randomizing Parent Ids...."});
+    m_MessageHandler.sendInfoMessage("Randomizing Parent Ids....");
     // Generate all the numbers up front
     const int32 rangeMin = 1;
     const int32 rangeMax = numParents - 1;
@@ -324,7 +323,7 @@ Result<> MergeColonies::operator()()
     int32 r = 0;
     int32 temp = 0;
 
-    m_MessageHandler({IFilter::Message::Type::Info, "Shuffle elements ...."});
+    m_MessageHandler.sendInfoMessage("Shuffle elements ....");
     //--- Shuffle elements by randomly exchanging each with one other.
     for(int32 i = 1; i < numParents; i++)
     {
@@ -338,7 +337,7 @@ Result<> MergeColonies::operator()()
       pid[r] = temp;
     }
 
-    m_MessageHandler({IFilter::Message::Type::Info, "Adjusting Feature Ids Array...."});
+    m_MessageHandler.sendInfoMessage("Adjusting Feature Ids Array....");
     // Now adjust all the FeatureId values for each Voxel
     for(usize i = 0; i < totalPoints; ++i)
     {

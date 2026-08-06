@@ -139,7 +139,7 @@ Result<> InterpolateValuesToUnstructuredGrid::operator()()
   ParallelDataAlgorithm dataAlg;
   dataAlg.setRange(0ULL, static_cast<usize>(destGeometry.getNumberOfVertices()));
   dataAlg.execute(CalculateClosestVerticesImpl(this, srcGeometry, destGeometry, closestSrcIds, m_MessageHandler, m_ShouldCancel));
-  m_MessageHandler(IFilter::Message::Type::Info, "Calculating Closest Vertices || 100%");
+  m_MessageHandler.sendInfoMessage("Calculating Closest Vertices || 100%");
 
   DataPath interpolatedAttrMatrixPath;
   if(m_InputValues->UseExistingAttrMatrix)
@@ -154,7 +154,7 @@ Result<> InterpolateValuesToUnstructuredGrid::operator()()
   for(usize i = 0; i < m_InputValues->InputDataPaths.size(); i++)
   {
     const auto& dataPath = m_InputValues->InputDataPaths[i];
-    m_MessageHandler(IFilter::Message::Type::Info, fmt::format("Interpolating \"{}\" Array Values || {}/{}", dataPath.getTargetName(), i + 1, m_InputValues->InputDataPaths.size()));
+    m_MessageHandler.sendInfoMessage(fmt::format("Interpolating \"{}\" Array Values || {}/{}", dataPath.getTargetName(), i + 1, m_InputValues->InputDataPaths.size()));
 
     if(m_ShouldCancel)
     {
@@ -184,7 +184,7 @@ void InterpolateValuesToUnstructuredGrid::sendThreadSafeProgressMessage(usize co
 
   auto progressInt = static_cast<usize>((static_cast<float32>(m_ProgressCounter) / static_cast<float32>(m_TotalElements)) * 100.0f);
   std::string ss = fmt::format("Calculating Closest Vertices || {}%", progressInt);
-  m_MessageHandler(IFilter::Message::Type::Info, ss);
+  m_MessageHandler.sendInfoMessage(ss);
 
   m_LastProgressInt = progressInt;
   m_InitialPoint = std::chrono::steady_clock::now();
