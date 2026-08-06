@@ -60,7 +60,7 @@ Result<> GlavicicTorture::operator()()
     }
     if(progressInterval > 0 && cellIndex % progressInterval == 0)
     {
-      m_MessageHandler({IFilter::Message::Type::Info, fmt::format("Assigning Euler Angles: {}%", (cellIndex * 100) / numCells)});
+      m_MessageHandler.sendInfoMessage(fmt::format("Assigning Euler Angles: {}%", (cellIndex * 100) / numCells));
     }
 
     int32 mtrId = static_cast<int32>(expectedMTRIdsRef[cellIndex]);

@@ -3,7 +3,6 @@
 #include "simplnx/Common/Constants.hpp"
 #include "simplnx/DataStructure/DataArray.hpp"
 #include "simplnx/DataStructure/StringArray.hpp"
-#include "simplnx/Utilities/MessageHelper.hpp"
 
 #include "EbsdLib/Core/EbsdLibConstants.h"
 #include "EbsdLib/Core/Orientation.hpp"
@@ -134,7 +133,7 @@ Result<> EMsoftSO3Sampler::operator()()
       // report on status of computation
       if(Di > Dc)
       {
-        m_MessageHandler(IFilter::Message::Type::Info, fmt::format("Euler Angles | Tested: {} of {} | Inside RFZ: {} ", Di, Totp, Dg));
+        m_MessageHandler.sendInfoMessage(fmt::format("Euler Angles | Tested: {} of {} | Inside RFZ: {} ", Di, Totp, Dg));
         Dc += Dn;
       }
       if(m_ShouldCancel)
@@ -253,7 +252,7 @@ Result<> EMsoftSO3Sampler::operator()()
       // report on status of computation
       if(Dg > Dc)
       {
-        m_MessageHandler(IFilter::Message::Type::Info, fmt::format("Euler Angles | Generated: {} / {}", Dg, Totp));
+        m_MessageHandler.sendInfoMessage(fmt::format("Euler Angles | Generated: {} / {}", Dg, Totp));
         Dc += Dn;
       }
     }
@@ -287,7 +286,7 @@ Result<> EMsoftSO3Sampler::operator()()
         // report on status of computation
         if(Dg > Dc)
         {
-          m_MessageHandler(IFilter::Message::Type::Info, fmt::format("Euler Angles | Generated: {} / {}", Dg, Totp));
+          m_MessageHandler.sendInfoMessage(fmt::format("Euler Angles | Generated: {} / {}", Dg, Totp));
           Dc += Dn;
         }
       }
