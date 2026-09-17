@@ -391,7 +391,8 @@ int32 MergeColonies::getSeed(int32 newFid)
   {
     m_FeatureParentIds[featureIdSeed] = newFid;
     const std::vector<usize> tDims = {static_cast<usize>(newFid + 1)};
-    m_DataStructure.getDataRefAs<AttributeMatrix>(m_InputValues->CellFeatureAMPath).resizeTuples(tDims);
+    AttributeMatrix& amRef = m_DataStructure.getDataRefAs<AttributeMatrix>(m_InputValues->CellFeatureAMPath);
+    Result<> result = amRef.resizeTuples(tDims);
   }
   return featureIdSeed;
 }
