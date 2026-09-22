@@ -14,6 +14,13 @@
 #include <cmath>
 
 using namespace nx::core;
+
+namespace
+{
+// Cells are far too small a unit to report or poll cancellation on individually. The stride is the
+// outer work unit for the whole-volume passes below.
+constexpr usize k_ProgressCellStride = 65536;
+} // namespace
 using LaueOpsShPtrType = std::shared_ptr<ebsdlib::LaueOps>;
 using LaueOpsContainer = std::vector<LaueOpsShPtrType>;
 
@@ -146,7 +153,7 @@ bool MergeColonies::growGrouping(int32_t referenceFeature, int32_t neighborFeatu
 // -----------------------------------------------------------------------------
 Result<> MergeColonies::execute()
 {
-  ThrottledMessageHandler throttledMessenger(m_MessageHandler);
+  ThrottledMessageHandler progressThrottle(m_MessageHandler);
 
   NeighborList<int32>& featureNeighborListRef = m_DataStructure.getDataRefAs<NeighborList<int32>>(m_InputValues->ContiguousNeighborListArrayPath);
   NeighborList<int32>* nonContigNeighListPtr = nullptr;
@@ -251,7 +258,7 @@ Result<> MergeColonies::execute()
         }
       }
 
-      throttledMessenger.queueMessage("Parent Count: {}", parentCount);
+      progressThrottle.queueMessage("Parent Count: {}", parentCount);
     }
     groupList.clear();
   }
@@ -286,8 +293,18 @@ Result<> MergeColonies::operator()()
 
   int32 numParents = 0;
   usize totalPoints = featureIds.getNumberOfTuples();
+  ThrottledMessageHandler cellThrottle(m_MessageHandler);
+  cellThrottle.reset(totalPoints, "Mapping Cells to Parents");
   for(usize k = 0; k < totalPoints; k++)
   {
+    if(k % k_ProgressCellStride == 0)
+    {
+      if(m_ShouldCancel)
+      {
+        return {};
+      }
+      cellThrottle.updatePercent(k);
+    }
     int32 featurename = featureIds[k];
     cellParentIds[k] = m_FeatureParentIds[featurename];
     if(m_FeatureParentIds[featurename] > numParents)
@@ -339,8 +356,21 @@ Result<> MergeColonies::operator()()
 
     m_MessageHandler.sendInfoMessage("Adjusting Feature Ids Array....");
     // Now adjust all the FeatureId values for each Voxel
+    cellThrottle.reset(totalPoints, "Adjusting Feature Ids");
+    // This pass rewrites the cell parent id and the feature-level parent id for the same feature.
+    // Returning part way leaves cellParentIds inconsistent with m_FeatureParentIds, and nothing
+    // restores either, so the remap runs to completion once started. It is one cheap pass over the
+    // cells; cancellation is honoured before it begins.
+    if(m_ShouldCancel)
+    {
+      return {};
+    }
     for(usize i = 0; i < totalPoints; ++i)
     {
+      if(i % k_ProgressCellStride == 0)
+      {
+        cellThrottle.updatePercent(i);
+      }
       cellParentIds[i] = pid[cellParentIds[i]];
       m_FeatureParentIds[featureIds[i]] = cellParentIds[i];
     }

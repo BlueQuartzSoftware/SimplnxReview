@@ -37,25 +37,22 @@ public:
 
   void generate(size_t start, size_t end) const
   {
-    auto startTime = std::chrono::steady_clock::now();
     usize counter = 0;
-    usize increment = (end - start) / 100;
+    // A count stride keeps the seam out of the per-vertex hot path. The throttle behind the seam
+    // decides when a message is actually due, so this loop never reads the clock.
+    const usize increment = std::max<usize>(1, (end - start) / 100);
     for(usize destVertexId = start; destVertexId < end; destVertexId++)
     {
       if(m_ShouldCancel)
       {
+        m_Filter->sendThreadSafeProgressMessage(counter);
         return;
       }
 
       if(counter > increment)
       {
-        auto now = std::chrono::steady_clock::now();
-        if(std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime).count() > 1000)
-        {
-          m_Filter->sendThreadSafeProgressMessage(counter);
-          counter = 0;
-          startTime = std::chrono::steady_clock::now();
-        }
+        m_Filter->sendThreadSafeProgressMessage(counter);
+        counter = 0;
       }
 
       Vec3<float32> destVertexCoord = m_DestGeometry.getVertexCoordinate(destVertexId);
@@ -112,6 +109,7 @@ InterpolateValuesToUnstructuredGrid::InterpolateValuesToUnstructuredGrid(DataStr
 , m_InputValues(inputValues)
 , m_ShouldCancel(shouldCancel)
 , m_MessageHandler(mesgHandler)
+, m_Throttle(mesgHandler)
 {
 }
 
@@ -134,12 +132,17 @@ Result<> InterpolateValuesToUnstructuredGrid::operator()()
 
   // set up thread-safe messenger
   m_TotalElements = destGeometry.getNumberOfVertices();
+  m_Throttle.reset(m_TotalElements, "Calculating Closest Vertices");
 
   // Parallel algorithm to calculate closest vertices
   ParallelDataAlgorithm dataAlg;
   dataAlg.setRange(0ULL, static_cast<usize>(destGeometry.getNumberOfVertices()));
   dataAlg.execute(CalculateClosestVerticesImpl(this, srcGeometry, destGeometry, closestSrcIds, m_MessageHandler, m_ShouldCancel));
-  m_MessageHandler.sendInfoMessage("Calculating Closest Vertices || 100%");
+  if(m_ShouldCancel)
+  {
+    return {};
+  }
+  m_MessageHandler.sendProgressCount("Calculating Closest Vertices", m_TotalElements, m_TotalElements);
 
   DataPath interpolatedAttrMatrixPath;
   if(m_InputValues->UseExistingAttrMatrix)
@@ -151,20 +154,24 @@ Result<> InterpolateValuesToUnstructuredGrid::operator()()
     interpolatedAttrMatrixPath = m_InputValues->DestinationGeomPath.createChildPath(m_InputValues->CreatedAttrMatrixName);
   }
 
+  ProgressEstimator arrayEstimator;
   for(usize i = 0; i < m_InputValues->InputDataPaths.size(); i++)
   {
     const auto& dataPath = m_InputValues->InputDataPaths[i];
-    m_MessageHandler.sendInfoMessage(fmt::format("Interpolating \"{}\" Array Values || {}/{}", dataPath.getTargetName(), i + 1, m_InputValues->InputDataPaths.size()));
 
     if(m_ShouldCancel)
     {
       return {};
     }
 
+    m_MessageHandler.sendInfoMessage(fmt::format("Interpolating \"{}\" Array Values", dataPath.getTargetName()));
+
     const auto& srcDataArray = m_DataStructure.getDataRefAs<IDataArray>(dataPath);
     auto& destDataArray = m_DataStructure.getDataRefAs<IDataArray>(interpolatedAttrMatrixPath.createChildPath(dataPath.getTargetName()));
 
     ExecuteDataFunction(ExecuteInterpolation{}, srcDataArray.getDataType(), srcDataArray, destDataArray, closestSrcIds);
+
+    m_MessageHandler.sendProgressCount("Interpolating Array Values", i + 1, m_InputValues->InputDataPaths.size(), arrayEstimator.estimate(i + 1, m_InputValues->InputDataPaths.size()));
   }
 
   return {};
@@ -174,18 +181,5 @@ Result<> InterpolateValuesToUnstructuredGrid::operator()()
 void InterpolateValuesToUnstructuredGrid::sendThreadSafeProgressMessage(usize counter)
 {
   std::lock_guard<std::mutex> guard(m_ProgressMessage_Mutex);
-
-  m_ProgressCounter += counter;
-  auto now = std::chrono::steady_clock::now();
-  if(std::chrono::duration_cast<std::chrono::milliseconds>(now - m_InitialPoint).count() > 1000)
-  {
-    return;
-  }
-
-  auto progressInt = static_cast<usize>((static_cast<float32>(m_ProgressCounter) / static_cast<float32>(m_TotalElements)) * 100.0f);
-  std::string ss = fmt::format("Calculating Closest Vertices || {}%", progressInt);
-  m_MessageHandler.sendInfoMessage(ss);
-
-  m_LastProgressInt = progressInt;
-  m_InitialPoint = std::chrono::steady_clock::now();
+  m_Throttle.incrementPercent(counter);
 }

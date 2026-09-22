@@ -13,6 +13,8 @@
 #include "simplnx/Parameters/NumberParameter.hpp"
 #include "simplnx/Parameters/VectorParameter.hpp"
 #include "simplnx/Utilities/ImageRotationUtilities.hpp"
+#include "simplnx/Utilities/ProgressEstimator.hpp"
+#include "simplnx/Utilities/ThrottledMessageHandler.hpp"
 
 #include <Eigen/Dense>
 
@@ -59,11 +61,9 @@ private:
   const IFilter::MessageHandler& m_MessageHandler;
 
   // Thread safe Progress Message
-  std::chrono::steady_clock::time_point m_InitialPoint = std::chrono::steady_clock::now();
   mutable std::mutex m_ProgressMessage_Mutex;
-  size_t m_TotalElements = 0;
-  size_t m_ProgressCounter = 0;
-  size_t m_LastProgressInt = 0;
+  usize m_TotalElements = 0;
+  ThrottledMessageHandler m_Throttle;
 };
 
 } // namespace nx::core

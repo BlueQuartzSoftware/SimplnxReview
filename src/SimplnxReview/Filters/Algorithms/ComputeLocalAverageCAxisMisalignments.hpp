@@ -8,6 +8,7 @@
 #include "simplnx/Parameters/ArraySelectionParameter.hpp"
 #include "simplnx/Parameters/DataGroupSelectionParameter.hpp"
 #include "simplnx/Parameters/StringParameter.hpp"
+#include "simplnx/Utilities/ThrottledMessageHandler.hpp"
 
 namespace nx::core
 {
@@ -49,5 +50,6 @@ private:
   const ComputeLocalAverageCAxisMisalignmentsInputValues* m_InputValues = nullptr;
   const std::atomic_bool& m_ShouldCancel;
   const IFilter::MessageHandler& m_MessageHandler;
+  ThrottledMessageHandler m_Throttle;
 };
 } // namespace nx::core

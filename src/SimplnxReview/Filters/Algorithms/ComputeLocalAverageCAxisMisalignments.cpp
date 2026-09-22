@@ -18,9 +18,11 @@ template <class MisalignmentArguments = MisalignmentArguments<false, false>>
 class FindLocalAverageMisalignments
 {
 public:
-  FindLocalAverageMisalignments(const std::atomic_bool& shouldCancel, const Int32Array& featureParentIds, const Float32Array& avgCAxisMisalignments, Int32NeighborList& neighborList,
-                                Float32NeighborList& cAxisMisalignmentList, Int32Array& numFeaturesPerParent, Float32Array& unbiasedLocalCAxisMisalignments, Float32Array& localCAxisMisalignments)
+  FindLocalAverageMisalignments(const std::atomic_bool& shouldCancel, ThrottledMessageHandler& progressThrottle, const Int32Array& featureParentIds, const Float32Array& avgCAxisMisalignments,
+                                Int32NeighborList& neighborList, Float32NeighborList& cAxisMisalignmentList, Int32Array& numFeaturesPerParent, Float32Array& unbiasedLocalCAxisMisalignments,
+                                Float32Array& localCAxisMisalignments)
   : m_ShouldCancel(shouldCancel)
+  , m_Throttle(progressThrottle)
   , m_FeatureParentIds(featureParentIds)
   , m_AvgCAxisMisalignments(avgCAxisMisalignments)
   , m_NeighborList(neighborList)
@@ -50,12 +52,14 @@ public:
       numUnbiasedFeaturesPerParent.resize(numFeatures);
     }
 
+    m_Throttle.reset(numFeatures > 1 ? numFeatures - 1 : 0, "Computing Local Average CAxis Misalignments");
     for(usize i = 1; i < numFeatures; i++)
     {
       if(m_ShouldCancel)
       {
         return {};
       }
+      m_Throttle.updatePercent(i - 1);
 
       int32 parentId = m_FeatureParentIds[i];
       if constexpr(MisalignmentArguments::CalculatingUnbiasedAverage)
@@ -77,12 +81,14 @@ public:
       }
     }
 
+    m_Throttle.reset(newNumFeatures > 1 ? newNumFeatures - 1 : 0, "Normalizing Parent Misalignments");
     for(usize i = 1; i < newNumFeatures; i++)
     {
       if(m_ShouldCancel)
       {
         return {};
       }
+      m_Throttle.updatePercent(i - 1);
 
       if constexpr(MisalignmentArguments::CalculatingBiasedAverage)
       {
@@ -107,6 +113,7 @@ public:
 
 private:
   const std::atomic_bool& m_ShouldCancel;
+  ThrottledMessageHandler& m_Throttle;
 
   // Unmodified Arrays
   const Int32Array& m_FeatureParentIds;
@@ -128,6 +135,7 @@ ComputeLocalAverageCAxisMisalignments::ComputeLocalAverageCAxisMisalignments(Dat
 , m_InputValues(inputValues)
 , m_ShouldCancel(shouldCancel)
 , m_MessageHandler(mesgHandler)
+, m_Throttle(mesgHandler)
 {
 }
 
@@ -155,15 +163,15 @@ Result<> ComputeLocalAverageCAxisMisalignments::operator()()
   {
     if(m_InputValues->CalcUnbiasedAvg)
     {
-      return ::FindLocalAverageMisalignments<MisalignmentArguments<true, true>>(getCancel(), featureParentIds, avgCAxisMisalignments, neighborList, cAxisMisalignmentList, numFeaturesPerParent,
-                                                                                unbiasedLocalCAxisMisalignments, localCAxisMisalignments)();
+      return ::FindLocalAverageMisalignments<MisalignmentArguments<true, true>>(getCancel(), m_Throttle, featureParentIds, avgCAxisMisalignments, neighborList, cAxisMisalignmentList,
+                                                                                numFeaturesPerParent, unbiasedLocalCAxisMisalignments, localCAxisMisalignments)();
     }
-    return ::FindLocalAverageMisalignments<MisalignmentArguments<true, false>>(getCancel(), featureParentIds, avgCAxisMisalignments, neighborList, cAxisMisalignmentList, numFeaturesPerParent,
-                                                                               unbiasedLocalCAxisMisalignments, localCAxisMisalignments)();
+    return ::FindLocalAverageMisalignments<MisalignmentArguments<true, false>>(getCancel(), m_Throttle, featureParentIds, avgCAxisMisalignments, neighborList, cAxisMisalignmentList,
+                                                                               numFeaturesPerParent, unbiasedLocalCAxisMisalignments, localCAxisMisalignments)();
   }
 
   // Since we validate that at least one of the bool options is true in preflight we know that
   // by reaching this point in the logic we m_InputValues->CalcUnbiasedAvg must be true
-  return ::FindLocalAverageMisalignments<MisalignmentArguments<false, true>>(getCancel(), featureParentIds, avgCAxisMisalignments, neighborList, cAxisMisalignmentList, numFeaturesPerParent,
-                                                                             unbiasedLocalCAxisMisalignments, localCAxisMisalignments)();
+  return ::FindLocalAverageMisalignments<MisalignmentArguments<false, true>>(getCancel(), m_Throttle, featureParentIds, avgCAxisMisalignments, neighborList, cAxisMisalignmentList,
+                                                                             numFeaturesPerParent, unbiasedLocalCAxisMisalignments, localCAxisMisalignments)();
 }
