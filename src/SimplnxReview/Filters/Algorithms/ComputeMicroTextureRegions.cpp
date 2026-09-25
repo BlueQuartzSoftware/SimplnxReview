@@ -2,6 +2,7 @@
 
 #include "simplnx/DataStructure/DataArray.hpp"
 #include "simplnx/DataStructure/Geometry/ImageGeom.hpp"
+#include "simplnx/Utilities/ThrottledMessageHandler.hpp"
 
 #include <algorithm>
 
@@ -49,10 +50,17 @@ Result<> ComputeMicroTextureRegions::operator()()
 
   std::for_each(featureIds.begin(), featureIds.end(), [&microTextureRegionNumCells](const int32 id) mutable { microTextureRegionNumCells[id].inc(); });
 
+  ThrottledMessageHandler progressThrottle(m_MessageHandler);
+  progressThrottle.reset(zPoints, "Finding MicroTexture Region Bounds");
+
   float32 x, y, z;
   usize zStride, yStride;
   for(usize i = 0; i < zPoints; i++)
   {
+    if(m_ShouldCancel)
+    {
+      return {};
+    }
     zStride = i * xPoints * yPoints;
     for(usize j = 0; j < yPoints; j++)
     {
@@ -89,11 +97,17 @@ Result<> ComputeMicroTextureRegions::operator()()
         }
       }
     }
+    progressThrottle.updateCount(i + 1);
   }
 
   auto& microTextureRegionFractionOccupied = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->MicroTextureRegionFractionOccupiedArrayPath);
+  progressThrottle.reset(numMicroTextureRegions > 1 ? numMicroTextureRegions - 1 : 0, "Computing MicroTexture Region Fractions");
   for(usize i = 1; i < numMicroTextureRegions; i++)
   {
+    if(m_ShouldCancel)
+    {
+      return {};
+    }
     float32 xLength = (microTextureRegionXMaxs[i] - microTextureRegionXMins[i]) + spacing[0];
     float32 yLength = (microTextureRegionYMaxs[i] - microTextureRegionYMins[i]) + spacing[1];
     if(zPoints == 1)
@@ -107,6 +121,7 @@ Result<> ComputeMicroTextureRegions::operator()()
       float32 rectangleVolume = xLength * yLength;
       microTextureRegionFractionOccupied[i] = (static_cast<float32>(microTextureRegionNumCells[i]) * spacing[0] * spacing[1]) / rectangleVolume;
     }
+    progressThrottle.updateCount(i);
   }
 
   return {};

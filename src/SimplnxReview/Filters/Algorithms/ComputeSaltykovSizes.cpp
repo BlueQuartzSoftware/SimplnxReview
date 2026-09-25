@@ -2,6 +2,7 @@
 
 #include "simplnx/DataStructure/DataArray.hpp"
 #include "simplnx/DataStructure/DataGroup.hpp"
+#include "simplnx/Utilities/ThrottledMessageHandler.hpp"
 
 #include <random>
 
@@ -126,8 +127,17 @@ Result<> ComputeSaltykovSizes::operator()()
   // the feature eq dia.  But, it is important to note that the Saltykov eq dia
   // is not a direct transformation of the particular eq dia that it is matched
   // up with
+  ThrottledMessageHandler progressThrottle(m_MessageHandler);
+  usize fittingAttempt = 0;
   while(saltykovLength != numFeatures - 1)
   {
+    if(m_ShouldCancel)
+    {
+      return {};
+    }
+    fittingAttempt++;
+    progressThrottle.queueMessage("Fitting Saltykov bins: attempt {}, {} bins", fittingAttempt, numberOfBins);
+
     // find the bin length
     binLength = maxEqDia / static_cast<float32>(numberOfBins - 1);
 
@@ -260,8 +270,14 @@ Result<> ComputeSaltykovSizes::operator()()
     std::sort(saltykovEquivalentDiameters.begin(), saltykovEquivalentDiameters.end(), std::less<>());
 
     // this nested loop matches the Saltykov eq dia's with the feature eq dia's in ascending order
+    progressThrottle.reset(numFeatures > 1 ? numFeatures - 1 : 0, "Matching Saltykov Diameters");
     for(usize i = 1; i < numFeatures; i++)
     {
+      if(m_ShouldCancel)
+      {
+        return {};
+      }
+      progressThrottle.updatePercent(i - 1);
       for(usize j = 1; j < numFeatures; j++)
       {
         if(equivalentDiameters[j] == currentMinimum)
