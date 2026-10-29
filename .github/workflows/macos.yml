@@ -18,11 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-14
           - macos-15
         include:
-          - os: macos-14
-            preset: ci-macos-arm64
           - os: macos-15
             preset: ci-macos-arm64
     runs-on: ${{matrix.os}}
@@ -40,7 +37,6 @@ jobs:
             VCPKG_INSTALLATION_ROOT=${{github.workspace}}/vcpkg
             echo "$VCPKG_INSTALLATION_ROOT" >> $GITHUB_PATH
             echo "VCPKG_INSTALLATION_ROOT=$VCPKG_INSTALLATION_ROOT" >> "$GITHUB_ENV"
-        if: matrix.os == 'macos-14'
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
