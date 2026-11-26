@@ -113,7 +113,7 @@ IFilter::PreflightResult InterpolateValuesToUnstructuredGridFilter::preflightImp
                 MakeErrorResult<OutputActions>(-3002, fmt::format("The following DataArrays all must have equal numbers of tuples but this was not satisfied.\n{}", tupleValidityCheck.error()))};
   }
 
-  auto* destGeometry = dataStructure.getDataAs<INodeGeometry0D>(destGeomPath);
+  const auto* destGeometry = dataStructure.getDataAs<INodeGeometry0D>(destGeomPath);
 
   DataPath interpolatedAttrMatrixPath;
   if(useExistingAttrMatrix)
@@ -129,7 +129,7 @@ IFilter::PreflightResult InterpolateValuesToUnstructuredGridFilter::preflightImp
 
   for(const auto& inputDataPath : inputDataPaths)
   {
-    auto* inputArray = dataStructure.getDataAs<IDataArray>(inputDataPath);
+    const auto* inputArray = dataStructure.getDataAs<IDataArray>(inputDataPath);
     DataPath outputDataPath = interpolatedAttrMatrixPath.createChildPath(inputDataPath.getTargetName());
 
     auto createArrayAction = std::make_unique<CreateArrayAction>(inputArray->getDataType(), std::vector<usize>{destGeometry->getNumberOfVertices()}, std::vector<usize>{1}, outputDataPath);

@@ -92,7 +92,7 @@ IFilter::PreflightResult ComputeMicroTextureRegionsFilter::preflightImpl(const D
   nx::core::Result<OutputActions> resultOutputActions;
   std::vector<PreflightValue> preflightUpdatedValues;
 
-  auto* cellFeatureAM = dataStructure.getDataAs<AttributeMatrix>(pCellFeatureAttributeMatrixNameValue);
+  const auto* cellFeatureAM = dataStructure.getDataAs<AttributeMatrix>(pCellFeatureAttributeMatrixNameValue);
   {
     DataPath createArrayDataPath = pCellFeatureAttributeMatrixNameValue.createChildPath(pMicroTextureRegionFractionOccupiedArrayNameValue);
     // Create the face areas DataArray Action and store it into the resultOutputActions
