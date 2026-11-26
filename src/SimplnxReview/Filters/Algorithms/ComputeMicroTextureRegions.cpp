@@ -53,8 +53,11 @@ Result<> ComputeMicroTextureRegions::operator()()
   ThrottledMessageHandler progressThrottle(m_MessageHandler);
   progressThrottle.reset(zPoints, "Finding MicroTexture Region Bounds");
 
-  float32 x = NAN, y = NAN, z = NAN;
-  usize zStride = 0, yStride = 0;
+  float32 x = NAN;
+  float32 y = NAN;
+  float32 z = NAN;
+  usize zStride = 0;
+  usize yStride = 0;
   for(usize i = 0; i < zPoints; i++)
   {
     if(m_ShouldCancel)

@@ -170,7 +170,8 @@ Result<> MergeColonies::execute()
 
   int32 parentCount = 0;
   int32 featureSeed = 0;
-  int32 featureNeighborListSize = 0, nonContigNeighListSize = 0;
+  int32 featureNeighborListSize = 0;
+  int32 nonContigNeighListSize = 0;
   bool patchGrouping = false;
 
   while(featureSeed >= 0)

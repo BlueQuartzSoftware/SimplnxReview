@@ -66,12 +66,16 @@ Result<> ComputeSaltykovSizes::operator()()
   const int32 MaxAttempts = 10;
   const uint64 RandMaxFloat = 0xffffffff;
   // an initial guess of 10 bins is used
-  int32 numberOfBins = 10, numberOfBins1 = 0, numberOfBins2 = 20;
+  int32 numberOfBins = 10;
+  int32 numberOfBins1 = 0;
+  int32 numberOfBins2 = 20;
   // the second guess is 20 bins, after this, a forward difference will ensue
 
   float32 binLength = 0.0f;
   //  int32 iter = 0;
-  int32 saltykovLength = 0, saltykovLength1 = 0, saltykovLength2 = 0;
+  int32 saltykovLength = 0;
+  int32 saltykovLength1 = 0;
+  int32 saltykovLength2 = 0;
   int32 saltykovIndex = 1;
   int32 attempts = 0;
   int32 binToAddTo = 0;
