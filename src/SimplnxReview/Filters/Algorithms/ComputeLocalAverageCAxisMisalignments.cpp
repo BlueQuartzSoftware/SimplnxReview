@@ -10,8 +10,8 @@ namespace
 template <bool CalculateBiasedAverage, bool CalculateUnbiasedAverage>
 struct MisalignmentArguments
 {
-  static inline constexpr bool CalculatingBiasedAverage = CalculateBiasedAverage;
-  static inline constexpr bool CalculatingUnbiasedAverage = CalculateUnbiasedAverage;
+  static constexpr bool CalculatingBiasedAverage = CalculateBiasedAverage;
+  static constexpr bool CalculatingUnbiasedAverage = CalculateUnbiasedAverage;
 };
 
 template <class MisalignmentArguments = MisalignmentArguments<false, false>>
