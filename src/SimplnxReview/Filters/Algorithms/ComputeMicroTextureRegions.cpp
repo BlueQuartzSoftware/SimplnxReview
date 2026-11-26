@@ -19,7 +19,7 @@ ComputeMicroTextureRegions::ComputeMicroTextureRegions(DataStructure& dataStruct
 }
 
 // -----------------------------------------------------------------------------
-ComputeMicroTextureRegions::~ComputeMicroTextureRegions() noexcept = default;
+
 
 // -----------------------------------------------------------------------------
 const std::atomic_bool& ComputeMicroTextureRegions::getCancel()

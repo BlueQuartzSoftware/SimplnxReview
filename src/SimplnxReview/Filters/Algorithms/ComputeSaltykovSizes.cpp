@@ -47,7 +47,7 @@ ComputeSaltykovSizes::ComputeSaltykovSizes(DataStructure& dataStructure, const I
 }
 
 // -----------------------------------------------------------------------------
-ComputeSaltykovSizes::~ComputeSaltykovSizes() noexcept = default;
+
 
 // -----------------------------------------------------------------------------
 const std::atomic_bool& ComputeSaltykovSizes::getCancel()
