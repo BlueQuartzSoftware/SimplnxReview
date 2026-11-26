@@ -81,7 +81,7 @@ private:
   float32 m_AxisToleranceRad = 0.0;
   float32 m_AngleTolerance = 1.0;
 
-  std::mt19937_64 m_Generator = {};
-  std::uniform_real_distribution<float32> m_Distribution = {};
+  std::mt19937_64 m_Generator;
+  std::uniform_real_distribution<float32> m_Distribution;
 };
 } // namespace nx::core
