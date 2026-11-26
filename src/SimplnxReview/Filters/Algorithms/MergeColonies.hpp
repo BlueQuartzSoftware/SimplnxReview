@@ -63,9 +63,9 @@ protected:
   int getSeed(int32 newFid);
   bool determineGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid) const;
   Result<> execute();
-  static bool growPatch(int32 currentPatch);
-  static bool growGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid);
-  void characterize_colonies();
+  static bool GrowPatch(int32 currentPatch);
+  static bool GrowGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid);
+  void characterizeColonies();
 
 private:
   DataStructure& m_DataStructure;

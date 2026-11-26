@@ -92,18 +92,18 @@ IFilter::PreflightResult ComputeMicroTextureRegionsFilter::preflightImpl(const D
   nx::core::Result<OutputActions> resultOutputActions;
   std::vector<PreflightValue> preflightUpdatedValues;
 
-  const auto* cellFeatureAM = dataStructure.getDataAs<AttributeMatrix>(pCellFeatureAttributeMatrixNameValue);
+  const auto* cellFeatureAmPtr = dataStructure.getDataAs<AttributeMatrix>(pCellFeatureAttributeMatrixNameValue);
   {
     DataPath createArrayDataPath = pCellFeatureAttributeMatrixNameValue.createChildPath(pMicroTextureRegionFractionOccupiedArrayNameValue);
     // Create the face areas DataArray Action and store it into the resultOutputActions
-    auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::float32, cellFeatureAM->getShape(), std::vector<usize>{1}, createArrayDataPath);
+    auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::float32, cellFeatureAmPtr->getShape(), std::vector<usize>{1}, createArrayDataPath);
     resultOutputActions.value().appendAction(std::move(createArrayAction));
   }
 
   {
     DataPath createArrayDataPath = pCellFeatureAttributeMatrixNameValue.createChildPath(pMicroTextureRegionNumCellsArrayNameValue);
     // Create the face areas DataArray Action and store it into the resultOutputActions
-    auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::int32, cellFeatureAM->getShape(), std::vector<usize>{1}, createArrayDataPath);
+    auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::int32, cellFeatureAmPtr->getShape(), std::vector<usize>{1}, createArrayDataPath);
     resultOutputActions.value().appendAction(std::move(createArrayAction));
   }
 
@@ -132,7 +132,7 @@ Result<> ComputeMicroTextureRegionsFilter::executeImpl(DataStructure& dataStruct
 
 namespace
 {
-namespace SIMPL
+namespace simpl
 {
 constexpr StringLiteral k_CellFeatureAttributeMatrixNameKey = "CellFeatureAttributeMatrixName";
 constexpr StringLiteral k_MicroTextureRegionFractionOccupiedArrayNameKey = "MicroTextureRegionFractionOccupiedArrayName";
@@ -148,12 +148,12 @@ Result<Arguments> ComputeMicroTextureRegionsFilter::FromSIMPLJson(const nlohmann
   std::vector<Result<>> results;
 
   results.push_back(
-      SIMPLConversion::ConvertParameter<SIMPLConversion::DataContainerSelectionFilterParameterConverter>(args, json, SIMPL::k_CellFeatureAttributeMatrixNameKey, k_CellFeatureAttributeMatrixPath_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, SIMPL::k_MicroTextureRegionFractionOccupiedArrayNameKey,
+      SIMPLConversion::ConvertParameter<SIMPLConversion::DataContainerSelectionFilterParameterConverter>(args, json, simpl::k_CellFeatureAttributeMatrixNameKey, k_CellFeatureAttributeMatrixPath_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, simpl::k_MicroTextureRegionFractionOccupiedArrayNameKey,
                                                                                                                    k_MicroTextureRegionFractionOccupiedArrayName_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, SIMPL::k_MicroTextureRegionNumCellsArrayNameKey,
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, simpl::k_MicroTextureRegionNumCellsArrayNameKey,
                                                                                                                    k_MicroTextureRegionNumCellsArrayName_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_FeatureIdsArrayPathKey, k_FeatureIdsArrayPath_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_FeatureIdsArrayPathKey, k_FeatureIdsArrayPath_Key));
 
   Result<> conversionResult = MergeResults(std::move(results));
 

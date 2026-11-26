@@ -113,7 +113,7 @@ IFilter::PreflightResult InterpolateValuesToUnstructuredGridFilter::preflightImp
                 MakeErrorResult<OutputActions>(-3002, fmt::format("The following DataArrays all must have equal numbers of tuples but this was not satisfied.\n{}", tupleValidityCheck.error()))};
   }
 
-  const auto* destGeometry = dataStructure.getDataAs<INodeGeometry0D>(destGeomPath);
+  const auto* destGeometryPtr = dataStructure.getDataAs<INodeGeometry0D>(destGeomPath);
 
   DataPath interpolatedAttrMatrixPath;
   if(useExistingAttrMatrix)
@@ -123,16 +123,16 @@ IFilter::PreflightResult InterpolateValuesToUnstructuredGridFilter::preflightImp
   else
   {
     interpolatedAttrMatrixPath = destGeomPath.createChildPath(createdAttrMatrixName);
-    auto createAttrMatrixAction = std::make_unique<CreateAttributeMatrixAction>(interpolatedAttrMatrixPath, std::vector<usize>{destGeometry->getNumberOfVertices()});
+    auto createAttrMatrixAction = std::make_unique<CreateAttributeMatrixAction>(interpolatedAttrMatrixPath, std::vector<usize>{destGeometryPtr->getNumberOfVertices()});
     actions.appendAction(std::move(createAttrMatrixAction));
   }
 
   for(const auto& inputDataPath : inputDataPaths)
   {
-    const auto* inputArray = dataStructure.getDataAs<IDataArray>(inputDataPath);
+    const auto* inputArrayPtr = dataStructure.getDataAs<IDataArray>(inputDataPath);
     DataPath outputDataPath = interpolatedAttrMatrixPath.createChildPath(inputDataPath.getTargetName());
 
-    auto createArrayAction = std::make_unique<CreateArrayAction>(inputArray->getDataType(), std::vector<usize>{destGeometry->getNumberOfVertices()}, std::vector<usize>{1}, outputDataPath);
+    auto createArrayAction = std::make_unique<CreateArrayAction>(inputArrayPtr->getDataType(), std::vector<usize>{destGeometryPtr->getNumberOfVertices()}, std::vector<usize>{1}, outputDataPath);
     actions.appendAction(std::move(createArrayAction));
   }
 
@@ -155,13 +155,11 @@ Result<> InterpolateValuesToUnstructuredGridFilter::executeImpl(DataStructure& d
   return InterpolateValuesToUnstructuredGrid(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }
 
-namespace
-{
-namespace SIMPL
-{
 
-} // namespace SIMPL
-} // namespace
+
+
+
+
 
 Result<Arguments> InterpolateValuesToUnstructuredGridFilter::FromSIMPLJson(const nlohmann::json& /*json*/)
 {

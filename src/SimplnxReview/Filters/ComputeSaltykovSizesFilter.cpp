@@ -92,9 +92,9 @@ IFilter::PreflightResult ComputeSaltykovSizesFilter::preflightImpl(const DataStr
   std::vector<PreflightValue> preflightUpdatedValues;
 
   DataPath saltykovPath = pEquivalentDiametersArrayPathValue.replaceName(pSaltykovEquivalentDiametersNameValue);
-  const auto* equivDiams = dataStructure.getDataAs<IDataArray>(pEquivalentDiametersArrayPathValue);
+  const auto* equivDiamsPtr = dataStructure.getDataAs<IDataArray>(pEquivalentDiametersArrayPathValue);
   {
-    auto createArrayAction = std::make_unique<CreateArrayAction>(DataType::float32, equivDiams->getTupleShape(), std::vector<usize>{1}, saltykovPath);
+    auto createArrayAction = std::make_unique<CreateArrayAction>(DataType::float32, equivDiamsPtr->getTupleShape(), std::vector<usize>{1}, saltykovPath);
     resultOutputActions.value().appendAction(std::move(createArrayAction));
   }
 
@@ -125,7 +125,7 @@ Result<> ComputeSaltykovSizesFilter::executeImpl(DataStructure& dataStructure, c
 
 namespace
 {
-namespace SIMPL
+namespace simpl
 {
 constexpr StringLiteral k_EquivalentDiametersArrayPathKey = "EquivalentDiametersArrayPath";
 constexpr StringLiteral k_SaltykovEquivalentDiametersArrayPathKey = "SaltykovEquivalentDiametersArrayPath";
@@ -139,8 +139,8 @@ Result<Arguments> ComputeSaltykovSizesFilter::FromSIMPLJson(const nlohmann::json
   std::vector<Result<>> results;
 
   results.push_back(
-      SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_EquivalentDiametersArrayPathKey, k_EquivalentDiametersArrayPath_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArrayCreationToDataObjectNameFilterParameterConverter>(args, json, SIMPL::k_SaltykovEquivalentDiametersArrayPathKey,
+      SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_EquivalentDiametersArrayPathKey, k_EquivalentDiametersArrayPath_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArrayCreationToDataObjectNameFilterParameterConverter>(args, json, simpl::k_SaltykovEquivalentDiametersArrayPathKey,
                                                                                                                                   k_SaltykovEquivalentDiametersName_Key));
 
   Result<> conversionResult = MergeResults(std::move(results));

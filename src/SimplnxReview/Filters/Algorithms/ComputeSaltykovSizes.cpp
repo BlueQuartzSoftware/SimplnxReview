@@ -13,7 +13,7 @@ namespace
 {
 // the below is formal Saltykov method of spheres with the formal variable names and 12 Saltykov coefficients.  It was decided
 // that any further contributions from the coefficients is negligible
-constexpr std::array<float64, 12> saltyCoefficients = {1.6461, -0.4561, -0.1162, -0.0415, -0.0173, -0.0079, -0.0038, -0.0018, -0.0010, -0.0003, -0.0002, -0.0002};
+constexpr std::array<float64, 12> k_SaltyCoefficients = {1.6461, -0.4561, -0.1162, -0.0415, -0.0173, -0.0079, -0.0038, -0.0018, -0.0010, -0.0003, -0.0002, -0.0002};
 
 int32 DoSaltykov(std::vector<int32> nA, float32 DMax, int32 k)
 {
@@ -21,7 +21,7 @@ int32 DoSaltykov(std::vector<int32> nA, float32 DMax, int32 k)
   float64 temp1 = 0.0;
   while((i < 12) && ((k - i) > 0))
   {
-    temp1 += saltyCoefficients[i + 1 - 1] * float64(nA[k - i - 1]);
+    temp1 += k_SaltyCoefficients[i + 1 - 1] * float64(nA[k - i - 1]);
     i++;
   }
 
@@ -62,10 +62,10 @@ Result<> ComputeSaltykovSizes::operator()()
   std::uniform_int_distribution<int32> dist(std::numeric_limits<int32>::min(), std::numeric_limits<int32>::max());
 
   const auto& equivalentDiameters = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->EquivalentDiametersPath);
-  auto& m_SaltykovEquivalentDiameters = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->SaltykovEquivalentDiametersPath);
+  auto& mSaltykovEquivalentDiameters = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->SaltykovEquivalentDiametersPath);
 
-  const int32 MaxAttempts = 10;
-  const uint64 RandMaxFloat = 0xffffffff;
+  const int32 maxAttempts = 10;
+  const uint64 randMaxFloat = 0xffffffff;
   // an initial guess of 10 bins is used
   int32 numberOfBins = 10;
   int32 numberOfBins1 = 0;
@@ -196,7 +196,7 @@ Result<> ComputeSaltykovSizes::operator()()
     {
       // better minimum formula
       difference = saltykovLength - (numFeatures - 1);
-      if(attempts >= MaxAttempts && difference < 0)
+      if(attempts >= maxAttempts && difference < 0)
       {
         for(int32 i = 0; i > difference; i--)
         {
@@ -258,7 +258,7 @@ Result<> ComputeSaltykovSizes::operator()()
       {
         // generate a random float between the current bin extents
         randomLong = dist(gen);
-        randomFraction = (float64(randomLong) / float64(RandMaxFloat));
+        randomFraction = (float64(randomLong) / float64(randMaxFloat));
         saltykovEquivalentDiameters[saltykovIndex] = float32(randomFraction) * binLength + float32(i) * binLength;
         saltykovIndex++;
       }
@@ -280,7 +280,7 @@ Result<> ComputeSaltykovSizes::operator()()
       {
         if(equivalentDiameters[j] == currentMinimum)
         {
-          m_SaltykovEquivalentDiameters[j] = saltykovEquivalentDiameters[i - 1];
+          mSaltykovEquivalentDiameters[j] = saltykovEquivalentDiameters[i - 1];
         }
         if(equivalentDiameters[j] > currentMinimum && equivalentDiameters[j] < nextMinimum)
         {

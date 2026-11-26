@@ -61,7 +61,7 @@ private:
   const IFilter::MessageHandler& m_MessageHandler;
 
   // Thread safe Progress Message
-  mutable std::mutex m_ProgressMessage_Mutex;
+  mutable std::mutex m_ProgressMessageMutex;
   usize m_TotalElements = 0;
   ThrottledMessageHandler m_Throttle;
 };
