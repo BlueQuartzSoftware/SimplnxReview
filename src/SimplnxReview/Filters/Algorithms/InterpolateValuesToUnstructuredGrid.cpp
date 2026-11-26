@@ -56,7 +56,7 @@ public:
       }
 
       Vec3<float32> destVertexCoord = m_DestGeometry.getVertexCoordinate(destVertexId);
-      usize closestVertexId;
+      usize closestVertexId = 0;
       float32 closestDist = std::numeric_limits<float32>::max();
       for(usize srcVertexId = 0; srcVertexId < m_SrcGeometry.getNumberOfVertices(); srcVertexId++)
       {

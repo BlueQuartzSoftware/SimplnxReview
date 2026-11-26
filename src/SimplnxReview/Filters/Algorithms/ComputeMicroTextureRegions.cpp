@@ -5,6 +5,7 @@
 #include "simplnx/Utilities/ThrottledMessageHandler.hpp"
 
 #include <algorithm>
+#include <cmath>
 
 using namespace nx::core;
 
@@ -53,8 +54,8 @@ Result<> ComputeMicroTextureRegions::operator()()
   ThrottledMessageHandler progressThrottle(m_MessageHandler);
   progressThrottle.reset(zPoints, "Finding MicroTexture Region Bounds");
 
-  float32 x, y, z;
-  usize zStride, yStride;
+  float32 x = NAN, y = NAN, z = NAN;
+  usize zStride = 0, yStride = 0;
   for(usize i = 0; i < zPoints; i++)
   {
     if(m_ShouldCancel)
