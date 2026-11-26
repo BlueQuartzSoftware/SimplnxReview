@@ -48,7 +48,6 @@ ComputeSaltykovSizes::ComputeSaltykovSizes(DataStructure& dataStructure, const I
 
 // -----------------------------------------------------------------------------
 
-
 // -----------------------------------------------------------------------------
 const std::atomic_bool& ComputeSaltykovSizes::getCancel()
 {

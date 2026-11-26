@@ -103,13 +103,14 @@ IFilter::PreflightResult InterpolateValuesToUnstructuredGridFilter::preflightImp
 
   if(inputDataPaths.empty())
   {
-    return {.outputActions=MakeErrorResult<OutputActions>(-3000, "There are no attribute arrays to interpolate.  Please select at least one attribute array to interpolate.")};
+    return {.outputActions = MakeErrorResult<OutputActions>(-3000, "There are no attribute arrays to interpolate.  Please select at least one attribute array to interpolate.")};
   }
 
   auto tupleValidityCheck = dataStructure.validateNumberOfTuples(inputDataPaths);
   if(!tupleValidityCheck)
   {
-    return {.outputActions=MakeErrorResult<OutputActions>(-3002, fmt::format("The following DataArrays all must have equal numbers of tuples but this was not satisfied.\n{}", tupleValidityCheck.error()))};
+    return {.outputActions =
+                MakeErrorResult<OutputActions>(-3002, fmt::format("The following DataArrays all must have equal numbers of tuples but this was not satisfied.\n{}", tupleValidityCheck.error()))};
   }
 
   auto* destGeometry = dataStructure.getDataAs<INodeGeometry0D>(destGeomPath);

@@ -21,7 +21,6 @@ ComputeMicroTextureRegions::ComputeMicroTextureRegions(DataStructure& dataStruct
 
 // -----------------------------------------------------------------------------
 
-
 // -----------------------------------------------------------------------------
 const std::atomic_bool& ComputeMicroTextureRegions::getCancel()
 {
