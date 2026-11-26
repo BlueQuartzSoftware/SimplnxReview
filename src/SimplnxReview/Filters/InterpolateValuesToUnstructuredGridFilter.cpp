@@ -155,12 +155,6 @@ Result<> InterpolateValuesToUnstructuredGridFilter::executeImpl(DataStructure& d
   return InterpolateValuesToUnstructuredGrid(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }
 
-
-
-
-
-
-
 Result<Arguments> InterpolateValuesToUnstructuredGridFilter::FromSIMPLJson(const nlohmann::json& /*json*/)
 {
   Arguments args = InterpolateValuesToUnstructuredGridFilter().getDefaultArguments();

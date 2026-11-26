@@ -138,7 +138,7 @@ constexpr StringLiteral k_CellFeatureAttributeMatrixNameKey = "CellFeatureAttrib
 constexpr StringLiteral k_MicroTextureRegionFractionOccupiedArrayNameKey = "MicroTextureRegionFractionOccupiedArrayName";
 constexpr StringLiteral k_MicroTextureRegionNumCellsArrayNameKey = "MicroTextureRegionNumCellsArrayName";
 constexpr StringLiteral k_FeatureIdsArrayPathKey = "FeatureIdsArrayPath";
-} // namespace SIMPL
+} // namespace simpl
 } // namespace
 
 Result<Arguments> ComputeMicroTextureRegionsFilter::FromSIMPLJson(const nlohmann::json& json)

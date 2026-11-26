@@ -32,13 +32,18 @@ const float64 k_Unit111 = std::numbers::inv_sqrt3;
 const float64 k_Unit1121 = 1.0 / std::sqrt(6.0);
 const float64 k_Unit1122 = 2.0 / std::sqrt(6.0);
 
-std::vector<ebsdlib::Matrix3X3D> CrystalDirections = {
-    {k_Unit111, k_Unit1121, k_Unit110, -k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, -k_Unit1122, 0}, {-k_Unit111, k_Unit1121, k_Unit110, k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, k_Unit1122, 0},
-    {k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, -k_Unit1121, -k_Unit110, k_Unit111, k_Unit1122, 0}, {k_Unit111, k_Unit1121, k_Unit110, k_Unit111, k_Unit1121, -k_Unit110, -k_Unit111, k_Unit1122, 0},
-    {k_Unit111, k_Unit1121, k_Unit110, k_Unit111, -k_Unit1122, 0, k_Unit111, k_Unit1121, -k_Unit110},  {k_Unit111, -k_Unit1121, k_Unit110, -k_Unit111, -k_Unit1122, 0, k_Unit111, -k_Unit1121, -k_Unit110},
-    {k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, k_Unit1122, 0, -k_Unit111, k_Unit1121, k_Unit110},  {-k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, -k_Unit1122, 0, k_Unit111, k_Unit1121, k_Unit110},
-    {k_Unit111, -k_Unit1122, 0, k_Unit111, k_Unit1121, k_Unit110, -k_Unit111, -k_Unit1121, k_Unit110}, {k_Unit111, k_Unit1122, 0, -k_Unit111, k_Unit1121, k_Unit110, k_Unit111, -k_Unit1121, k_Unit110},
-    {k_Unit111, k_Unit1122, 0, k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, -k_Unit1121, -k_Unit110}, {-k_Unit111, k_Unit1122, 0, k_Unit111, k_Unit1121, k_Unit110, k_Unit111, k_Unit1121, -k_Unit110}};
+std::vector<ebsdlib::Matrix3X3D> CrystalDirections = {{k_Unit111, k_Unit1121, k_Unit110, -k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, -k_Unit1122, 0},
+                                                      {-k_Unit111, k_Unit1121, k_Unit110, k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, k_Unit1122, 0},
+                                                      {k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, -k_Unit1121, -k_Unit110, k_Unit111, k_Unit1122, 0},
+                                                      {k_Unit111, k_Unit1121, k_Unit110, k_Unit111, k_Unit1121, -k_Unit110, -k_Unit111, k_Unit1122, 0},
+                                                      {k_Unit111, k_Unit1121, k_Unit110, k_Unit111, -k_Unit1122, 0, k_Unit111, k_Unit1121, -k_Unit110},
+                                                      {k_Unit111, -k_Unit1121, k_Unit110, -k_Unit111, -k_Unit1122, 0, k_Unit111, -k_Unit1121, -k_Unit110},
+                                                      {k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, k_Unit1122, 0, -k_Unit111, k_Unit1121, k_Unit110},
+                                                      {-k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, -k_Unit1122, 0, k_Unit111, k_Unit1121, k_Unit110},
+                                                      {k_Unit111, -k_Unit1122, 0, k_Unit111, k_Unit1121, k_Unit110, -k_Unit111, -k_Unit1121, k_Unit110},
+                                                      {k_Unit111, k_Unit1122, 0, -k_Unit111, k_Unit1121, k_Unit110, k_Unit111, -k_Unit1121, k_Unit110},
+                                                      {k_Unit111, k_Unit1122, 0, k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, -k_Unit1121, -k_Unit110},
+                                                      {-k_Unit111, k_Unit1122, 0, k_Unit111, k_Unit1121, k_Unit110, k_Unit111, k_Unit1121, -k_Unit110}};
 
 // -----------------------------------------------------------------------------
 //

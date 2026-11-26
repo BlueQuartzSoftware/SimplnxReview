@@ -129,7 +129,7 @@ namespace simpl
 {
 constexpr StringLiteral k_EquivalentDiametersArrayPathKey = "EquivalentDiametersArrayPath";
 constexpr StringLiteral k_SaltykovEquivalentDiametersArrayPathKey = "SaltykovEquivalentDiametersArrayPath";
-} // namespace SIMPL
+} // namespace simpl
 } // namespace
 
 Result<Arguments> ComputeSaltykovSizesFilter::FromSIMPLJson(const nlohmann::json& json)

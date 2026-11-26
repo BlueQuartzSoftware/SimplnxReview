@@ -265,7 +265,7 @@ constexpr StringLiteral k_NeighborListArrayPathKey = "NeighborListArrayPath";
 constexpr StringLiteral k_NumFeaturesPerParentArrayNameKey = "NumFeaturesPerParentArrayName";
 constexpr StringLiteral k_NewCellFeatureAttributeMatrixNameKey = "NewCellFeatureAttributeMatrixName";
 constexpr StringLiteral k_UnbiasedLocalCAxisMisalignmentsArrayNameKey = "UnbiasedLocalCAxisMisalignmentsArrayName";
-} // namespace SIMPL
+} // namespace simpl
 } // namespace
 
 Result<Arguments> ComputeLocalAverageCAxisMisalignmentsFilter::FromSIMPLJson(const nlohmann::json& json)

@@ -218,7 +218,7 @@ constexpr StringLiteral k_FeaturePhasesArrayPathKey = "FeaturePhasesArrayPath";
 constexpr StringLiteral k_NewCellFeatureAttributeMatrixNameKey = "NewCellFeatureAttributeMatrixName";
 constexpr StringLiteral k_NonContiguousNeighborListArrayPathKey = "NonContiguousNeighborListArrayPath";
 constexpr StringLiteral k_UseNonContiguousNeighborsKey = "UseNonContiguousNeighbors";
-} // namespace SIMPL
+} // namespace simpl
 } // namespace
 
 Result<Arguments> MergeColoniesFilter::FromSIMPLJson(const nlohmann::json& json)
