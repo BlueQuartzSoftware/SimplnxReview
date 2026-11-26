@@ -1,4 +1,4 @@
-# nxcleanup completed P2b
+# nxcleanup completed P2c
 # Shared BlueQuartz clang-tidy configuration (simplnx, SimplnxOoc, SimplnxReview, DREAM3DNX).
 # Only HeaderFilterRegex and the macro allowlist differ between repositories.
 #
@@ -27,12 +27,7 @@
 # nxcleanup P4 check cppcoreguidelines-special-member-functions
 # nxcleanup P2b check modernize-use-designated-initializers
 # nxcleanup P2c check modernize-use-ranges
-# nxcleanup P2c check modernize-use-std-numbers
 # nxcleanup P4 check readability-identifier-length
-# nxcleanup P2c check readability-isolate-declaration
-# nxcleanup P2c check readability-qualified-auto
-# nxcleanup P2c check readability-redundant-casting
-# nxcleanup P2c check readability-use-std-min-max
 # nxcleanup P4 naming-kind ConstexprVariable
 # nxcleanup P4 naming-kind Function
 # nxcleanup P4 naming-kind GlobalConstant
@@ -56,7 +51,7 @@ Checks: -abseil-*, bugprone-*, -bugprone-easily-swappable-parameters, -boost-*, 
   -modernize-use-nodiscard, -modernize-use-auto, -mpi-*, -objc-*, -openmp-*, performance-*,
   -performance-enum-size, -portability-*, readability-*, -readability-function-cognitive-complexity,
   -readability-function-size, -readability-math-missing-parentheses, -readability-uppercase-literal-suffix,
-  -readability-magic-numbers,-bugprone-chained-comparison,-bugprone-implicit-widening-of-multiplication-result,-bugprone-narrowing-conversions,-clang-analyzer-deadcode.DeadStores,-cppcoreguidelines-avoid-do-while,-cppcoreguidelines-avoid-non-const-global-variables,-cppcoreguidelines-narrowing-conversions,-cppcoreguidelines-special-member-functions,-modernize-use-designated-initializers,-modernize-use-ranges,-modernize-use-std-numbers,-readability-identifier-length,-readability-isolate-declaration,-readability-qualified-auto,-readability-redundant-casting,-readability-use-std-min-max,-misc-const-correctness,-misc-include-cleaner
+  -readability-magic-numbers,-bugprone-chained-comparison,-bugprone-implicit-widening-of-multiplication-result,-bugprone-narrowing-conversions,-clang-analyzer-deadcode.DeadStores,-cppcoreguidelines-avoid-do-while,-cppcoreguidelines-avoid-non-const-global-variables,-cppcoreguidelines-narrowing-conversions,-cppcoreguidelines-special-member-functions,-modernize-use-designated-initializers,-modernize-use-ranges,-readability-identifier-length,-misc-const-correctness,-misc-include-cleaner
 WarningsAsErrors: '*'
 HeaderFilterRegex: .*/SimplnxReview/(src|test|wrapping)/.*\.(h|hpp)$
 ExcludeHeaderFilterRegex: .*/3rd[Pp]arty/.*
