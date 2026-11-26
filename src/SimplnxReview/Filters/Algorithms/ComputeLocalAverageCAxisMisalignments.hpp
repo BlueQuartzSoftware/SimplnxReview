@@ -14,8 +14,8 @@ namespace nx::core
 {
 struct SIMPLNXREVIEW_EXPORT ComputeLocalAverageCAxisMisalignmentsInputValues
 {
-  bool CalcBiasedAvg;
-  bool CalcUnbiasedAvg;
+  bool CalcBiasedAvg{};
+  bool CalcUnbiasedAvg{};
   DataPath NeighborListPath;
   DataPath CAxisMisalignmentListPath;
   DataPath AvgCAxisMisalignmentsPath;

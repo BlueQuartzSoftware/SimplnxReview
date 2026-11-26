@@ -26,7 +26,7 @@ struct SIMPLNXREVIEW_EXPORT InterpolateValuesToUnstructuredGridInputValues
   DataPath SourceGeomPath;
   DataPath DestinationGeomPath;
   std::vector<DataPath> InputDataPaths;
-  bool UseExistingAttrMatrix;
+  bool UseExistingAttrMatrix{};
   DataPath ExistingAttrMatrixPath;
   std::string CreatedAttrMatrixName;
 };

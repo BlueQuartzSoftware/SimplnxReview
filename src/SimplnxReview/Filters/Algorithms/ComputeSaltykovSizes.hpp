@@ -15,7 +15,7 @@ struct SIMPLNXREVIEW_EXPORT ComputeSaltykovSizesInputValues
 {
   DataPath EquivalentDiametersPath;
   DataPath SaltykovEquivalentDiametersPath;
-  uint64 Seed;
+  uint64 Seed{};
 };
 
 /**

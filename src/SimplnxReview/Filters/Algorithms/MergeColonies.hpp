@@ -19,12 +19,12 @@ namespace nx::core
 {
 struct SIMPLNXREVIEW_EXPORT MergeColoniesInputValues
 {
-  bool UseNonContiguousNeighbors;
+  bool UseNonContiguousNeighbors{};
   DataPath NonContiguousNeighborListArrayPath;
   DataPath ContiguousNeighborListArrayPath;
   bool m_PatchGrouping = false;
-  float32 AxisTolerance;
-  float32 AngleTolerance;
+  float32 AxisTolerance{};
+  float32 AngleTolerance{};
   DataPath FeaturePhasesPath;
   DataPath AvgQuatsPath;
   DataPath FeatureIdsPath;
@@ -34,7 +34,7 @@ struct SIMPLNXREVIEW_EXPORT MergeColoniesInputValues
   DataPath CellFeatureAMPath;
   DataPath FeatureParentIdsPath;
   DataPath ActivePath;
-  uint64 SeedValue;
+  uint64 SeedValue{};
   bool RandomizeParentIds = true;
 };
 
