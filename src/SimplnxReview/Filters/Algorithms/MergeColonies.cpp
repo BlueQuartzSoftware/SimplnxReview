@@ -27,8 +27,8 @@ using LaueOpsContainer = std::vector<LaueOpsShPtrType>;
 
 namespace
 {
-const float64 unit110 = 1.0 / std::sqrt(2.0);
-const float64 unit111 = 1.0 / std::sqrt(3.0);
+const float64 unit110 = 1.0 / std::numbers::sqrt2;
+const float64 unit111 = std::numbers::inv_sqrt3;
 const float64 unit112_1 = 1.0 / std::sqrt(6.0);
 const float64 unit112_2 = 2.0 / std::sqrt(6.0);
 
