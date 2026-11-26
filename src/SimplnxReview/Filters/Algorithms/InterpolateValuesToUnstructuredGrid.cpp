@@ -136,7 +136,7 @@ Result<> InterpolateValuesToUnstructuredGrid::operator()()
 
   // Parallel algorithm to calculate closest vertices
   ParallelDataAlgorithm dataAlg;
-  dataAlg.setRange(0ULL, static_cast<usize>(destGeometry.getNumberOfVertices()));
+  dataAlg.setRange(0ULL, destGeometry.getNumberOfVertices());
   dataAlg.execute(CalculateClosestVerticesImpl(this, srcGeometry, destGeometry, closestSrcIds, m_MessageHandler, m_ShouldCancel));
   if(m_ShouldCancel)
   {
