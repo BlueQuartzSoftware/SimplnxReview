@@ -11,6 +11,7 @@
 #include "EbsdLib/Core/Orientation.hpp"
 #include "EbsdLib/Orientation/Quaternion.hpp"
 
+#include <algorithm>
 #include <cmath>
 
 using namespace nx::core;
@@ -308,10 +309,7 @@ Result<> MergeColonies::operator()()
     }
     int32 featurename = featureIds[k];
     cellParentIds[k] = m_FeatureParentIds[featurename];
-    if(m_FeatureParentIds[featurename] > numParents)
-    {
-      numParents = m_FeatureParentIds[featurename];
-    }
+    numParents = std::max<int>(m_FeatureParentIds[featurename], numParents);
   }
   numParents += 1;
 

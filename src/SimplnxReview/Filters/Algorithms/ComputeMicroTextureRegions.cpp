@@ -74,30 +74,12 @@ Result<> ComputeMicroTextureRegions::operator()()
         x = static_cast<float32>(k) * spacing[0];
         y = static_cast<float32>(j) * spacing[1];
         z = static_cast<float32>(i) * spacing[2];
-        if(x > microTextureRegionXMaxs[mtNum])
-        {
-          microTextureRegionXMaxs[mtNum] = x;
-        }
-        if(y > microTextureRegionYMaxs[mtNum])
-        {
-          microTextureRegionYMaxs[mtNum] = y;
-        }
-        if(z > microTextureRegionZMaxs[mtNum])
-        {
-          microTextureRegionZMaxs[mtNum] = z;
-        }
-        if(x < microTextureRegionXMins[mtNum])
-        {
-          microTextureRegionXMins[mtNum] = x;
-        }
-        if(y < microTextureRegionYMins[mtNum])
-        {
-          microTextureRegionYMins[mtNum] = y;
-        }
-        if(z < microTextureRegionZMins[mtNum])
-        {
-          microTextureRegionZMins[mtNum] = z;
-        }
+        microTextureRegionXMaxs[mtNum] = std::max(x, microTextureRegionXMaxs[mtNum]);
+        microTextureRegionYMaxs[mtNum] = std::max(y, microTextureRegionYMaxs[mtNum]);
+        microTextureRegionZMaxs[mtNum] = std::max(z, microTextureRegionZMaxs[mtNum]);
+        microTextureRegionXMins[mtNum] = std::min(x, microTextureRegionXMins[mtNum]);
+        microTextureRegionYMins[mtNum] = std::min(y, microTextureRegionYMins[mtNum]);
+        microTextureRegionZMins[mtNum] = std::min(z, microTextureRegionZMins[mtNum]);
       }
     }
     progressThrottle.updateCount(i + 1);

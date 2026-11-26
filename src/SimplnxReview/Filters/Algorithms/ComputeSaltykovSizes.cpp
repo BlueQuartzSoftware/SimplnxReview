@@ -4,6 +4,7 @@
 #include "simplnx/DataStructure/DataGroup.hpp"
 #include "simplnx/Utilities/ThrottledMessageHandler.hpp"
 
+#include <algorithm>
 #include <random>
 
 using namespace nx::core;
@@ -172,10 +173,7 @@ Result<> ComputeSaltykovSizes::operator()()
     {
       saltykovBinLengths[i - 1] = DoSaltykov(binLengths, maxEqDia, i);
 
-      if(saltykovBinLengths[i - 1] < 0)
-      {
-        saltykovBinLengths[i - 1] = 0;
-      }
+      saltykovBinLengths[i - 1] = std::max(saltykovBinLengths[i - 1], 0);
 
       saltykovLength += saltykovBinLengths[i - 1];
     }
@@ -240,10 +238,7 @@ Result<> ComputeSaltykovSizes::operator()()
         }
 
         // in case the number of bins is less than 1
-        if(numberOfBins < 1)
-        {
-          numberOfBins = 1;
-        }
+        numberOfBins = std::max(numberOfBins, 1);
 
         binLengths.resize(numberOfBins);
         saltykovBinLengths.resize(numberOfBins);
