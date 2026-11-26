@@ -110,8 +110,8 @@ IFilter::VersionType ComputeLocalAverageCAxisMisalignmentsFilter::parametersVers
 }
 
 //------------------------------------------------------------------------------
-IFilter::PreflightResult ComputeLocalAverageCAxisMisalignmentsFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler&  /*messageHandler*/,
-                                                                                    const std::atomic_bool&  /*shouldCancel*/, const ExecutionContext&  /*executionContext*/) const
+IFilter::PreflightResult ComputeLocalAverageCAxisMisalignmentsFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& /*messageHandler*/,
+                                                                                    const std::atomic_bool& /*shouldCancel*/, const ExecutionContext& /*executionContext*/) const
 {
   auto pCalcBiasedAvgValue = filterArgs.value<bool>(k_CalcBiasedAvg_Key);
   auto pCalcUnbiasedAvgValue = filterArgs.value<bool>(k_CalcUnbiasedAvg_Key);
@@ -213,8 +213,8 @@ IFilter::PreflightResult ComputeLocalAverageCAxisMisalignmentsFilter::preflightI
 }
 
 //------------------------------------------------------------------------------
-Result<> ComputeLocalAverageCAxisMisalignmentsFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter*  /*pipelineNode*/, const MessageHandler& messageHandler,
-                                                                  const std::atomic_bool& shouldCancel, const ExecutionContext&  /*executionContext*/) const
+Result<> ComputeLocalAverageCAxisMisalignmentsFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* /*pipelineNode*/,
+                                                                  const MessageHandler& messageHandler, const std::atomic_bool& shouldCancel, const ExecutionContext& /*executionContext*/) const
 {
   ComputeLocalAverageCAxisMisalignmentsInputValues inputValues;
 

@@ -89,8 +89,8 @@ IFilter::VersionType InterpolateValuesToUnstructuredGridFilter::parametersVersio
 }
 
 //------------------------------------------------------------------------------
-IFilter::PreflightResult InterpolateValuesToUnstructuredGridFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler&  /*messageHandler*/,
-                                                                                  const std::atomic_bool&  /*shouldCancel*/, const ExecutionContext&  /*executionContext*/) const
+IFilter::PreflightResult InterpolateValuesToUnstructuredGridFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& /*messageHandler*/,
+                                                                                  const std::atomic_bool& /*shouldCancel*/, const ExecutionContext& /*executionContext*/) const
 {
   auto srcGeomPath = filterArgs.value<DataPath>(k_SourceGeometryPath_Key);
   auto destGeomPath = filterArgs.value<DataPath>(k_DestinationGeometryPath_Key);
@@ -139,8 +139,8 @@ IFilter::PreflightResult InterpolateValuesToUnstructuredGridFilter::preflightImp
 }
 
 //------------------------------------------------------------------------------
-Result<> InterpolateValuesToUnstructuredGridFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter*  /*pipelineNode*/, const MessageHandler& messageHandler,
-                                                                const std::atomic_bool& shouldCancel, const ExecutionContext&  /*executionContext*/) const
+Result<> InterpolateValuesToUnstructuredGridFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* /*pipelineNode*/, const MessageHandler& messageHandler,
+                                                                const std::atomic_bool& shouldCancel, const ExecutionContext& /*executionContext*/) const
 {
   InterpolateValuesToUnstructuredGridInputValues inputValues;
 
@@ -162,7 +162,7 @@ namespace SIMPL
 } // namespace SIMPL
 } // namespace
 
-Result<Arguments> InterpolateValuesToUnstructuredGridFilter::FromSIMPLJson(const nlohmann::json&  /*json*/)
+Result<Arguments> InterpolateValuesToUnstructuredGridFilter::FromSIMPLJson(const nlohmann::json& /*json*/)
 {
   Arguments args = InterpolateValuesToUnstructuredGridFilter().getDefaultArguments();
 

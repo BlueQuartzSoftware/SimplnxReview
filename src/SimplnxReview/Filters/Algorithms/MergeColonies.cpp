@@ -139,13 +139,13 @@ MergeColonies::MergeColonies(DataStructure& dataStructure, const IFilter::Messag
 MergeColonies::~MergeColonies() noexcept = default;
 
 // -----------------------------------------------------------------------------
-bool MergeColonies::growPatch(int32_t  /*currentPatch*/)
+bool MergeColonies::growPatch(int32_t /*currentPatch*/)
 {
   return false;
 }
 
 // -----------------------------------------------------------------------------
-bool MergeColonies::growGrouping(int32_t  /*referenceFeature*/, int32_t  /*neighborFeature*/, int32_t  /*newFid*/)
+bool MergeColonies::growGrouping(int32_t /*referenceFeature*/, int32_t /*neighborFeature*/, int32_t /*newFid*/)
 {
   return false;
 }
