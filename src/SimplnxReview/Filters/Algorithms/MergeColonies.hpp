@@ -63,8 +63,8 @@ protected:
   int getSeed(int32 newFid);
   bool determineGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid) const;
   Result<> execute();
-  bool growPatch(int32 currentPatch);
-  bool growGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid);
+  static bool growPatch(int32 currentPatch);
+  static bool growGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid);
   void characterize_colonies();
 
 private:
