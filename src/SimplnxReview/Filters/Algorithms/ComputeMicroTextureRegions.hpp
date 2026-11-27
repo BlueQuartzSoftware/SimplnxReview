@@ -29,7 +29,7 @@ class SIMPLNXREVIEW_EXPORT ComputeMicroTextureRegions
 {
 public:
   ComputeMicroTextureRegions(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel, ComputeMicroTextureRegionsInputValues* inputValues);
-  ~ComputeMicroTextureRegions() noexcept;
+  ~ComputeMicroTextureRegions() noexcept = default;
 
   ComputeMicroTextureRegions(const ComputeMicroTextureRegions&) = delete;
   ComputeMicroTextureRegions(ComputeMicroTextureRegions&&) noexcept = delete;

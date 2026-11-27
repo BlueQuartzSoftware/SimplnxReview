@@ -10,8 +10,8 @@ namespace
 template <bool CalculateBiasedAverage, bool CalculateUnbiasedAverage>
 struct MisalignmentArguments
 {
-  static inline constexpr bool CalculatingBiasedAverage = CalculateBiasedAverage;
-  static inline constexpr bool CalculatingUnbiasedAverage = CalculateUnbiasedAverage;
+  static constexpr bool k_CalculatingBiasedAverage = CalculateBiasedAverage;
+  static constexpr bool k_CalculatingUnbiasedAverage = CalculateUnbiasedAverage;
 };
 
 template <class MisalignmentArguments = MisalignmentArguments<false, false>>
@@ -46,7 +46,7 @@ public:
 
     std::vector<int32> numUnbiasedFeaturesPerParent(1, 0);
 
-    if constexpr(MisalignmentArguments::CalculatingUnbiasedAverage)
+    if constexpr(MisalignmentArguments::k_CalculatingUnbiasedAverage)
     {
       // Default value-initialized to zeroes: https://en.cppreference.com/w/cpp/named_req/DefaultInsertable
       numUnbiasedFeaturesPerParent.resize(numFeatures);
@@ -62,7 +62,7 @@ public:
       m_Throttle.updatePercent(i - 1);
 
       int32 parentId = m_FeatureParentIds[i];
-      if constexpr(MisalignmentArguments::CalculatingUnbiasedAverage)
+      if constexpr(MisalignmentArguments::k_CalculatingUnbiasedAverage)
       {
         for(usize j = 0; j < m_NeighborList[i].size(); j++)
         {
@@ -74,7 +74,7 @@ public:
         }
       }
 
-      if constexpr(MisalignmentArguments::CalculatingBiasedAverage)
+      if constexpr(MisalignmentArguments::k_CalculatingBiasedAverage)
       {
         m_NumFeaturesPerParent[parentId].inc();
         m_LocalCAxisMisalignments[parentId] += m_AvgCAxisMisalignments[i];
@@ -90,12 +90,12 @@ public:
       }
       m_Throttle.updatePercent(i - 1);
 
-      if constexpr(MisalignmentArguments::CalculatingBiasedAverage)
+      if constexpr(MisalignmentArguments::k_CalculatingBiasedAverage)
       {
         m_LocalCAxisMisalignments[i] /= m_NumFeaturesPerParent[i];
       }
 
-      if constexpr(MisalignmentArguments::CalculatingUnbiasedAverage)
+      if constexpr(MisalignmentArguments::k_CalculatingUnbiasedAverage)
       {
         if(numUnbiasedFeaturesPerParent[i] > 0)
         {

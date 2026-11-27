@@ -19,12 +19,12 @@ namespace nx::core
 {
 struct SIMPLNXREVIEW_EXPORT MergeColoniesInputValues
 {
-  bool UseNonContiguousNeighbors;
+  bool UseNonContiguousNeighbors{};
   DataPath NonContiguousNeighborListArrayPath;
   DataPath ContiguousNeighborListArrayPath;
   bool m_PatchGrouping = false;
-  float32 AxisTolerance;
-  float32 AngleTolerance;
+  float32 AxisTolerance{};
+  float32 AngleTolerance{};
   DataPath FeaturePhasesPath;
   DataPath AvgQuatsPath;
   DataPath FeatureIdsPath;
@@ -34,7 +34,7 @@ struct SIMPLNXREVIEW_EXPORT MergeColoniesInputValues
   DataPath CellFeatureAMPath;
   DataPath FeatureParentIdsPath;
   DataPath ActivePath;
-  uint64 SeedValue;
+  uint64 SeedValue{};
   bool RandomizeParentIds = true;
 };
 
@@ -63,9 +63,9 @@ protected:
   int getSeed(int32 newFid);
   bool determineGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid) const;
   Result<> execute();
-  bool growPatch(int32 currentPatch);
-  bool growGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid);
-  void characterize_colonies();
+  static bool GrowPatch(int32 currentPatch);
+  static bool GrowGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid);
+  void characterizeColonies();
 
 private:
   DataStructure& m_DataStructure;
@@ -81,7 +81,7 @@ private:
   float32 m_AxisToleranceRad = 0.0;
   float32 m_AngleTolerance = 1.0;
 
-  std::mt19937_64 m_Generator = {};
-  std::uniform_real_distribution<float32> m_Distribution = {};
+  std::mt19937_64 m_Generator;
+  std::uniform_real_distribution<float32> m_Distribution;
 };
 } // namespace nx::core

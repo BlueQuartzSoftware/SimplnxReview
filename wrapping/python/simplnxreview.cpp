@@ -20,7 +20,7 @@ PYBIND11_MODULE(simplnxreview, mod) // <== IS THAT IN ALL LOWER CASE?
 
   auto& internals = Internals::Instance();
 
-  auto* plugin = internals.addPlugin<SimplnxReviewPlugin>();
+  const auto* pluginPtr = internals.addPlugin<SimplnxReviewPlugin>();
 
   SimplnxReview::BindFilters(mod, internals);
 }

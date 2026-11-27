@@ -11,7 +11,7 @@ using namespace nx::core;
 
 namespace
 {
-float32 distBetweenPoints(const Vec3<float32>& srcPoint, const Vec3<float32>& destPoint)
+float32 DistBetweenPoints(const Vec3<float32>& srcPoint, const Vec3<float32>& destPoint)
 {
   return powf(destPoint[0] - srcPoint[0], 2.0f) + pow(destPoint[1] - srcPoint[1], 2.0f) + pow(destPoint[2] - srcPoint[2], 2.0f);
 }
@@ -56,12 +56,12 @@ public:
       }
 
       Vec3<float32> destVertexCoord = m_DestGeometry.getVertexCoordinate(destVertexId);
-      usize closestVertexId;
+      usize closestVertexId = 0;
       float32 closestDist = std::numeric_limits<float32>::max();
       for(usize srcVertexId = 0; srcVertexId < m_SrcGeometry.getNumberOfVertices(); srcVertexId++)
       {
         Vec3<float32> srcVertexCoord = m_SrcGeometry.getVertexCoordinate(srcVertexId);
-        float32 dist = distBetweenPoints(srcVertexCoord, destVertexCoord);
+        float32 dist = DistBetweenPoints(srcVertexCoord, destVertexCoord);
         closestVertexId = (dist < closestDist) ? srcVertexId : closestVertexId;
         closestDist = (dist < closestDist) ? dist : closestDist;
       }
@@ -136,7 +136,7 @@ Result<> InterpolateValuesToUnstructuredGrid::operator()()
 
   // Parallel algorithm to calculate closest vertices
   ParallelDataAlgorithm dataAlg;
-  dataAlg.setRange(0ULL, static_cast<usize>(destGeometry.getNumberOfVertices()));
+  dataAlg.setRange(0ULL, destGeometry.getNumberOfVertices());
   dataAlg.execute(CalculateClosestVerticesImpl(this, srcGeometry, destGeometry, closestSrcIds, m_MessageHandler, m_ShouldCancel));
   if(m_ShouldCancel)
   {
@@ -180,6 +180,6 @@ Result<> InterpolateValuesToUnstructuredGrid::operator()()
 // -----------------------------------------------------------------------------
 void InterpolateValuesToUnstructuredGrid::sendThreadSafeProgressMessage(usize counter)
 {
-  std::lock_guard<std::mutex> guard(m_ProgressMessage_Mutex);
+  std::lock_guard<std::mutex> guard(m_ProgressMessageMutex);
   m_Throttle.incrementPercent(counter);
 }

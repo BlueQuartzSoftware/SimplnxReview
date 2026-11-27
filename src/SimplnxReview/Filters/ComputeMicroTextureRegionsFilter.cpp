@@ -81,8 +81,8 @@ IFilter::VersionType ComputeMicroTextureRegionsFilter::parametersVersion() const
 }
 
 //------------------------------------------------------------------------------
-IFilter::PreflightResult ComputeMicroTextureRegionsFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
-                                                                         const std::atomic_bool& shouldCancel, const ExecutionContext& executionContext) const
+IFilter::PreflightResult ComputeMicroTextureRegionsFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& /*messageHandler*/,
+                                                                         const std::atomic_bool& /*shouldCancel*/, const ExecutionContext& /*executionContext*/) const
 {
   auto pFeatureIdsArrayPathValue = filterArgs.value<DataPath>(k_FeatureIdsArrayPath_Key);
   auto pCellFeatureAttributeMatrixNameValue = filterArgs.value<DataPath>(k_CellFeatureAttributeMatrixPath_Key);
@@ -92,18 +92,18 @@ IFilter::PreflightResult ComputeMicroTextureRegionsFilter::preflightImpl(const D
   nx::core::Result<OutputActions> resultOutputActions;
   std::vector<PreflightValue> preflightUpdatedValues;
 
-  auto* cellFeatureAM = dataStructure.getDataAs<AttributeMatrix>(pCellFeatureAttributeMatrixNameValue);
+  const auto* cellFeatureAmPtr = dataStructure.getDataAs<AttributeMatrix>(pCellFeatureAttributeMatrixNameValue);
   {
     DataPath createArrayDataPath = pCellFeatureAttributeMatrixNameValue.createChildPath(pMicroTextureRegionFractionOccupiedArrayNameValue);
     // Create the face areas DataArray Action and store it into the resultOutputActions
-    auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::float32, cellFeatureAM->getShape(), std::vector<usize>{1}, createArrayDataPath);
+    auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::float32, cellFeatureAmPtr->getShape(), std::vector<usize>{1}, createArrayDataPath);
     resultOutputActions.value().appendAction(std::move(createArrayAction));
   }
 
   {
     DataPath createArrayDataPath = pCellFeatureAttributeMatrixNameValue.createChildPath(pMicroTextureRegionNumCellsArrayNameValue);
     // Create the face areas DataArray Action and store it into the resultOutputActions
-    auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::int32, cellFeatureAM->getShape(), std::vector<usize>{1}, createArrayDataPath);
+    auto createArrayAction = std::make_unique<CreateArrayAction>(nx::core::DataType::int32, cellFeatureAmPtr->getShape(), std::vector<usize>{1}, createArrayDataPath);
     resultOutputActions.value().appendAction(std::move(createArrayAction));
   }
 
@@ -111,12 +111,12 @@ IFilter::PreflightResult ComputeMicroTextureRegionsFilter::preflightImpl(const D
   resultOutputActions.warnings().push_back({-65432, "WARNING: This filter is experimental in nature and has not had any testing, validation or verification. Use at your own risk"});
 
   // Return both the resultOutputActions and the preflightUpdatedValues via std::move()
-  return {std::move(resultOutputActions), std::move(preflightUpdatedValues)};
+  return {.outputActions = std::move(resultOutputActions), .outputValues = std::move(preflightUpdatedValues)};
 }
 
 //------------------------------------------------------------------------------
-Result<> ComputeMicroTextureRegionsFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
-                                                       const std::atomic_bool& shouldCancel, const ExecutionContext& executionContext) const
+Result<> ComputeMicroTextureRegionsFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* /*pipelineNode*/, const MessageHandler& messageHandler,
+                                                       const std::atomic_bool& shouldCancel, const ExecutionContext& /*executionContext*/) const
 {
   ComputeMicroTextureRegionsInputValues inputValues;
 
@@ -132,13 +132,13 @@ Result<> ComputeMicroTextureRegionsFilter::executeImpl(DataStructure& dataStruct
 
 namespace
 {
-namespace SIMPL
+namespace simpl
 {
 constexpr StringLiteral k_CellFeatureAttributeMatrixNameKey = "CellFeatureAttributeMatrixName";
 constexpr StringLiteral k_MicroTextureRegionFractionOccupiedArrayNameKey = "MicroTextureRegionFractionOccupiedArrayName";
 constexpr StringLiteral k_MicroTextureRegionNumCellsArrayNameKey = "MicroTextureRegionNumCellsArrayName";
 constexpr StringLiteral k_FeatureIdsArrayPathKey = "FeatureIdsArrayPath";
-} // namespace SIMPL
+} // namespace simpl
 } // namespace
 
 Result<Arguments> ComputeMicroTextureRegionsFilter::FromSIMPLJson(const nlohmann::json& json)
@@ -148,12 +148,12 @@ Result<Arguments> ComputeMicroTextureRegionsFilter::FromSIMPLJson(const nlohmann
   std::vector<Result<>> results;
 
   results.push_back(
-      SIMPLConversion::ConvertParameter<SIMPLConversion::DataContainerSelectionFilterParameterConverter>(args, json, SIMPL::k_CellFeatureAttributeMatrixNameKey, k_CellFeatureAttributeMatrixPath_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, SIMPL::k_MicroTextureRegionFractionOccupiedArrayNameKey,
+      SIMPLConversion::ConvertParameter<SIMPLConversion::DataContainerSelectionFilterParameterConverter>(args, json, simpl::k_CellFeatureAttributeMatrixNameKey, k_CellFeatureAttributeMatrixPath_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, simpl::k_MicroTextureRegionFractionOccupiedArrayNameKey,
                                                                                                                    k_MicroTextureRegionFractionOccupiedArrayName_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, SIMPL::k_MicroTextureRegionNumCellsArrayNameKey,
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, simpl::k_MicroTextureRegionNumCellsArrayNameKey,
                                                                                                                    k_MicroTextureRegionNumCellsArrayName_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_FeatureIdsArrayPathKey, k_FeatureIdsArrayPath_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_FeatureIdsArrayPathKey, k_FeatureIdsArrayPath_Key));
 
   Result<> conversionResult = MergeResults(std::move(results));
 

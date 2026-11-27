@@ -81,8 +81,8 @@ IFilter::VersionType ComputeSaltykovSizesFilter::parametersVersion() const
 }
 
 //------------------------------------------------------------------------------
-IFilter::PreflightResult ComputeSaltykovSizesFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
-                                                                   const std::atomic_bool& shouldCancel, const ExecutionContext& executionContext) const
+IFilter::PreflightResult ComputeSaltykovSizesFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& /*messageHandler*/,
+                                                                   const std::atomic_bool& /*shouldCancel*/, const ExecutionContext& /*executionContext*/) const
 {
   auto pEquivalentDiametersArrayPathValue = filterArgs.value<DataPath>(k_EquivalentDiametersArrayPath_Key);
   auto pSaltykovEquivalentDiametersNameValue = filterArgs.value<std::string>(k_SaltykovEquivalentDiametersName_Key);
@@ -92,21 +92,21 @@ IFilter::PreflightResult ComputeSaltykovSizesFilter::preflightImpl(const DataStr
   std::vector<PreflightValue> preflightUpdatedValues;
 
   DataPath saltykovPath = pEquivalentDiametersArrayPathValue.replaceName(pSaltykovEquivalentDiametersNameValue);
-  const auto* equivDiams = dataStructure.getDataAs<IDataArray>(pEquivalentDiametersArrayPathValue);
+  const auto* equivDiamsPtr = dataStructure.getDataAs<IDataArray>(pEquivalentDiametersArrayPathValue);
   {
-    auto createArrayAction = std::make_unique<CreateArrayAction>(DataType::float32, equivDiams->getTupleShape(), std::vector<usize>{1}, saltykovPath);
+    auto createArrayAction = std::make_unique<CreateArrayAction>(DataType::float32, equivDiamsPtr->getTupleShape(), std::vector<usize>{1}, saltykovPath);
     resultOutputActions.value().appendAction(std::move(createArrayAction));
   }
 
   preflightUpdatedValues.push_back({"WARNING: This filter is experimental in nature and has not had any testing, validation or verification. Use at your own risk"});
   resultOutputActions.warnings().push_back({-65432, "WARNING: This filter is experimental in nature and has not had any testing, validation or verification. Use at your own risk"});
 
-  return {std::move(resultOutputActions), std::move(preflightUpdatedValues)};
+  return {.outputActions = std::move(resultOutputActions), .outputValues = std::move(preflightUpdatedValues)};
 }
 
 //------------------------------------------------------------------------------
-Result<> ComputeSaltykovSizesFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
-                                                 const std::atomic_bool& shouldCancel, const ExecutionContext& executionContext) const
+Result<> ComputeSaltykovSizesFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* /*pipelineNode*/, const MessageHandler& messageHandler,
+                                                 const std::atomic_bool& shouldCancel, const ExecutionContext& /*executionContext*/) const
 {
   auto seed = filterArgs.value<std::mt19937_64::result_type>(k_SeedValue_Key);
   if(!filterArgs.value<bool>(k_UseSeed_Key))
@@ -125,11 +125,11 @@ Result<> ComputeSaltykovSizesFilter::executeImpl(DataStructure& dataStructure, c
 
 namespace
 {
-namespace SIMPL
+namespace simpl
 {
 constexpr StringLiteral k_EquivalentDiametersArrayPathKey = "EquivalentDiametersArrayPath";
 constexpr StringLiteral k_SaltykovEquivalentDiametersArrayPathKey = "SaltykovEquivalentDiametersArrayPath";
-} // namespace SIMPL
+} // namespace simpl
 } // namespace
 
 Result<Arguments> ComputeSaltykovSizesFilter::FromSIMPLJson(const nlohmann::json& json)
@@ -139,8 +139,8 @@ Result<Arguments> ComputeSaltykovSizesFilter::FromSIMPLJson(const nlohmann::json
   std::vector<Result<>> results;
 
   results.push_back(
-      SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_EquivalentDiametersArrayPathKey, k_EquivalentDiametersArrayPath_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArrayCreationToDataObjectNameFilterParameterConverter>(args, json, SIMPL::k_SaltykovEquivalentDiametersArrayPathKey,
+      SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_EquivalentDiametersArrayPathKey, k_EquivalentDiametersArrayPath_Key));
+  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArrayCreationToDataObjectNameFilterParameterConverter>(args, json, simpl::k_SaltykovEquivalentDiametersArrayPathKey,
                                                                                                                                   k_SaltykovEquivalentDiametersName_Key));
 
   Result<> conversionResult = MergeResults(std::move(results));
