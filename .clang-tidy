@@ -1,4 +1,4 @@
-# nxcleanup completed P3
+# nxcleanup completed P4
 # Shared BlueQuartz clang-tidy configuration (simplnx, SimplnxOoc, SimplnxReview, DREAM3DNX).
 # Only HeaderFilterRegex and the macro allowlist differ between repositories.
 #
@@ -28,13 +28,6 @@
 # nxcleanup P2b check modernize-use-designated-initializers
 # nxcleanup P2c check modernize-use-ranges
 # nxcleanup P4 check readability-identifier-length
-# nxcleanup P4 naming-kind ConstexprVariable
-# nxcleanup P4 naming-kind Function
-# nxcleanup P4 naming-kind GlobalConstant
-# nxcleanup P4 naming-kind GlobalVariable
-# nxcleanup P4 naming-kind Method
-# nxcleanup P4 naming-kind Namespace
-# nxcleanup P4 naming-kind PublicMember
 # nxcleanup P4 naming-kind TypeAlias
 # nxcleanup disabled-by-decision misc-const-correctness: Maintainer decision (2026-11-26) to keep this check off until reconsidered. Adding const to returned or moved locals can turn moves into copies.
 # nxcleanup disabled-by-decision misc-include-cleaner: Maintainer decision (2026-11-26) to keep this check off until reconsidered. Include removal can break other platforms or build configurations.
@@ -70,8 +63,7 @@ CheckOptions:
   readability-identifier-naming.ClassMethodCase: CamelCase
   readability-identifier-naming.ClassMethodIgnoredRegexp: ^(at|back|begin|capacity|cbegin|cend|c_str|c_view|clear|compare|contains|copy|crbegin|crend|data|emplace|emplace_back|emplace_front|empty|end|ends_with|erase|find|find_first_not_of|find_first_of|find_last_not_of|find_last_of|front|get_allocator|insert|insert_or_assign|length|lower_bound|max_size|merge|npos|pop_back|pop_front|push_back|push_front|rbegin|rend|replace|reserve|resize|rfind|shrink_to_fit|size|starts_with|str|substr|swap|try_emplace|upper_bound|view|kdtree_get_point_count|kdtree_get_pt|kdtree_get_bbox|kdtree_distance)$
   readability-identifier-naming.MethodCase: camelBack
-  # Enable Method in P4 after its findings are resolved.
-  readability-identifier-naming.MethodIgnoredRegexp: .*
+  readability-identifier-naming.MethodIgnoredRegexp: ^(at|back|begin|capacity|cbegin|cend|c_str|c_view|clear|compare|contains|copy|crbegin|crend|data|emplace|emplace_back|emplace_front|empty|end|ends_with|erase|find|find_first_not_of|find_first_of|find_last_not_of|find_last_of|front|get_allocator|insert|insert_or_assign|length|lower_bound|max_size|merge|npos|pop_back|pop_front|push_back|push_front|rbegin|rend|replace|reserve|resize|rfind|shrink_to_fit|size|starts_with|str|substr|swap|try_emplace|upper_bound|view|kdtree_get_point_count|kdtree_get_pt|kdtree_get_bbox|kdtree_distance)$
   readability-identifier-naming.FunctionCase: CamelCase
   readability-identifier-naming.GlobalFunctionCase: CamelCase
   readability-identifier-naming.GlobalFunctionIgnoredRegexp: ^(swap|to_underlying|SIMPLNX_(Create|Destroy)Plugin)$
@@ -80,28 +72,19 @@ CheckOptions:
   readability-identifier-naming.ProtectedMemberPrefix: m_
   readability-identifier-naming.ProtectedMemberCase: CamelCase
   readability-identifier-naming.PublicMemberCase: lower_case
-  # Enable PublicMember in P4 after its findings are resolved.
-  readability-identifier-naming.PublicMemberIgnoredRegexp: .*
+  readability-identifier-naming.PublicMemberIgnoredRegexp: ^(first|second)$
   readability-identifier-naming.VariableCase: camelBack
   readability-identifier-naming.LocalPointerCase: camelBack
   readability-identifier-naming.LocalPointerSuffix: Ptr
   readability-identifier-naming.GlobalVariableCase: CamelCase
   readability-identifier-naming.GlobalConstantCase: CamelCase
   readability-identifier-naming.GlobalConstantPrefix: k_
-  # Enable GlobalConstant in P4 after its findings are resolved.
-  readability-identifier-naming.GlobalConstantIgnoredRegexp: .*
+  readability-identifier-naming.GlobalConstantIgnoredRegexp: ^k_[A-Za-z0-9]+_Key$
   readability-identifier-naming.ConstexprVariableCase: CamelCase
   readability-identifier-naming.ConstexprVariablePrefix: k_
-  # Enable ConstexprVariable in P4 after its findings are resolved.
-  readability-identifier-naming.ConstexprVariableIgnoredRegexp: .*
+  readability-identifier-naming.ConstexprVariableIgnoredRegexp: ^k_[A-Za-z0-9]+_Key$
   readability-identifier-naming.TypeAliasCase: CamelCase
   readability-identifier-naming.TypeAliasSuffix: Type
   # Enable TypeAlias in P4 after its findings are resolved.
   readability-identifier-naming.TypeAliasIgnoredRegexp: .*
   readability-identifier-naming.MacroDefinitionCase: UPPER_CASE
-  # Enable Function in P4 after its findings are resolved.
-  readability-identifier-naming.FunctionIgnoredRegexp: .*
-  # Enable GlobalVariable in P4 after its findings are resolved.
-  readability-identifier-naming.GlobalVariableIgnoredRegexp: .*
-  # Enable Namespace in P4 after its findings are resolved.
-  readability-identifier-naming.NamespaceIgnoredRegexp: .*
