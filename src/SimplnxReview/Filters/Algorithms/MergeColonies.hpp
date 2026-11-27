@@ -19,23 +19,23 @@ namespace nx::core
 {
 struct SIMPLNXREVIEW_EXPORT MergeColoniesInputValues
 {
-  bool UseNonContiguousNeighbors;
-  DataPath NonContiguousNeighborListArrayPath;
-  DataPath ContiguousNeighborListArrayPath;
-  bool m_PatchGrouping = false;
-  float32 AxisTolerance;
-  float32 AngleTolerance;
-  DataPath FeaturePhasesPath;
-  DataPath AvgQuatsPath;
-  DataPath FeatureIdsPath;
-  DataPath CellPhasesPath;
-  DataPath CrystalStructuresPath;
-  DataPath CellParentIdsPath;
-  DataPath CellFeatureAMPath;
-  DataPath FeatureParentIdsPath;
-  DataPath ActivePath;
-  uint64 SeedValue;
-  bool RandomizeParentIds = true;
+  bool use_non_contiguous_neighbors{};
+  DataPath non_contiguous_neighbor_list_array_path;
+  DataPath contiguous_neighbor_list_array_path;
+  bool m_patch_grouping = false;
+  float32 axis_tolerance{};
+  float32 angle_tolerance{};
+  DataPath feature_phases_path;
+  DataPath avg_quats_path;
+  DataPath feature_ids_path;
+  DataPath cell_phases_path;
+  DataPath crystal_structures_path;
+  DataPath cell_parent_ids_path;
+  DataPath cell_feature_am_path;
+  DataPath feature_parent_ids_path;
+  DataPath active_path;
+  uint64 seed_value{};
+  bool randomize_parent_ids = true;
 };
 
 /**
@@ -46,7 +46,7 @@ struct SIMPLNXREVIEW_EXPORT MergeColoniesInputValues
 class SIMPLNXREVIEW_EXPORT MergeColonies
 {
   using LaueOpsShPtrType = std::shared_ptr<ebsdlib::LaueOps>;
-  using LaueOpsContainer = std::vector<LaueOpsShPtrType>;
+  using LaueOpsContainerType = std::vector<LaueOpsShPtrType>;
 
 public:
   MergeColonies(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel, MergeColoniesInputValues* inputValues);
@@ -63,9 +63,9 @@ protected:
   int getSeed(int32 newFid);
   bool determineGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid) const;
   Result<> execute();
-  bool growPatch(int32 currentPatch);
-  bool growGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid);
-  void characterize_colonies();
+  static bool GrowPatch(int32 currentPatch);
+  static bool GrowGrouping(int32 referenceFeature, int32 neighborFeature, int32 newFid);
+  void characterizeColonies();
 
 private:
   DataStructure& m_DataStructure;
@@ -73,15 +73,15 @@ private:
   const std::atomic_bool& m_ShouldCancel;
   const IFilter::MessageHandler& m_MessageHandler;
 
-  LaueOpsContainer m_OrientationOps;
-  Int32Array& m_FeatureParentIds;
-  Int32Array& m_FeaturePhases;
-  Float32Array& m_AvgQuats;
-  UInt32Array& m_CrystalStructures;
+  LaueOpsContainerType m_OrientationOps;
+  Int32ArrayType& m_FeatureParentIds;
+  Int32ArrayType& m_FeaturePhases;
+  Float32ArrayType& m_AvgQuats;
+  UInt32ArrayType& m_CrystalStructures;
   float32 m_AxisToleranceRad = 0.0;
   float32 m_AngleTolerance = 1.0;
 
-  std::mt19937_64 m_Generator = {};
-  std::uniform_real_distribution<float32> m_Distribution = {};
+  std::mt19937_64 m_Generator;
+  std::uniform_real_distribution<float32> m_Distribution;
 };
 } // namespace nx::core

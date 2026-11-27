@@ -11,7 +11,9 @@
 #include "EbsdLib/Core/Orientation.hpp"
 #include "EbsdLib/Orientation/Quaternion.hpp"
 
+#include <algorithm>
 #include <cmath>
+#include <numbers>
 
 using namespace nx::core;
 
@@ -26,27 +28,32 @@ using LaueOpsContainer = std::vector<LaueOpsShPtrType>;
 
 namespace
 {
-const float64 unit110 = 1.0 / std::sqrt(2.0);
-const float64 unit111 = 1.0 / std::sqrt(3.0);
-const float64 unit112_1 = 1.0 / std::sqrt(6.0);
-const float64 unit112_2 = 2.0 / std::sqrt(6.0);
+const float64 k_Unit110 = 1.0 / std::numbers::sqrt2;
+const float64 k_Unit111 = std::numbers::inv_sqrt3;
+const float64 k_Unit1121 = 1.0 / std::sqrt(6.0);
+const float64 k_Unit1122 = 2.0 / std::sqrt(6.0);
 
-std::vector<ebsdlib::Matrix3X3D> crystalDirections = {
-    {unit111, unit112_1, unit110, -unit111, -unit112_1, unit110, unit111, -unit112_2, 0}, {-unit111, unit112_1, unit110, unit111, -unit112_1, unit110, unit111, unit112_2, 0},
-    {unit111, -unit112_1, unit110, unit111, -unit112_1, -unit110, unit111, unit112_2, 0}, {unit111, unit112_1, unit110, unit111, unit112_1, -unit110, -unit111, unit112_2, 0},
-    {unit111, unit112_1, unit110, unit111, -unit112_2, 0, unit111, unit112_1, -unit110},  {unit111, -unit112_1, unit110, -unit111, -unit112_2, 0, unit111, -unit112_1, -unit110},
-    {unit111, -unit112_1, unit110, unit111, unit112_2, 0, -unit111, unit112_1, unit110},  {-unit111, -unit112_1, unit110, unit111, -unit112_2, 0, unit111, unit112_1, unit110},
-    {unit111, -unit112_2, 0, unit111, unit112_1, unit110, -unit111, -unit112_1, unit110}, {unit111, unit112_2, 0, -unit111, unit112_1, unit110, unit111, -unit112_1, unit110},
-    {unit111, unit112_2, 0, unit111, -unit112_1, unit110, unit111, -unit112_1, -unit110}, {-unit111, unit112_2, 0, unit111, unit112_1, unit110, unit111, unit112_1, -unit110}};
+std::vector<ebsdlib::Matrix3X3D> CrystalDirections = {{k_Unit111, k_Unit1121, k_Unit110, -k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, -k_Unit1122, 0},
+                                                      {-k_Unit111, k_Unit1121, k_Unit110, k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, k_Unit1122, 0},
+                                                      {k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, -k_Unit1121, -k_Unit110, k_Unit111, k_Unit1122, 0},
+                                                      {k_Unit111, k_Unit1121, k_Unit110, k_Unit111, k_Unit1121, -k_Unit110, -k_Unit111, k_Unit1122, 0},
+                                                      {k_Unit111, k_Unit1121, k_Unit110, k_Unit111, -k_Unit1122, 0, k_Unit111, k_Unit1121, -k_Unit110},
+                                                      {k_Unit111, -k_Unit1121, k_Unit110, -k_Unit111, -k_Unit1122, 0, k_Unit111, -k_Unit1121, -k_Unit110},
+                                                      {k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, k_Unit1122, 0, -k_Unit111, k_Unit1121, k_Unit110},
+                                                      {-k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, -k_Unit1122, 0, k_Unit111, k_Unit1121, k_Unit110},
+                                                      {k_Unit111, -k_Unit1122, 0, k_Unit111, k_Unit1121, k_Unit110, -k_Unit111, -k_Unit1121, k_Unit110},
+                                                      {k_Unit111, k_Unit1122, 0, -k_Unit111, k_Unit1121, k_Unit110, k_Unit111, -k_Unit1121, k_Unit110},
+                                                      {k_Unit111, k_Unit1122, 0, k_Unit111, -k_Unit1121, k_Unit110, k_Unit111, -k_Unit1121, -k_Unit110},
+                                                      {-k_Unit111, k_Unit1122, 0, k_Unit111, k_Unit1121, k_Unit110, k_Unit111, k_Unit1121, -k_Unit110}};
 
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-bool check_for_burgers(const ebsdlib::QuatD& betaQuat, const ebsdlib::QuatD& alphaQuat, float64 angleTolerance)
+bool CheckForBurgers(const ebsdlib::QuatD& betaQuat, const ebsdlib::QuatD& alphaQuat, float64 angleTolerance)
 {
   float64 dP = 0.0;
   float64 angle = 0.0;
-  constexpr float64 radToDeg = 180.0 / Constants::k_PiD;
+  constexpr float64 k_RadToDeg = 180.0 / constants::k_PiD;
 
   // transpose gBeta so the sample direction is the output when
   // gBeta is multiplied by the crystal directions below
@@ -57,7 +64,7 @@ bool check_for_burgers(const ebsdlib::QuatD& betaQuat, const ebsdlib::QuatD& alp
 
   for(int32 i = 0; i < 12; i++)
   {
-    ebsdlib::Matrix3X3D mat = gBetaT * crystalDirections[i];
+    ebsdlib::Matrix3X3D mat = gBetaT * CrystalDirections[i];
 
     ebsdlib::Matrix3X1D a(mat[2], mat[5], mat[8]);
     ebsdlib::Matrix3X1D b(gAlphaT[2], gAlphaT[5], gAlphaT[8]);
@@ -66,7 +73,7 @@ bool check_for_burgers(const ebsdlib::QuatD& betaQuat, const ebsdlib::QuatD& alp
     dP = std::clamp(dP, -1.0, 1.0);
     angle = std::acos(dP);
 
-    if((angle * radToDeg) < angleTolerance || (180.0f - (angle * radToDeg)) < angleTolerance)
+    if((angle * k_RadToDeg) < angleTolerance || (180.0f - (angle * k_RadToDeg)) < angleTolerance)
     {
       a[0] = mat[0];
       a[1] = mat[3];
@@ -77,11 +84,11 @@ bool check_for_burgers(const ebsdlib::QuatD& betaQuat, const ebsdlib::QuatD& alp
       dP = a.cosTheta(b);
       dP = std::clamp(dP, -1.0, 1.0);
       angle = std::acos(dP);
-      if((angle * radToDeg) < angleTolerance)
+      if((angle * k_RadToDeg) < angleTolerance)
       {
         return true;
       }
-      if((180.0 - (angle * radToDeg)) < angleTolerance)
+      if((180.0 - (angle * k_RadToDeg)) < angleTolerance)
       {
         return true;
       }
@@ -91,11 +98,11 @@ bool check_for_burgers(const ebsdlib::QuatD& betaQuat, const ebsdlib::QuatD& alp
       dP = a.cosTheta(b);
       dP = std::clamp(dP, -1.0, 1.0);
       angle = std::acos(dP);
-      if((angle * radToDeg) < angleTolerance)
+      if((angle * k_RadToDeg) < angleTolerance)
       {
         return true;
       }
-      if((180.0 - (angle * radToDeg)) < angleTolerance)
+      if((180.0 - (angle * k_RadToDeg)) < angleTolerance)
       {
         return true;
       }
@@ -105,11 +112,11 @@ bool check_for_burgers(const ebsdlib::QuatD& betaQuat, const ebsdlib::QuatD& alp
       dP = a.cosTheta(b);
       dP = std::clamp(dP, -1.0, 1.0);
       angle = std::acos(dP);
-      if((angle * radToDeg) < angleTolerance)
+      if((angle * k_RadToDeg) < angleTolerance)
       {
         return true;
       }
-      if((180.0 - (angle * radToDeg)) < angleTolerance)
+      if((180.0 - (angle * k_RadToDeg)) < angleTolerance)
       {
         return true;
       }
@@ -126,12 +133,12 @@ MergeColonies::MergeColonies(DataStructure& dataStructure, const IFilter::Messag
 , m_ShouldCancel(shouldCancel)
 , m_MessageHandler(mesgHandler)
 , m_OrientationOps(ebsdlib::LaueOps::GetAllOrientationOps())
-, m_FeatureParentIds(dataStructure.getDataRefAs<Int32Array>(inputValues->FeatureParentIdsPath))
-, m_FeaturePhases(dataStructure.getDataRefAs<Int32Array>(inputValues->FeaturePhasesPath))
-, m_AvgQuats(dataStructure.getDataRefAs<Float32Array>(inputValues->AvgQuatsPath))
-, m_CrystalStructures(dataStructure.getDataRefAs<UInt32Array>(inputValues->CrystalStructuresPath))
-, m_AxisToleranceRad(inputValues->AxisTolerance * Constants::k_PiF / 180.0f)
-, m_AngleTolerance(inputValues->AngleTolerance)
+, m_FeatureParentIds(dataStructure.getDataRefAs<Int32ArrayType>(inputValues->feature_parent_ids_path))
+, m_FeaturePhases(dataStructure.getDataRefAs<Int32ArrayType>(inputValues->feature_phases_path))
+, m_AvgQuats(dataStructure.getDataRefAs<Float32ArrayType>(inputValues->avg_quats_path))
+, m_CrystalStructures(dataStructure.getDataRefAs<UInt32ArrayType>(inputValues->crystal_structures_path))
+, m_AxisToleranceRad(inputValues->axis_tolerance * constants::k_PiF / 180.0f)
+, m_AngleTolerance(inputValues->angle_tolerance)
 {
 }
 
@@ -139,13 +146,13 @@ MergeColonies::MergeColonies(DataStructure& dataStructure, const IFilter::Messag
 MergeColonies::~MergeColonies() noexcept = default;
 
 // -----------------------------------------------------------------------------
-bool MergeColonies::growPatch(int32_t currentPatch)
+bool MergeColonies::GrowPatch(int32_t /*currentPatch*/)
 {
   return false;
 }
 
 // -----------------------------------------------------------------------------
-bool MergeColonies::growGrouping(int32_t referenceFeature, int32_t neighborFeature, int32_t newFid)
+bool MergeColonies::GrowGrouping(int32_t /*referenceFeature*/, int32_t /*neighborFeature*/, int32_t /*newFid*/)
 {
   return false;
 }
@@ -155,11 +162,11 @@ Result<> MergeColonies::execute()
 {
   ThrottledMessageHandler progressThrottle(m_MessageHandler);
 
-  NeighborList<int32>& featureNeighborListRef = m_DataStructure.getDataRefAs<NeighborList<int32>>(m_InputValues->ContiguousNeighborListArrayPath);
+  NeighborList<int32>& featureNeighborListRef = m_DataStructure.getDataRefAs<NeighborList<int32>>(m_InputValues->contiguous_neighbor_list_array_path);
   NeighborList<int32>* nonContigNeighListPtr = nullptr;
-  if(m_InputValues->UseNonContiguousNeighbors)
+  if(m_InputValues->use_non_contiguous_neighbors)
   {
-    nonContigNeighListPtr = m_DataStructure.getDataAs<NeighborList<int32>>(m_InputValues->NonContiguousNeighborListArrayPath);
+    nonContigNeighListPtr = m_DataStructure.getDataAs<NeighborList<int32>>(m_InputValues->non_contiguous_neighbor_list_array_path);
   }
   if(nullptr == nonContigNeighListPtr)
   {
@@ -170,7 +177,8 @@ Result<> MergeColonies::execute()
 
   int32 parentCount = 0;
   int32 featureSeed = 0;
-  int32 featureNeighborListSize = 0, nonContigNeighListSize = 0;
+  int32 featureNeighborListSize = 0;
+  int32 nonContigNeighListSize = 0;
   bool patchGrouping = false;
 
   while(featureSeed >= 0)
@@ -185,7 +193,7 @@ Result<> MergeColonies::execute()
       {
         int32 firstFeature = groupList[j];
         featureNeighborListSize = static_cast<int32>(featureNeighborListRef[firstFeature].size());
-        if(m_InputValues->UseNonContiguousNeighbors)
+        if(m_InputValues->use_non_contiguous_neighbors)
         {
           nonContigNeighListSize = nonContigNeighListPtr->getListSize(firstFeature);
         }
@@ -217,7 +225,7 @@ Result<> MergeColonies::execute()
             {
               neigh = featureNeighborListRef[firstFeature][l];
             }
-            else if(k == 1 && m_InputValues->UseNonContiguousNeighbors) // Feature NeighborHood (non-contiguous)
+            else if(k == 1 && m_InputValues->use_non_contiguous_neighbors) // Feature NeighborHood (non-contiguous)
             {
               bool ok = false;
               neigh = nonContigNeighListPtr->getValue(firstFeature, l, ok);
@@ -237,7 +245,7 @@ Result<> MergeColonies::execute()
       }
       if(patchGrouping)
       {
-        if(growPatch(parentCount))
+        if(GrowPatch(parentCount))
         {
           for(std::vector<int32_t>::size_type j = 0; j < groupList.size(); j++)
           {
@@ -248,7 +256,7 @@ Result<> MergeColonies::execute()
               int32 neigh = featureNeighborListRef[firstfeature][l];
               if(neigh != firstfeature)
               {
-                if(growGrouping(firstfeature, neigh, parentCount))
+                if(GrowGrouping(firstfeature, neigh, parentCount))
                 {
                   groupList.push_back(neigh);
                 }
@@ -269,7 +277,7 @@ Result<> MergeColonies::execute()
 Result<> MergeColonies::operator()()
 {
   // Initialize the random number generator
-  m_Generator = std::mt19937_64(m_InputValues->SeedValue);
+  m_Generator = std::mt19937_64(m_InputValues->seed_value);
   m_Distribution = std::uniform_real_distribution<float32>(0.0f, 1.0f);
 
   // The main algorithm is in the 'execute()' method
@@ -279,7 +287,7 @@ Result<> MergeColonies::operator()()
     return result;
   }
 
-  auto active = m_DataStructure.getDataRefAs<BoolArray>(m_InputValues->ActivePath);
+  auto active = m_DataStructure.getDataRefAs<BoolArrayType>(m_InputValues->active_path);
 
   usize totalFeatures = active.getNumberOfTuples();
   if(totalFeatures < 2)
@@ -288,8 +296,8 @@ Result<> MergeColonies::operator()()
                                    "Features were detected. A grouping value may be set too high");
   }
 
-  auto featureIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeatureIdsPath);
-  auto cellParentIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->CellParentIdsPath);
+  auto featureIds = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->feature_ids_path);
+  auto cellParentIds = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->cell_parent_ids_path);
 
   int32 numParents = 0;
   usize totalPoints = featureIds.getNumberOfTuples();
@@ -307,24 +315,21 @@ Result<> MergeColonies::operator()()
     }
     int32 featurename = featureIds[k];
     cellParentIds[k] = m_FeatureParentIds[featurename];
-    if(m_FeatureParentIds[featurename] > numParents)
-    {
-      numParents = m_FeatureParentIds[featurename];
-    }
+    numParents = std::max<int>(m_FeatureParentIds[featurename], numParents);
   }
   numParents += 1;
 
   m_MessageHandler.sendInfoMessage("Characterizing Colonies Starting");
-  characterize_colonies();
+  characterizeColonies();
   m_MessageHandler.sendInfoMessage("Characterizing Colonies Complete");
 
-  if(m_InputValues->RandomizeParentIds)
+  if(m_InputValues->randomize_parent_ids)
   {
     m_MessageHandler.sendInfoMessage("Randomizing Parent Ids....");
     // Generate all the numbers up front
     const int32 rangeMin = 1;
     const int32 rangeMax = numParents - 1;
-    std::mt19937 generator(m_InputValues->SeedValue); // Standard mersenne_twister_engine seeded
+    std::mt19937 generator(m_InputValues->seed_value); // Standard mersenne_twister_engine seeded
     std::uniform_int_distribution<int32> distribution(rangeMin, rangeMax);
 
     std::vector<int32> pid(numParents);
@@ -420,7 +425,7 @@ int32 MergeColonies::getSeed(int32 newFid)
   {
     m_FeatureParentIds[featureIdSeed] = newFid;
     const std::vector<usize> tDims = {static_cast<usize>(newFid + 1)};
-    AttributeMatrix& amRef = m_DataStructure.getDataRefAs<AttributeMatrix>(m_InputValues->CellFeatureAMPath);
+    AttributeMatrix& amRef = m_DataStructure.getDataRefAs<AttributeMatrix>(m_InputValues->cell_feature_am_path);
     Result<> result = amRef.resizeTuples(tDims);
   }
   return featureIdSeed;
@@ -447,7 +452,7 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
       ebsdlib::Rodrigues<double> rod = ax.toRodrigues();
       rod = m_OrientationOps[laueClass1]->getMDFFZRod(rod);
       ax = rod.toAxisAngle();
-      const float32 w = ax[3] * (Constants::k_180OverPiD); // Convert to degrees
+      const float32 w = ax[3] * (constants::k_180OverPiD); // Convert to degrees
 
       // Test each of the special Axis-Angle relationships
       // c = <0001>
@@ -497,7 +502,7 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
     }
     else if(ebsdlib::CrystalStructure::Cubic_High == laueClass2 && ebsdlib::CrystalStructure::Hexagonal_High == laueClass1)
     {
-      if(check_for_burgers(q2, q1, m_AngleTolerance))
+      if(CheckForBurgers(q2, q1, m_AngleTolerance))
       {
         m_FeatureParentIds[neighborFeature] = newFid;
         return true;
@@ -505,7 +510,7 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
     }
     else if(ebsdlib::CrystalStructure::Cubic_High == laueClass1 && ebsdlib::CrystalStructure::Hexagonal_High == laueClass2)
     {
-      if(check_for_burgers(q1, q2, m_AngleTolerance))
+      if(CheckForBurgers(q1, q2, m_AngleTolerance))
       {
         m_FeatureParentIds[neighborFeature] = newFid;
         return true;
@@ -518,6 +523,6 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
 // -----------------------------------------------------------------------------
 //
 // -----------------------------------------------------------------------------
-void MergeColonies::characterize_colonies()
+void MergeColonies::characterizeColonies()
 {
 }

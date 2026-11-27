@@ -5,6 +5,7 @@
 #include "simplnx/Utilities/ThrottledMessageHandler.hpp"
 
 #include <algorithm>
+#include <cmath>
 
 using namespace nx::core;
 
@@ -19,7 +20,6 @@ ComputeMicroTextureRegions::ComputeMicroTextureRegions(DataStructure& dataStruct
 }
 
 // -----------------------------------------------------------------------------
-ComputeMicroTextureRegions::~ComputeMicroTextureRegions() noexcept = default;
 
 // -----------------------------------------------------------------------------
 const std::atomic_bool& ComputeMicroTextureRegions::getCancel()
@@ -30,16 +30,16 @@ const std::atomic_bool& ComputeMicroTextureRegions::getCancel()
 // -----------------------------------------------------------------------------
 Result<> ComputeMicroTextureRegions::operator()()
 {
-  auto& imageGeom = m_DataStructure.getDataRefAs<ImageGeom>(m_InputValues->ImageGeomPath);
-  auto& featureIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeatureIdsArrayPath);
-  auto& microTextureRegionNumCells = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->MicroTextureRegionNumCellsArrayPath);
+  auto& imageGeom = m_DataStructure.getDataRefAs<ImageGeom>(m_InputValues->image_geom_path);
+  auto& featureIds = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->feature_ids_array_path);
+  auto& microTextureRegionNumCells = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->micro_texture_region_num_cells_array_path);
 
   usize numMicroTextureRegions = microTextureRegionNumCells.getNumberOfTuples();
 
   usize xPoints = imageGeom.getNumXCells();
   usize yPoints = imageGeom.getNumYCells();
   usize zPoints = imageGeom.getNumZCells();
-  FloatVec3 spacing = imageGeom.getSpacing();
+  FloatVec3Type spacing = imageGeom.getSpacing();
 
   std::vector<float32> microTextureRegionXMins(numMicroTextureRegions, spacing[0] * static_cast<float32>(xPoints));
   std::vector<float32> microTextureRegionXMaxs(numMicroTextureRegions, 0.0f);
@@ -53,8 +53,11 @@ Result<> ComputeMicroTextureRegions::operator()()
   ThrottledMessageHandler progressThrottle(m_MessageHandler);
   progressThrottle.reset(zPoints, "Finding MicroTexture Region Bounds");
 
-  float32 x, y, z;
-  usize zStride, yStride;
+  float32 x = NAN;
+  float32 y = NAN;
+  float32 z = NAN;
+  usize zStride = 0;
+  usize yStride = 0;
   for(usize i = 0; i < zPoints; i++)
   {
     if(m_ShouldCancel)
@@ -71,36 +74,18 @@ Result<> ComputeMicroTextureRegions::operator()()
         x = static_cast<float32>(k) * spacing[0];
         y = static_cast<float32>(j) * spacing[1];
         z = static_cast<float32>(i) * spacing[2];
-        if(x > microTextureRegionXMaxs[mtNum])
-        {
-          microTextureRegionXMaxs[mtNum] = x;
-        }
-        if(y > microTextureRegionYMaxs[mtNum])
-        {
-          microTextureRegionYMaxs[mtNum] = y;
-        }
-        if(z > microTextureRegionZMaxs[mtNum])
-        {
-          microTextureRegionZMaxs[mtNum] = z;
-        }
-        if(x < microTextureRegionXMins[mtNum])
-        {
-          microTextureRegionXMins[mtNum] = x;
-        }
-        if(y < microTextureRegionYMins[mtNum])
-        {
-          microTextureRegionYMins[mtNum] = y;
-        }
-        if(z < microTextureRegionZMins[mtNum])
-        {
-          microTextureRegionZMins[mtNum] = z;
-        }
+        microTextureRegionXMaxs[mtNum] = std::max(x, microTextureRegionXMaxs[mtNum]);
+        microTextureRegionYMaxs[mtNum] = std::max(y, microTextureRegionYMaxs[mtNum]);
+        microTextureRegionZMaxs[mtNum] = std::max(z, microTextureRegionZMaxs[mtNum]);
+        microTextureRegionXMins[mtNum] = std::min(x, microTextureRegionXMins[mtNum]);
+        microTextureRegionYMins[mtNum] = std::min(y, microTextureRegionYMins[mtNum]);
+        microTextureRegionZMins[mtNum] = std::min(z, microTextureRegionZMins[mtNum]);
       }
     }
     progressThrottle.updateCount(i + 1);
   }
 
-  auto& microTextureRegionFractionOccupied = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->MicroTextureRegionFractionOccupiedArrayPath);
+  auto& microTextureRegionFractionOccupied = m_DataStructure.getDataRefAs<Float32ArrayType>(m_InputValues->micro_texture_region_fraction_occupied_array_path);
   progressThrottle.reset(numMicroTextureRegions > 1 ? numMicroTextureRegions - 1 : 0, "Computing MicroTexture Region Fractions");
   for(usize i = 1; i < numMicroTextureRegions; i++)
   {

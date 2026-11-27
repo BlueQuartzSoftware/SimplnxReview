@@ -11,7 +11,7 @@ using namespace nx::core;
 
 namespace
 {
-float32 distBetweenPoints(const Vec3<float32>& srcPoint, const Vec3<float32>& destPoint)
+float32 DistBetweenPoints(const Vec3<float32>& srcPoint, const Vec3<float32>& destPoint)
 {
   return powf(destPoint[0] - srcPoint[0], 2.0f) + pow(destPoint[1] - srcPoint[1], 2.0f) + pow(destPoint[2] - srcPoint[2], 2.0f);
 }
@@ -56,12 +56,12 @@ public:
       }
 
       Vec3<float32> destVertexCoord = m_DestGeometry.getVertexCoordinate(destVertexId);
-      usize closestVertexId;
+      usize closestVertexId = 0;
       float32 closestDist = std::numeric_limits<float32>::max();
       for(usize srcVertexId = 0; srcVertexId < m_SrcGeometry.getNumberOfVertices(); srcVertexId++)
       {
         Vec3<float32> srcVertexCoord = m_SrcGeometry.getVertexCoordinate(srcVertexId);
-        float32 dist = distBetweenPoints(srcVertexCoord, destVertexCoord);
+        float32 dist = DistBetweenPoints(srcVertexCoord, destVertexCoord);
         closestVertexId = (dist < closestDist) ? srcVertexId : closestVertexId;
         closestDist = (dist < closestDist) ? dist : closestDist;
       }
@@ -125,8 +125,8 @@ const std::atomic_bool& InterpolateValuesToUnstructuredGrid::getCancel()
 // -----------------------------------------------------------------------------
 Result<> InterpolateValuesToUnstructuredGrid::operator()()
 {
-  auto& srcGeometry = m_DataStructure.getDataRefAs<INodeGeometry0D>(m_InputValues->SourceGeomPath);
-  auto& destGeometry = m_DataStructure.getDataRefAs<INodeGeometry0D>(m_InputValues->DestinationGeomPath);
+  auto& srcGeometry = m_DataStructure.getDataRefAs<INodeGeometry0D>(m_InputValues->source_geom_path);
+  auto& destGeometry = m_DataStructure.getDataRefAs<INodeGeometry0D>(m_InputValues->destination_geom_path);
 
   std::vector<usize> closestSrcIds(destGeometry.getNumberOfVertices());
 
@@ -136,7 +136,7 @@ Result<> InterpolateValuesToUnstructuredGrid::operator()()
 
   // Parallel algorithm to calculate closest vertices
   ParallelDataAlgorithm dataAlg;
-  dataAlg.setRange(0ULL, static_cast<usize>(destGeometry.getNumberOfVertices()));
+  dataAlg.setRange(0ULL, destGeometry.getNumberOfVertices());
   dataAlg.execute(CalculateClosestVerticesImpl(this, srcGeometry, destGeometry, closestSrcIds, m_MessageHandler, m_ShouldCancel));
   if(m_ShouldCancel)
   {
@@ -145,19 +145,19 @@ Result<> InterpolateValuesToUnstructuredGrid::operator()()
   m_MessageHandler.sendProgressCount("Calculating Closest Vertices", m_TotalElements, m_TotalElements);
 
   DataPath interpolatedAttrMatrixPath;
-  if(m_InputValues->UseExistingAttrMatrix)
+  if(m_InputValues->use_existing_attr_matrix)
   {
-    interpolatedAttrMatrixPath = m_InputValues->ExistingAttrMatrixPath;
+    interpolatedAttrMatrixPath = m_InputValues->existing_attr_matrix_path;
   }
   else
   {
-    interpolatedAttrMatrixPath = m_InputValues->DestinationGeomPath.createChildPath(m_InputValues->CreatedAttrMatrixName);
+    interpolatedAttrMatrixPath = m_InputValues->destination_geom_path.createChildPath(m_InputValues->created_attr_matrix_name);
   }
 
   ProgressEstimator arrayEstimator;
-  for(usize i = 0; i < m_InputValues->InputDataPaths.size(); i++)
+  for(usize i = 0; i < m_InputValues->input_data_paths.size(); i++)
   {
-    const auto& dataPath = m_InputValues->InputDataPaths[i];
+    const auto& dataPath = m_InputValues->input_data_paths[i];
 
     if(m_ShouldCancel)
     {
@@ -171,7 +171,7 @@ Result<> InterpolateValuesToUnstructuredGrid::operator()()
 
     ExecuteDataFunction(ExecuteInterpolation{}, srcDataArray.getDataType(), srcDataArray, destDataArray, closestSrcIds);
 
-    m_MessageHandler.sendProgressCount("Interpolating Array Values", i + 1, m_InputValues->InputDataPaths.size(), arrayEstimator.estimate(i + 1, m_InputValues->InputDataPaths.size()));
+    m_MessageHandler.sendProgressCount("Interpolating Array Values", i + 1, m_InputValues->input_data_paths.size(), arrayEstimator.estimate(i + 1, m_InputValues->input_data_paths.size()));
   }
 
   return {};
@@ -180,6 +180,6 @@ Result<> InterpolateValuesToUnstructuredGrid::operator()()
 // -----------------------------------------------------------------------------
 void InterpolateValuesToUnstructuredGrid::sendThreadSafeProgressMessage(usize counter)
 {
-  std::lock_guard<std::mutex> guard(m_ProgressMessage_Mutex);
+  std::lock_guard<std::mutex> guard(m_ProgressMessageMutex);
   m_Throttle.incrementPercent(counter);
 }

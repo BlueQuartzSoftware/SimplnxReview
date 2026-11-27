@@ -5,7 +5,7 @@
 #include "SimplnxReview/SimplnxReviewFilterBinding.hpp"
 
 using namespace nx::core;
-using namespace nx::core::NxPybind;
+using namespace nx::core::nx_pybind;
 namespace py = pybind11;
 
 using namespace pybind11::literals;
@@ -20,7 +20,7 @@ PYBIND11_MODULE(simplnxreview, mod) // <== IS THAT IN ALL LOWER CASE?
 
   auto& internals = Internals::Instance();
 
-  auto* plugin = internals.addPlugin<SimplnxReviewPlugin>();
+  const auto* pluginPtr = internals.addPlugin<SimplnxReviewPlugin>();
 
   SimplnxReview::BindFilters(mod, internals);
 }

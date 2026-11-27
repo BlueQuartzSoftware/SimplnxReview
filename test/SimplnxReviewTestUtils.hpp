@@ -43,8 +43,3 @@ namespace nx::core
 } // namespace nx::core
 
 using namespace nx::core;
-
-namespace SmallIn100
-{
-
-} // namespace SmallIn100

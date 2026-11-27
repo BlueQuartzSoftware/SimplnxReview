@@ -24,10 +24,10 @@ public:
   ComputeSaltykovSizesFilter& operator=(ComputeSaltykovSizesFilter&&) noexcept = delete;
 
   // Parameter Keys
-  static constexpr StringLiteral k_UseSeed_Key = "use_seed";
-  static constexpr StringLiteral k_SeedValue_Key = "seed_value";
-  static constexpr StringLiteral k_EquivalentDiametersArrayPath_Key = "equivalent_diameters_array_path";
-  static constexpr StringLiteral k_SaltykovEquivalentDiametersName_Key = "saltykov_equivalent_diameters_name";
+  static constexpr StringLiteralType k_UseSeed_Key = "use_seed";
+  static constexpr StringLiteralType k_SeedValue_Key = "seed_value";
+  static constexpr StringLiteralType k_EquivalentDiametersArrayPath_Key = "equivalent_diameters_array_path";
+  static constexpr StringLiteralType k_SaltykovEquivalentDiametersName_Key = "saltykov_equivalent_diameters_name";
 
   /**
    * @brief Reads SIMPL json and converts it simplnx Arguments.
@@ -84,7 +84,7 @@ public:
    * @brief Returns a copy of the filter.
    * @return
    */
-  UniquePointer clone() const override;
+  UniquePointerType clone() const override;
 
 protected:
   /**

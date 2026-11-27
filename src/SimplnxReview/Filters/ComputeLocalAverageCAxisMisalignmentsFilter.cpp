@@ -68,17 +68,17 @@ Parameters ComputeLocalAverageCAxisMisalignmentsFilter::parameters() const
 
   params.insertSeparator(Parameters::Separator{"Input Feature Data"});
   params.insert(std::make_unique<ArraySelectionParameter>(k_FeatureParentIdsPath_Key, "Feature Parent Ids", "Input feature based ParentIds data array", DataPath{},
-                                                          ArraySelectionParameter::AllowedTypes{DataType::int32}, ArraySelectionParameter::AllowedComponentShapes{{1}}));
-  params.insert(
-      std::make_unique<NeighborListSelectionParameter>(k_NeighborListPath_Key, "Neighbor List", "Feature based Neighbors", DataPath{}, NeighborListSelectionParameter::AllowedTypes{DataType::int32}));
+                                                          ArraySelectionParameter::AllowedTypeSetType{DataType::int32}, ArraySelectionParameter::AllowedComponentShapesType{{1}}));
+  params.insert(std::make_unique<NeighborListSelectionParameter>(k_NeighborListPath_Key, "Neighbor List", "Feature based Neighbors", DataPath{},
+                                                                 NeighborListSelectionParameter::AllowedTypeSetType{DataType::int32}));
   params.insert(std::make_unique<NeighborListSelectionParameter>(k_CAxisMisalignmentListPath_Key, "C-Axis Mis-alignment NeighborList", "Input feature based C-Axis Mis-alignment NeighborList",
-                                                                 DataPath{}, NeighborListSelectionParameter::AllowedTypes{DataType::float32}));
+                                                                 DataPath{}, NeighborListSelectionParameter::AllowedTypeSetType{DataType::float32}));
   params.insert(std::make_unique<ArraySelectionParameter>(k_AvgCAxisMisalignmentsPath_Key, "Average C-Axis Mis-alignments", "Input feature based Average C-Axis Mis-alignments", DataPath{},
-                                                          ArraySelectionParameter::AllowedTypes{DataType::int32}, ArraySelectionParameter::AllowedComponentShapes{{1}}));
+                                                          ArraySelectionParameter::AllowedTypeSetType{DataType::int32}, ArraySelectionParameter::AllowedComponentShapesType{{1}}));
 
   params.insertSeparator(Parameters::Separator{"Output Feature Data"});
   params.insert(std::make_unique<DataGroupSelectionParameter>(k_NewCellFeatureAttributeMatrixPath_Key, "New Feature Attribute Matrix Name", "Output Feature Attribute Matrix to hold results",
-                                                              DataPath{}, DataGroupSelectionParameter::AllowedTypes{BaseGroup::GroupType::AttributeMatrix}));
+                                                              DataPath{}, DataGroupSelectionParameter::AllowedTypeSetType{BaseGroup::GroupType::AttributeMatrix}));
   params.insert(std::make_unique<DataObjectNameParameter>(k_NumFeaturesPerParentName_Key, "Number of Features Per Parent Array Name", "Output feature data array to hold number of features per parent",
                                                           "NumFeaturesPerParent"));
   params.insert(std::make_unique<DataObjectNameParameter>(k_LocalCAxisMisalignmentsName_Key, "Local C-Axis Mis-alignments Array Name",
@@ -98,7 +98,7 @@ Parameters ComputeLocalAverageCAxisMisalignmentsFilter::parameters() const
 }
 
 //------------------------------------------------------------------------------
-IFilter::UniquePointer ComputeLocalAverageCAxisMisalignmentsFilter::clone() const
+IFilter::UniquePointerType ComputeLocalAverageCAxisMisalignmentsFilter::clone() const
 {
   return std::make_unique<ComputeLocalAverageCAxisMisalignmentsFilter>();
 }
@@ -110,8 +110,8 @@ IFilter::VersionType ComputeLocalAverageCAxisMisalignmentsFilter::parametersVers
 }
 
 //------------------------------------------------------------------------------
-IFilter::PreflightResult ComputeLocalAverageCAxisMisalignmentsFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& messageHandler,
-                                                                                    const std::atomic_bool& shouldCancel, const ExecutionContext& executionContext) const
+IFilter::PreflightResult ComputeLocalAverageCAxisMisalignmentsFilter::preflightImpl(const DataStructure& dataStructure, const Arguments& filterArgs, const MessageHandler& /*messageHandler*/,
+                                                                                    const std::atomic_bool& /*shouldCancel*/, const ExecutionContext& /*executionContext*/) const
 {
   auto pCalcBiasedAvgValue = filterArgs.value<bool>(k_CalcBiasedAvg_Key);
   auto pCalcUnbiasedAvgValue = filterArgs.value<bool>(k_CalcUnbiasedAvg_Key);
@@ -133,17 +133,17 @@ IFilter::PreflightResult ComputeLocalAverageCAxisMisalignmentsFilter::preflightI
                                             "consider making one or both true or remove filter from pipeline.");
   }
 
-  const auto* parentAM = dataStructure.getDataAs<AttributeMatrix>(pParentAMPathValue);
+  const auto* parentAmPtr = dataStructure.getDataAs<AttributeMatrix>(pParentAMPathValue);
 
   {
-    auto createArrayAction = std::make_unique<CreateArrayAction>(DataType::int32, parentAM->getShape(), std::vector<usize>{1}, pParentAMPathValue.createChildPath(pNumFeaturesPerParentNameValue));
+    auto createArrayAction = std::make_unique<CreateArrayAction>(DataType::int32, parentAmPtr->getShape(), std::vector<usize>{1}, pParentAMPathValue.createChildPath(pNumFeaturesPerParentNameValue));
     resultOutputActions.value().appendAction(std::move(createArrayAction));
   }
 
   if(pCalcBiasedAvgValue)
   {
     {
-      auto createArrayAction = std::make_unique<CreateArrayAction>(DataType::float32, parentAM->getShape(), std::vector<usize>{1}, pParentAMPathValue.createChildPath(pLocalMisalignmentsNameValue));
+      auto createArrayAction = std::make_unique<CreateArrayAction>(DataType::float32, parentAmPtr->getShape(), std::vector<usize>{1}, pParentAMPathValue.createChildPath(pLocalMisalignmentsNameValue));
       resultOutputActions.value().appendAction(std::move(createArrayAction));
     }
   }
@@ -171,7 +171,7 @@ IFilter::PreflightResult ComputeLocalAverageCAxisMisalignmentsFilter::preflightI
   if(pCalcUnbiasedAvgValue)
   {
     {
-      auto createArrayAction = std::make_unique<CreateArrayAction>(DataType::float32, parentAM->getShape(), std::vector<usize>{1}, pParentAMPathValue.createChildPath(pUnbiasedArrayNameValue));
+      auto createArrayAction = std::make_unique<CreateArrayAction>(DataType::float32, parentAmPtr->getShape(), std::vector<usize>{1}, pParentAMPathValue.createChildPath(pUnbiasedArrayNameValue));
       resultOutputActions.value().appendAction(std::move(createArrayAction));
     }
   }
@@ -209,43 +209,43 @@ IFilter::PreflightResult ComputeLocalAverageCAxisMisalignmentsFilter::preflightI
   resultOutputActions.warnings().push_back({-65432, "WARNING: This filter is experimental in nature and has not had any testing, validation or verification. Use at your own risk"});
 
   // Return both the resultOutputActions and the preflightUpdatedValues via std::move()
-  return {std::move(resultOutputActions), std::move(preflightUpdatedValues)};
+  return {.output_actions = std::move(resultOutputActions), .output_values = std::move(preflightUpdatedValues)};
 }
 
 //------------------------------------------------------------------------------
-Result<> ComputeLocalAverageCAxisMisalignmentsFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* pipelineNode, const MessageHandler& messageHandler,
-                                                                  const std::atomic_bool& shouldCancel, const ExecutionContext& executionContext) const
+Result<> ComputeLocalAverageCAxisMisalignmentsFilter::executeImpl(DataStructure& dataStructure, const Arguments& filterArgs, const PipelineFilter* /*pipelineNode*/,
+                                                                  const MessageHandler& messageHandler, const std::atomic_bool& shouldCancel, const ExecutionContext& /*executionContext*/) const
 {
   ComputeLocalAverageCAxisMisalignmentsInputValues inputValues;
 
   auto parentAM = filterArgs.value<DataPath>(k_NewCellFeatureAttributeMatrixPath_Key);
-  inputValues.NumFeaturesPerParentPath = parentAM.createChildPath(filterArgs.value<StringParameter::ValueType>(k_NumFeaturesPerParentName_Key));
-  inputValues.FeatureParentIdsPath = filterArgs.value<DataPath>(k_FeatureParentIdsPath_Key);
+  inputValues.num_features_per_parent_path = parentAM.createChildPath(filterArgs.value<StringParameter::ValueType>(k_NumFeaturesPerParentName_Key));
+  inputValues.feature_parent_ids_path = filterArgs.value<DataPath>(k_FeatureParentIdsPath_Key);
 
-  inputValues.CalcBiasedAvg = filterArgs.value<bool>(k_CalcBiasedAvg_Key);
-  if(inputValues.CalcBiasedAvg)
+  inputValues.calc_biased_avg = filterArgs.value<bool>(k_CalcBiasedAvg_Key);
+  if(inputValues.calc_biased_avg)
   {
-    inputValues.AvgCAxisMisalignmentsPath = filterArgs.value<DataPath>(k_AvgCAxisMisalignmentsPath_Key);
-    inputValues.LocalCAxisMisalignmentsPath = parentAM.createChildPath(filterArgs.value<StringParameter::ValueType>(k_LocalCAxisMisalignmentsName_Key));
+    inputValues.avg_c_axis_misalignments_path = filterArgs.value<DataPath>(k_AvgCAxisMisalignmentsPath_Key);
+    inputValues.local_c_axis_misalignments_path = parentAM.createChildPath(filterArgs.value<StringParameter::ValueType>(k_LocalCAxisMisalignmentsName_Key));
   }
   else
   {
-    inputValues.AvgCAxisMisalignmentsPath = k_AvgCAxisMisalignmentsPath;
-    inputValues.LocalCAxisMisalignmentsPath = k_LocalCAxisMisalignmentsPath;
+    inputValues.avg_c_axis_misalignments_path = k_AvgCAxisMisalignmentsPath;
+    inputValues.local_c_axis_misalignments_path = k_LocalCAxisMisalignmentsPath;
   }
 
-  inputValues.CalcUnbiasedAvg = filterArgs.value<bool>(k_CalcUnbiasedAvg_Key);
-  if(inputValues.CalcUnbiasedAvg)
+  inputValues.calc_unbiased_avg = filterArgs.value<bool>(k_CalcUnbiasedAvg_Key);
+  if(inputValues.calc_unbiased_avg)
   {
-    inputValues.NeighborListPath = filterArgs.value<DataPath>(k_NeighborListPath_Key);
-    inputValues.CAxisMisalignmentListPath = filterArgs.value<DataPath>(k_CAxisMisalignmentListPath_Key);
-    inputValues.UnbiasedLocalCAxisMisalignmentsPath = parentAM.createChildPath(filterArgs.value<StringParameter::ValueType>(k_UnbiasedLocalCAxisMisalignmentsName_Key));
+    inputValues.neighbor_list_path = filterArgs.value<DataPath>(k_NeighborListPath_Key);
+    inputValues.c_axis_misalignment_list_path = filterArgs.value<DataPath>(k_CAxisMisalignmentListPath_Key);
+    inputValues.unbiased_local_c_axis_misalignments_path = parentAM.createChildPath(filterArgs.value<StringParameter::ValueType>(k_UnbiasedLocalCAxisMisalignmentsName_Key));
   }
   else
   {
-    inputValues.NeighborListPath = k_NeighborListPath;
-    inputValues.CAxisMisalignmentListPath = k_CAxisMisalignmentListPath;
-    inputValues.UnbiasedLocalCAxisMisalignmentsPath = k_UnbiasedLocalCAxisMisalignmentsPath;
+    inputValues.neighbor_list_path = k_NeighborListPath;
+    inputValues.c_axis_misalignment_list_path = k_CAxisMisalignmentListPath;
+    inputValues.unbiased_local_c_axis_misalignments_path = k_UnbiasedLocalCAxisMisalignmentsPath;
   }
 
   return ComputeLocalAverageCAxisMisalignments(dataStructure, messageHandler, shouldCancel, &inputValues)();
@@ -253,19 +253,19 @@ Result<> ComputeLocalAverageCAxisMisalignmentsFilter::executeImpl(DataStructure&
 
 namespace
 {
-namespace SIMPL
+namespace simpl
 {
-constexpr StringLiteral k_AvgCAxisMisalignmentsArrayPathKey = "AvgCAxisMisalignmentsArrayPath";
-constexpr StringLiteral k_CAxisMisalignmentListArrayPathKey = "CAxisMisalignmentListArrayPath";
-constexpr StringLiteral k_CalcBiasedAvgKey = "CalcBiasedAvg";
-constexpr StringLiteral k_CalcUnbiasedAvgKey = "CalcUnbiasedAvg";
-constexpr StringLiteral k_FeatureParentIdsArrayPathKey = "FeatureParentIdsArrayPath";
-constexpr StringLiteral k_LocalCAxisMisalignmentsArrayNameKey = "LocalCAxisMisalignmentsArrayName";
-constexpr StringLiteral k_NeighborListArrayPathKey = "NeighborListArrayPath";
-constexpr StringLiteral k_NumFeaturesPerParentArrayNameKey = "NumFeaturesPerParentArrayName";
-constexpr StringLiteral k_NewCellFeatureAttributeMatrixNameKey = "NewCellFeatureAttributeMatrixName";
-constexpr StringLiteral k_UnbiasedLocalCAxisMisalignmentsArrayNameKey = "UnbiasedLocalCAxisMisalignmentsArrayName";
-} // namespace SIMPL
+constexpr StringLiteralType k_AvgCAxisMisalignmentsArrayPathKey = "AvgCAxisMisalignmentsArrayPath";
+constexpr StringLiteralType k_CAxisMisalignmentListArrayPathKey = "CAxisMisalignmentListArrayPath";
+constexpr StringLiteralType k_CalcBiasedAvgKey = "CalcBiasedAvg";
+constexpr StringLiteralType k_CalcUnbiasedAvgKey = "CalcUnbiasedAvg";
+constexpr StringLiteralType k_FeatureParentIdsArrayPathKey = "FeatureParentIdsArrayPath";
+constexpr StringLiteralType k_LocalCAxisMisalignmentsArrayNameKey = "LocalCAxisMisalignmentsArrayName";
+constexpr StringLiteralType k_NeighborListArrayPathKey = "NeighborListArrayPath";
+constexpr StringLiteralType k_NumFeaturesPerParentArrayNameKey = "NumFeaturesPerParentArrayName";
+constexpr StringLiteralType k_NewCellFeatureAttributeMatrixNameKey = "NewCellFeatureAttributeMatrixName";
+constexpr StringLiteralType k_UnbiasedLocalCAxisMisalignmentsArrayNameKey = "UnbiasedLocalCAxisMisalignmentsArrayName";
+} // namespace simpl
 } // namespace
 
 Result<Arguments> ComputeLocalAverageCAxisMisalignmentsFilter::FromSIMPLJson(const nlohmann::json& json)
@@ -275,21 +275,21 @@ Result<Arguments> ComputeLocalAverageCAxisMisalignmentsFilter::FromSIMPLJson(con
   std::vector<Result<>> results;
 
   results.push_back(
-      SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_AvgCAxisMisalignmentsArrayPathKey, k_AvgCAxisMisalignmentsPath_Key));
+      simpl_conversion::ConvertParameter<simpl_conversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_AvgCAxisMisalignmentsArrayPathKey, k_AvgCAxisMisalignmentsPath_Key));
   results.push_back(
-      SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_CAxisMisalignmentListArrayPathKey, k_CAxisMisalignmentListPath_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedBooleanFilterParameterConverter>(args, json, SIMPL::k_CalcBiasedAvgKey, k_CalcBiasedAvg_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedBooleanFilterParameterConverter>(args, json, SIMPL::k_CalcUnbiasedAvgKey, k_CalcUnbiasedAvg_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_FeatureParentIdsArrayPathKey, k_FeatureParentIdsPath_Key));
+      simpl_conversion::ConvertParameter<simpl_conversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_CAxisMisalignmentListArrayPathKey, k_CAxisMisalignmentListPath_Key));
+  results.push_back(simpl_conversion::ConvertParameter<simpl_conversion::LinkedBooleanFilterParameterConverter>(args, json, simpl::k_CalcBiasedAvgKey, k_CalcBiasedAvg_Key));
+  results.push_back(simpl_conversion::ConvertParameter<simpl_conversion::LinkedBooleanFilterParameterConverter>(args, json, simpl::k_CalcUnbiasedAvgKey, k_CalcUnbiasedAvg_Key));
+  results.push_back(simpl_conversion::ConvertParameter<simpl_conversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_FeatureParentIdsArrayPathKey, k_FeatureParentIdsPath_Key));
   results.push_back(
-      SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, SIMPL::k_LocalCAxisMisalignmentsArrayNameKey, k_LocalCAxisMisalignmentsName_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, SIMPL::k_NeighborListArrayPathKey, k_NeighborListPath_Key));
+      simpl_conversion::ConvertParameter<simpl_conversion::LinkedPathCreationFilterParameterConverter>(args, json, simpl::k_LocalCAxisMisalignmentsArrayNameKey, k_LocalCAxisMisalignmentsName_Key));
+  results.push_back(simpl_conversion::ConvertParameter<simpl_conversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_NeighborListArrayPathKey, k_NeighborListPath_Key));
   results.push_back(
-      SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, SIMPL::k_NumFeaturesPerParentArrayNameKey, k_NumFeaturesPerParentName_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataContainerSelectionFilterParameterConverter>(args, json, SIMPL::k_NewCellFeatureAttributeMatrixNameKey,
-                                                                                                                       k_NewCellFeatureAttributeMatrixPath_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, SIMPL::k_UnbiasedLocalCAxisMisalignmentsArrayNameKey,
-                                                                                                                   k_UnbiasedLocalCAxisMisalignmentsName_Key));
+      simpl_conversion::ConvertParameter<simpl_conversion::LinkedPathCreationFilterParameterConverter>(args, json, simpl::k_NumFeaturesPerParentArrayNameKey, k_NumFeaturesPerParentName_Key));
+  results.push_back(simpl_conversion::ConvertParameter<simpl_conversion::DataContainerSelectionFilterParameterConverter>(args, json, simpl::k_NewCellFeatureAttributeMatrixNameKey,
+                                                                                                                         k_NewCellFeatureAttributeMatrixPath_Key));
+  results.push_back(simpl_conversion::ConvertParameter<simpl_conversion::LinkedPathCreationFilterParameterConverter>(args, json, simpl::k_UnbiasedLocalCAxisMisalignmentsArrayNameKey,
+                                                                                                                     k_UnbiasedLocalCAxisMisalignmentsName_Key));
 
   Result<> conversionResult = MergeResults(std::move(results));
 

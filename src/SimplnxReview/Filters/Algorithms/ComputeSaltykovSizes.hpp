@@ -13,9 +13,9 @@ namespace nx::core
 
 struct SIMPLNXREVIEW_EXPORT ComputeSaltykovSizesInputValues
 {
-  DataPath EquivalentDiametersPath;
-  DataPath SaltykovEquivalentDiametersPath;
-  uint64 Seed;
+  DataPath equivalent_diameters_path;
+  DataPath saltykov_equivalent_diameters_path;
+  uint64 seed{};
 };
 
 /**
@@ -27,7 +27,7 @@ class SIMPLNXREVIEW_EXPORT ComputeSaltykovSizes
 {
 public:
   ComputeSaltykovSizes(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel, ComputeSaltykovSizesInputValues* inputValues);
-  ~ComputeSaltykovSizes() noexcept;
+  ~ComputeSaltykovSizes() noexcept = default;
 
   ComputeSaltykovSizes(const ComputeSaltykovSizes&) = delete;
   ComputeSaltykovSizes(ComputeSaltykovSizes&&) noexcept = delete;

@@ -17,13 +17,13 @@
 
 namespace nx::core
 {
-  static const AbstractPlugin::SIMPLMapType k_SIMPL_to_SimplnxReview
+  static const AbstractPlugin::SIMPLMapType k_SimplToSimplnxReview
   {
     // syntax std::make_pair {Dream3d UUID , Dream3dnx UUID, {}}}, // dream3d-class-name
-    {nx::core::Uuid::FromString("2c4a6d83-6a1b-56d8-9f65-9453b28845b9").value(), {nx::core::FilterTraits<MergeColoniesFilter>::uuid, &MergeColoniesFilter::FromSIMPLJson}}, // MergeColonies
-    {nx::core::Uuid::FromString("cc76cffe-81ad-5ece-be2a-ce127c5fa6d7").value(), {nx::core::FilterTraits<ComputeSaltykovSizesFilter>::uuid, &ComputeSaltykovSizesFilter::FromSIMPLJson}}, // FindSaltykovSizes
-    {nx::core::Uuid::FromString("90f8e3b1-2460-5862-95a1-a9e06f5ee75e").value(), {nx::core::FilterTraits<ComputeMicroTextureRegionsFilter>::uuid, &ComputeMicroTextureRegionsFilter::FromSIMPLJson}}, // FindMicroTextureRegions
-    {nx::core::Uuid::FromString("49b2dd47-bb29-50d4-a051-5bad9b6b9f80").value(), {nx::core::FilterTraits<ComputeLocalAverageCAxisMisalignmentsFilter>::uuid, &ComputeLocalAverageCAxisMisalignmentsFilter::FromSIMPLJson}}, // FindLocalAverageCAxisMisalignments
+    {nx::core::Uuid::FromString("2c4a6d83-6a1b-56d8-9f65-9453b28845b9").value(), {.simplnx_uuid=nx::core::FilterTraits<MergeColoniesFilter>::uuid, .convert_json=&MergeColoniesFilter::FromSIMPLJson}}, // MergeColonies
+    {nx::core::Uuid::FromString("cc76cffe-81ad-5ece-be2a-ce127c5fa6d7").value(), {.simplnx_uuid=nx::core::FilterTraits<ComputeSaltykovSizesFilter>::uuid, .convert_json=&ComputeSaltykovSizesFilter::FromSIMPLJson}}, // FindSaltykovSizes
+    {nx::core::Uuid::FromString("90f8e3b1-2460-5862-95a1-a9e06f5ee75e").value(), {.simplnx_uuid=nx::core::FilterTraits<ComputeMicroTextureRegionsFilter>::uuid, .convert_json=&ComputeMicroTextureRegionsFilter::FromSIMPLJson}}, // FindMicroTextureRegions
+    {nx::core::Uuid::FromString("49b2dd47-bb29-50d4-a051-5bad9b6b9f80").value(), {.simplnx_uuid=nx::core::FilterTraits<ComputeLocalAverageCAxisMisalignmentsFilter>::uuid, .convert_json=&ComputeLocalAverageCAxisMisalignmentsFilter::FromSIMPLJson}}, // FindLocalAverageCAxisMisalignments
     // @@__MAP__UPDATE__TOKEN__DO__NOT__DELETE__@@
   };
 

@@ -13,11 +13,11 @@ namespace nx::core
 
 struct SIMPLNXREVIEW_EXPORT ComputeMicroTextureRegionsInputValues
 {
-  DataPath ImageGeomPath;
-  DataPath FeatureIdsArrayPath;
-  DataPath CellFeatureAttributeMatrixPath;
-  DataPath MicroTextureRegionNumCellsArrayPath;
-  DataPath MicroTextureRegionFractionOccupiedArrayPath;
+  DataPath image_geom_path;
+  DataPath feature_ids_array_path;
+  DataPath cell_feature_attribute_matrix_path;
+  DataPath micro_texture_region_num_cells_array_path;
+  DataPath micro_texture_region_fraction_occupied_array_path;
 };
 
 /**
@@ -29,7 +29,7 @@ class SIMPLNXREVIEW_EXPORT ComputeMicroTextureRegions
 {
 public:
   ComputeMicroTextureRegions(DataStructure& dataStructure, const IFilter::MessageHandler& mesgHandler, const std::atomic_bool& shouldCancel, ComputeMicroTextureRegionsInputValues* inputValues);
-  ~ComputeMicroTextureRegions() noexcept;
+  ~ComputeMicroTextureRegions() noexcept = default;
 
   ComputeMicroTextureRegions(const ComputeMicroTextureRegions&) = delete;
   ComputeMicroTextureRegions(ComputeMicroTextureRegions&&) noexcept = delete;
