@@ -67,14 +67,15 @@ Parameters ComputeLocalAverageCAxisMisalignmentsFilter::parameters() const
   params.insertLinkableParameter(std::make_unique<BoolParameter>(k_CalcBiasedAvg_Key, "Calculate Local C-Axis Mis-alignments", "Calculate Local C-Axis Mis-alignments", false));
 
   params.insertSeparator(Parameters::Separator{"Input Feature Data"});
-  params.insert(std::make_unique<ArraySelectionParameter>(k_FeatureParentIdsPath_Key, "Feature Parent Ids", "Input feature based ParentIds data array", DataPath{},
-                                                          ArraySelectionParameter::AllowedTypeSetType{DataType::int32}, ArraySelectionParameter::AllowedComponentShapesType{{1}}));
+  params.insert(std::make_unique<ArraySelectionParameter>(k_FeatureParentIdsPath_Key, "Feature Parent Ids", "Input feature based ParentIds data array", DataPath{}, GetDataArrayOnlyTypes(),
+                                                          ArraySelectionParameter::AllowedDataTypes{DataType::int32}, ArraySelectionParameter::AllowedComponentShapesType{{1}}));
   params.insert(std::make_unique<NeighborListSelectionParameter>(k_NeighborListPath_Key, "Neighbor List", "Feature based Neighbors", DataPath{},
                                                                  NeighborListSelectionParameter::AllowedTypeSetType{DataType::int32}));
   params.insert(std::make_unique<NeighborListSelectionParameter>(k_CAxisMisalignmentListPath_Key, "C-Axis Mis-alignment NeighborList", "Input feature based C-Axis Mis-alignment NeighborList",
                                                                  DataPath{}, NeighborListSelectionParameter::AllowedTypeSetType{DataType::float32}));
   params.insert(std::make_unique<ArraySelectionParameter>(k_AvgCAxisMisalignmentsPath_Key, "Average C-Axis Mis-alignments", "Input feature based Average C-Axis Mis-alignments", DataPath{},
-                                                          ArraySelectionParameter::AllowedTypeSetType{DataType::int32}, ArraySelectionParameter::AllowedComponentShapesType{{1}}));
+                                                          GetDataArrayOnlyTypes(), ArraySelectionParameter::AllowedDataTypes{DataType::int32},
+                                                          ArraySelectionParameter::AllowedComponentShapesType{{1}}));
 
   params.insertSeparator(Parameters::Separator{"Output Feature Data"});
   params.insert(std::make_unique<DataGroupSelectionParameter>(k_NewCellFeatureAttributeMatrixPath_Key, "New Feature Attribute Matrix Name", "Output Feature Attribute Matrix to hold results",

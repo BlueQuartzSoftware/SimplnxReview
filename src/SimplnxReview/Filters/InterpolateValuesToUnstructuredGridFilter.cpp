@@ -61,7 +61,7 @@ Parameters InterpolateValuesToUnstructuredGridFilter::parameters() const
   params.insert(std::make_unique<GeometrySelectionParameter>(k_DestinationGeometryPath_Key, "Interpolated Node-Based Geometry", "DataPath to node-based interpolated geometry", DataPath(), geomTypes));
 
   params.insert(std::make_unique<MultiArraySelectionParameter>(k_InterpolatedArrayPaths_Key, "Attribute Arrays to Interpolate", "DataPaths to interpolate", std::vector<DataPath>(),
-                                                               MultiArraySelectionParameter::AllowedTypeSetType{IArray::ArrayType::DataArray}, GetAllNumericTypes()));
+                                                               MultiArraySelectionParameter::AllowedArrayTypes{IArray::ArrayType::DataArray}, GetAllDataTypes()));
 
   params.insertSeparator(Parameters::Separator{"Output Data Object(s)"});
   params.insertLinkableParameter(
