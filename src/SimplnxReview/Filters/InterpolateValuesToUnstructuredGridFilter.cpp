@@ -52,7 +52,7 @@ std::vector<std::string> InterpolateValuesToUnstructuredGridFilter::defaultTags(
 Parameters InterpolateValuesToUnstructuredGridFilter::parameters() const
 {
   GeometrySelectionParameter::AllowedTypeSetType geomTypes = {IGeometry::Type::Vertex, IGeometry::Type::Edge,        IGeometry::Type::Triangle,
-                                                        IGeometry::Type::Quad,   IGeometry::Type::Tetrahedral, IGeometry::Type::Hexahedral};
+                                                              IGeometry::Type::Quad,   IGeometry::Type::Tetrahedral, IGeometry::Type::Hexahedral};
 
   Parameters params;
 

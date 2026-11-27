@@ -19,8 +19,8 @@ class FindLocalAverageMisalignments
 {
 public:
   FindLocalAverageMisalignments(const std::atomic_bool& shouldCancel, ThrottledMessageHandler& progressThrottle, const Int32ArrayType& featureParentIds, const Float32ArrayType& avgCAxisMisalignments,
-                                Int32NeighborListType& neighborList, Float32NeighborListType& cAxisMisalignmentList, Int32ArrayType& numFeaturesPerParent, Float32ArrayType& unbiasedLocalCAxisMisalignments,
-                                Float32ArrayType& localCAxisMisalignments)
+                                Int32NeighborListType& neighborList, Float32NeighborListType& cAxisMisalignmentList, Int32ArrayType& numFeaturesPerParent,
+                                Float32ArrayType& unbiasedLocalCAxisMisalignments, Float32ArrayType& localCAxisMisalignments)
   : m_ShouldCancel(shouldCancel)
   , m_Throttle(progressThrottle)
   , m_FeatureParentIds(featureParentIds)

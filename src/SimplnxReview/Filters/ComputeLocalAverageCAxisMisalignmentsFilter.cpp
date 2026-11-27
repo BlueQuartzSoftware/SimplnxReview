@@ -69,8 +69,8 @@ Parameters ComputeLocalAverageCAxisMisalignmentsFilter::parameters() const
   params.insertSeparator(Parameters::Separator{"Input Feature Data"});
   params.insert(std::make_unique<ArraySelectionParameter>(k_FeatureParentIdsPath_Key, "Feature Parent Ids", "Input feature based ParentIds data array", DataPath{},
                                                           ArraySelectionParameter::AllowedTypeSetType{DataType::int32}, ArraySelectionParameter::AllowedComponentShapesType{{1}}));
-  params.insert(
-      std::make_unique<NeighborListSelectionParameter>(k_NeighborListPath_Key, "Neighbor List", "Feature based Neighbors", DataPath{}, NeighborListSelectionParameter::AllowedTypeSetType{DataType::int32}));
+  params.insert(std::make_unique<NeighborListSelectionParameter>(k_NeighborListPath_Key, "Neighbor List", "Feature based Neighbors", DataPath{},
+                                                                 NeighborListSelectionParameter::AllowedTypeSetType{DataType::int32}));
   params.insert(std::make_unique<NeighborListSelectionParameter>(k_CAxisMisalignmentListPath_Key, "C-Axis Mis-alignment NeighborList", "Input feature based C-Axis Mis-alignment NeighborList",
                                                                  DataPath{}, NeighborListSelectionParameter::AllowedTypeSetType{DataType::float32}));
   params.insert(std::make_unique<ArraySelectionParameter>(k_AvgCAxisMisalignmentsPath_Key, "Average C-Axis Mis-alignments", "Input feature based Average C-Axis Mis-alignments", DataPath{},
@@ -287,9 +287,9 @@ Result<Arguments> ComputeLocalAverageCAxisMisalignmentsFilter::FromSIMPLJson(con
   results.push_back(
       simpl_conversion::ConvertParameter<simpl_conversion::LinkedPathCreationFilterParameterConverter>(args, json, simpl::k_NumFeaturesPerParentArrayNameKey, k_NumFeaturesPerParentName_Key));
   results.push_back(simpl_conversion::ConvertParameter<simpl_conversion::DataContainerSelectionFilterParameterConverter>(args, json, simpl::k_NewCellFeatureAttributeMatrixNameKey,
-                                                                                                                       k_NewCellFeatureAttributeMatrixPath_Key));
+                                                                                                                         k_NewCellFeatureAttributeMatrixPath_Key));
   results.push_back(simpl_conversion::ConvertParameter<simpl_conversion::LinkedPathCreationFilterParameterConverter>(args, json, simpl::k_UnbiasedLocalCAxisMisalignmentsArrayNameKey,
-                                                                                                                   k_UnbiasedLocalCAxisMisalignmentsName_Key));
+                                                                                                                     k_UnbiasedLocalCAxisMisalignmentsName_Key));
 
   Result<> conversionResult = MergeResults(std::move(results));
 

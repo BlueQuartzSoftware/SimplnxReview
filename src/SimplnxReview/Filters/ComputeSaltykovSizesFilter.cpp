@@ -141,7 +141,7 @@ Result<Arguments> ComputeSaltykovSizesFilter::FromSIMPLJson(const nlohmann::json
   results.push_back(
       simpl_conversion::ConvertParameter<simpl_conversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_EquivalentDiametersArrayPathKey, k_EquivalentDiametersArrayPath_Key));
   results.push_back(simpl_conversion::ConvertParameter<simpl_conversion::DataArrayCreationToDataObjectNameFilterParameterConverter>(args, json, simpl::k_SaltykovEquivalentDiametersArrayPathKey,
-                                                                                                                                  k_SaltykovEquivalentDiametersName_Key));
+                                                                                                                                    k_SaltykovEquivalentDiametersName_Key));
 
   Result<> conversionResult = MergeResults(std::move(results));
 
