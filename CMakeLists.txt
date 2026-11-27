@@ -30,6 +30,7 @@ set(${PLUGIN_NAME}_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
 # These are all the filters in the plugin. All filters should be kept in the
 # SimplnxReview/src/SimplnxReview/Filters/ directory.
 set(FilterList
+  ComputeEquivalentDiameterCirclesFilter
   ComputeLocalAverageCAxisMisalignmentsFilter
   ComputeMicroTextureRegionsFilter
   ComputeSaltykovSizesFilter
@@ -45,6 +46,7 @@ set(ActionList
 # This should be integrated with the `create_simplnx_plugin` function call
 # ------------------------------------------------------------------------------
 set(AlgorithmList
+  ComputeEquivalentDiameterCircles
   ComputeLocalAverageCAxisMisalignments
   ComputeMicroTextureRegions
   ComputeSaltykovSizes
