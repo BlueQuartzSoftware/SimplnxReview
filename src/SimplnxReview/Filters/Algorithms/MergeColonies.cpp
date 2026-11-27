@@ -133,12 +133,12 @@ MergeColonies::MergeColonies(DataStructure& dataStructure, const IFilter::Messag
 , m_ShouldCancel(shouldCancel)
 , m_MessageHandler(mesgHandler)
 , m_OrientationOps(ebsdlib::LaueOps::GetAllOrientationOps())
-, m_FeatureParentIds(dataStructure.getDataRefAs<Int32ArrayType>(inputValues->FeatureParentIdsPath))
-, m_FeaturePhases(dataStructure.getDataRefAs<Int32ArrayType>(inputValues->FeaturePhasesPath))
-, m_AvgQuats(dataStructure.getDataRefAs<Float32ArrayType>(inputValues->AvgQuatsPath))
-, m_CrystalStructures(dataStructure.getDataRefAs<UInt32ArrayType>(inputValues->CrystalStructuresPath))
-, m_AxisToleranceRad(inputValues->AxisTolerance * constants::k_PiF / 180.0f)
-, m_AngleTolerance(inputValues->AngleTolerance)
+, m_FeatureParentIds(dataStructure.getDataRefAs<Int32ArrayType>(inputValues->feature_parent_ids_path))
+, m_FeaturePhases(dataStructure.getDataRefAs<Int32ArrayType>(inputValues->feature_phases_path))
+, m_AvgQuats(dataStructure.getDataRefAs<Float32ArrayType>(inputValues->avg_quats_path))
+, m_CrystalStructures(dataStructure.getDataRefAs<UInt32ArrayType>(inputValues->crystal_structures_path))
+, m_AxisToleranceRad(inputValues->axis_tolerance * constants::k_PiF / 180.0f)
+, m_AngleTolerance(inputValues->angle_tolerance)
 {
 }
 
@@ -162,11 +162,11 @@ Result<> MergeColonies::execute()
 {
   ThrottledMessageHandler progressThrottle(m_MessageHandler);
 
-  NeighborList<int32>& featureNeighborListRef = m_DataStructure.getDataRefAs<NeighborList<int32>>(m_InputValues->ContiguousNeighborListArrayPath);
+  NeighborList<int32>& featureNeighborListRef = m_DataStructure.getDataRefAs<NeighborList<int32>>(m_InputValues->contiguous_neighbor_list_array_path);
   NeighborList<int32>* nonContigNeighListPtr = nullptr;
-  if(m_InputValues->UseNonContiguousNeighbors)
+  if(m_InputValues->use_non_contiguous_neighbors)
   {
-    nonContigNeighListPtr = m_DataStructure.getDataAs<NeighborList<int32>>(m_InputValues->NonContiguousNeighborListArrayPath);
+    nonContigNeighListPtr = m_DataStructure.getDataAs<NeighborList<int32>>(m_InputValues->non_contiguous_neighbor_list_array_path);
   }
   if(nullptr == nonContigNeighListPtr)
   {
@@ -193,7 +193,7 @@ Result<> MergeColonies::execute()
       {
         int32 firstFeature = groupList[j];
         featureNeighborListSize = static_cast<int32>(featureNeighborListRef[firstFeature].size());
-        if(m_InputValues->UseNonContiguousNeighbors)
+        if(m_InputValues->use_non_contiguous_neighbors)
         {
           nonContigNeighListSize = nonContigNeighListPtr->getListSize(firstFeature);
         }
@@ -225,7 +225,7 @@ Result<> MergeColonies::execute()
             {
               neigh = featureNeighborListRef[firstFeature][l];
             }
-            else if(k == 1 && m_InputValues->UseNonContiguousNeighbors) // Feature NeighborHood (non-contiguous)
+            else if(k == 1 && m_InputValues->use_non_contiguous_neighbors) // Feature NeighborHood (non-contiguous)
             {
               bool ok = false;
               neigh = nonContigNeighListPtr->getValue(firstFeature, l, ok);
@@ -277,7 +277,7 @@ Result<> MergeColonies::execute()
 Result<> MergeColonies::operator()()
 {
   // Initialize the random number generator
-  m_Generator = std::mt19937_64(m_InputValues->SeedValue);
+  m_Generator = std::mt19937_64(m_InputValues->seed_value);
   m_Distribution = std::uniform_real_distribution<float32>(0.0f, 1.0f);
 
   // The main algorithm is in the 'execute()' method
@@ -287,7 +287,7 @@ Result<> MergeColonies::operator()()
     return result;
   }
 
-  auto active = m_DataStructure.getDataRefAs<BoolArrayType>(m_InputValues->ActivePath);
+  auto active = m_DataStructure.getDataRefAs<BoolArrayType>(m_InputValues->active_path);
 
   usize totalFeatures = active.getNumberOfTuples();
   if(totalFeatures < 2)
@@ -296,8 +296,8 @@ Result<> MergeColonies::operator()()
                                    "Features were detected. A grouping value may be set too high");
   }
 
-  auto featureIds = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->FeatureIdsPath);
-  auto cellParentIds = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->CellParentIdsPath);
+  auto featureIds = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->feature_ids_path);
+  auto cellParentIds = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->cell_parent_ids_path);
 
   int32 numParents = 0;
   usize totalPoints = featureIds.getNumberOfTuples();
@@ -323,13 +323,13 @@ Result<> MergeColonies::operator()()
   characterizeColonies();
   m_MessageHandler.sendInfoMessage("Characterizing Colonies Complete");
 
-  if(m_InputValues->RandomizeParentIds)
+  if(m_InputValues->randomize_parent_ids)
   {
     m_MessageHandler.sendInfoMessage("Randomizing Parent Ids....");
     // Generate all the numbers up front
     const int32 rangeMin = 1;
     const int32 rangeMax = numParents - 1;
-    std::mt19937 generator(m_InputValues->SeedValue); // Standard mersenne_twister_engine seeded
+    std::mt19937 generator(m_InputValues->seed_value); // Standard mersenne_twister_engine seeded
     std::uniform_int_distribution<int32> distribution(rangeMin, rangeMax);
 
     std::vector<int32> pid(numParents);
@@ -425,7 +425,7 @@ int32 MergeColonies::getSeed(int32 newFid)
   {
     m_FeatureParentIds[featureIdSeed] = newFid;
     const std::vector<usize> tDims = {static_cast<usize>(newFid + 1)};
-    AttributeMatrix& amRef = m_DataStructure.getDataRefAs<AttributeMatrix>(m_InputValues->CellFeatureAMPath);
+    AttributeMatrix& amRef = m_DataStructure.getDataRefAs<AttributeMatrix>(m_InputValues->cell_feature_am_path);
     Result<> result = amRef.resizeTuples(tDims);
   }
   return featureIdSeed;

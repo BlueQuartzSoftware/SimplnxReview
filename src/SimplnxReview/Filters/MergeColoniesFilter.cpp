@@ -180,22 +180,22 @@ Result<> MergeColoniesFilter::executeImpl(DataStructure& dataStructure, const Ar
     seed = static_cast<std::mt19937_64::result_type>(std::chrono::steady_clock::now().time_since_epoch().count());
   }
 
-  inputValues.SeedValue = seed;
-  inputValues.AxisTolerance = filterArgs.value<float32>(k_AxisTolerance_Key);
-  inputValues.AngleTolerance = filterArgs.value<float32>(k_AngleTolerance_Key);
-  inputValues.FeaturePhasesPath = filterArgs.value<DataPath>(k_FeaturePhasesArrayPath_Key);
-  inputValues.AvgQuatsPath = filterArgs.value<DataPath>(k_AvgQuatsArrayPath_Key);
-  inputValues.FeatureIdsPath = filterArgs.value<DataPath>(k_FeatureIdsArrayPath_Key);
-  inputValues.CellPhasesPath = filterArgs.value<DataPath>(k_CellPhasesArrayPath_Key);
-  inputValues.CrystalStructuresPath = filterArgs.value<DataPath>(k_CrystalStructuresArrayPath_Key);
-  inputValues.CellParentIdsPath = inputValues.FeatureIdsPath.replaceName(filterArgs.value<std::string>(k_CellParentIdsArrayName_Key));
-  inputValues.CellFeatureAMPath = filterArgs.value<DataPath>(k_NewCellFeatureAttributeMatrixName_Key);
-  inputValues.FeatureParentIdsPath = inputValues.FeaturePhasesPath.replaceName(filterArgs.value<std::string>(k_FeatureParentIdsArrayName_Key));
-  inputValues.ActivePath = inputValues.CellFeatureAMPath.createChildPath(filterArgs.value<DataObjectNameParameter::ValueType>(k_ActiveArrayName_Key));
+  inputValues.seed_value = seed;
+  inputValues.axis_tolerance = filterArgs.value<float32>(k_AxisTolerance_Key);
+  inputValues.angle_tolerance = filterArgs.value<float32>(k_AngleTolerance_Key);
+  inputValues.feature_phases_path = filterArgs.value<DataPath>(k_FeaturePhasesArrayPath_Key);
+  inputValues.avg_quats_path = filterArgs.value<DataPath>(k_AvgQuatsArrayPath_Key);
+  inputValues.feature_ids_path = filterArgs.value<DataPath>(k_FeatureIdsArrayPath_Key);
+  inputValues.cell_phases_path = filterArgs.value<DataPath>(k_CellPhasesArrayPath_Key);
+  inputValues.crystal_structures_path = filterArgs.value<DataPath>(k_CrystalStructuresArrayPath_Key);
+  inputValues.cell_parent_ids_path = inputValues.feature_ids_path.replaceName(filterArgs.value<std::string>(k_CellParentIdsArrayName_Key));
+  inputValues.cell_feature_am_path = filterArgs.value<DataPath>(k_NewCellFeatureAttributeMatrixName_Key);
+  inputValues.feature_parent_ids_path = inputValues.feature_phases_path.replaceName(filterArgs.value<std::string>(k_FeatureParentIdsArrayName_Key));
+  inputValues.active_path = inputValues.cell_feature_am_path.createChildPath(filterArgs.value<DataObjectNameParameter::ValueType>(k_ActiveArrayName_Key));
 
-  inputValues.UseNonContiguousNeighbors = filterArgs.value<bool>(k_UseNonContiguousNeighbors_Key);
-  inputValues.NonContiguousNeighborListArrayPath = filterArgs.value<DataPath>(k_NonContiguousNeighborListArrayPath_Key);
-  inputValues.ContiguousNeighborListArrayPath = filterArgs.value<DataPath>(k_ContiguousNeighborListArrayPath_Key);
+  inputValues.use_non_contiguous_neighbors = filterArgs.value<bool>(k_UseNonContiguousNeighbors_Key);
+  inputValues.non_contiguous_neighbor_list_array_path = filterArgs.value<DataPath>(k_NonContiguousNeighborListArrayPath_Key);
+  inputValues.contiguous_neighbor_list_array_path = filterArgs.value<DataPath>(k_ContiguousNeighborListArrayPath_Key);
 
   return MergeColonies(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }

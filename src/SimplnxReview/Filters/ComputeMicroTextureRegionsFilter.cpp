@@ -120,12 +120,12 @@ Result<> ComputeMicroTextureRegionsFilter::executeImpl(DataStructure& dataStruct
 {
   ComputeMicroTextureRegionsInputValues inputValues;
 
-  inputValues.ImageGeomPath = filterArgs.value<DataPath>(k_ImageGeomPath_Key);
-  inputValues.FeatureIdsArrayPath = filterArgs.value<DataPath>(k_FeatureIdsArrayPath_Key);
-  inputValues.CellFeatureAttributeMatrixPath = filterArgs.value<DataPath>(k_CellFeatureAttributeMatrixPath_Key);
-  inputValues.MicroTextureRegionNumCellsArrayPath = inputValues.CellFeatureAttributeMatrixPath.createChildPath(filterArgs.value<std::string>(k_MicroTextureRegionNumCellsArrayName_Key));
-  inputValues.MicroTextureRegionFractionOccupiedArrayPath =
-      inputValues.CellFeatureAttributeMatrixPath.createChildPath(filterArgs.value<std::string>(k_MicroTextureRegionFractionOccupiedArrayName_Key));
+  inputValues.image_geom_path = filterArgs.value<DataPath>(k_ImageGeomPath_Key);
+  inputValues.feature_ids_array_path = filterArgs.value<DataPath>(k_FeatureIdsArrayPath_Key);
+  inputValues.cell_feature_attribute_matrix_path = filterArgs.value<DataPath>(k_CellFeatureAttributeMatrixPath_Key);
+  inputValues.micro_texture_region_num_cells_array_path = inputValues.cell_feature_attribute_matrix_path.createChildPath(filterArgs.value<std::string>(k_MicroTextureRegionNumCellsArrayName_Key));
+  inputValues.micro_texture_region_fraction_occupied_array_path =
+      inputValues.cell_feature_attribute_matrix_path.createChildPath(filterArgs.value<std::string>(k_MicroTextureRegionFractionOccupiedArrayName_Key));
 
   return ComputeMicroTextureRegions(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }

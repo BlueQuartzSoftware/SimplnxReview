@@ -145,12 +145,12 @@ Result<> InterpolateValuesToUnstructuredGridFilter::executeImpl(DataStructure& d
 {
   InterpolateValuesToUnstructuredGridInputValues inputValues;
 
-  inputValues.SourceGeomPath = filterArgs.value<DataPath>(k_SourceGeometryPath_Key);
-  inputValues.DestinationGeomPath = filterArgs.value<DataPath>(k_DestinationGeometryPath_Key);
-  inputValues.InputDataPaths = filterArgs.value<std::vector<DataPath>>(k_InterpolatedArrayPaths_Key);
-  inputValues.UseExistingAttrMatrix = filterArgs.value<BoolParameter::ValueType>(k_UseExistingAttrMatrix_Key);
-  inputValues.ExistingAttrMatrixPath = filterArgs.value<AttributeMatrixSelectionParameter::ValueType>(k_ExistingAttrMatrixPath_Key);
-  inputValues.CreatedAttrMatrixName = filterArgs.value<DataObjectNameParameter::ValueType>(k_CreatedAttrMatrixName_Key);
+  inputValues.source_geom_path = filterArgs.value<DataPath>(k_SourceGeometryPath_Key);
+  inputValues.destination_geom_path = filterArgs.value<DataPath>(k_DestinationGeometryPath_Key);
+  inputValues.input_data_paths = filterArgs.value<std::vector<DataPath>>(k_InterpolatedArrayPaths_Key);
+  inputValues.use_existing_attr_matrix = filterArgs.value<BoolParameter::ValueType>(k_UseExistingAttrMatrix_Key);
+  inputValues.existing_attr_matrix_path = filterArgs.value<AttributeMatrixSelectionParameter::ValueType>(k_ExistingAttrMatrixPath_Key);
+  inputValues.created_attr_matrix_name = filterArgs.value<DataObjectNameParameter::ValueType>(k_CreatedAttrMatrixName_Key);
 
   return InterpolateValuesToUnstructuredGrid(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }

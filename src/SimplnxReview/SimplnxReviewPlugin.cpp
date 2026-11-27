@@ -25,7 +25,7 @@ SimplnxReviewPlugin::~SimplnxReviewPlugin() = default;
 
 AbstractPlugin::SIMPLMapType SimplnxReviewPlugin::getSimplToSimplnxMap() const
 {
-  return nx::core::k_SIMPL_to_SimplnxReview;
+  return nx::core::k_SimplToSimplnxReview;
 }
 
 SIMPLNX_DEF_PLUGIN(SimplnxReviewPlugin)

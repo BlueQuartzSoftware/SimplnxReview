@@ -219,33 +219,33 @@ Result<> ComputeLocalAverageCAxisMisalignmentsFilter::executeImpl(DataStructure&
   ComputeLocalAverageCAxisMisalignmentsInputValues inputValues;
 
   auto parentAM = filterArgs.value<DataPath>(k_NewCellFeatureAttributeMatrixPath_Key);
-  inputValues.NumFeaturesPerParentPath = parentAM.createChildPath(filterArgs.value<StringParameter::ValueType>(k_NumFeaturesPerParentName_Key));
-  inputValues.FeatureParentIdsPath = filterArgs.value<DataPath>(k_FeatureParentIdsPath_Key);
+  inputValues.num_features_per_parent_path = parentAM.createChildPath(filterArgs.value<StringParameter::ValueType>(k_NumFeaturesPerParentName_Key));
+  inputValues.feature_parent_ids_path = filterArgs.value<DataPath>(k_FeatureParentIdsPath_Key);
 
-  inputValues.CalcBiasedAvg = filterArgs.value<bool>(k_CalcBiasedAvg_Key);
-  if(inputValues.CalcBiasedAvg)
+  inputValues.calc_biased_avg = filterArgs.value<bool>(k_CalcBiasedAvg_Key);
+  if(inputValues.calc_biased_avg)
   {
-    inputValues.AvgCAxisMisalignmentsPath = filterArgs.value<DataPath>(k_AvgCAxisMisalignmentsPath_Key);
-    inputValues.LocalCAxisMisalignmentsPath = parentAM.createChildPath(filterArgs.value<StringParameter::ValueType>(k_LocalCAxisMisalignmentsName_Key));
+    inputValues.avg_c_axis_misalignments_path = filterArgs.value<DataPath>(k_AvgCAxisMisalignmentsPath_Key);
+    inputValues.local_c_axis_misalignments_path = parentAM.createChildPath(filterArgs.value<StringParameter::ValueType>(k_LocalCAxisMisalignmentsName_Key));
   }
   else
   {
-    inputValues.AvgCAxisMisalignmentsPath = k_AvgCAxisMisalignmentsPath;
-    inputValues.LocalCAxisMisalignmentsPath = k_LocalCAxisMisalignmentsPath;
+    inputValues.avg_c_axis_misalignments_path = k_AvgCAxisMisalignmentsPath;
+    inputValues.local_c_axis_misalignments_path = k_LocalCAxisMisalignmentsPath;
   }
 
-  inputValues.CalcUnbiasedAvg = filterArgs.value<bool>(k_CalcUnbiasedAvg_Key);
-  if(inputValues.CalcUnbiasedAvg)
+  inputValues.calc_unbiased_avg = filterArgs.value<bool>(k_CalcUnbiasedAvg_Key);
+  if(inputValues.calc_unbiased_avg)
   {
-    inputValues.NeighborListPath = filterArgs.value<DataPath>(k_NeighborListPath_Key);
-    inputValues.CAxisMisalignmentListPath = filterArgs.value<DataPath>(k_CAxisMisalignmentListPath_Key);
-    inputValues.UnbiasedLocalCAxisMisalignmentsPath = parentAM.createChildPath(filterArgs.value<StringParameter::ValueType>(k_UnbiasedLocalCAxisMisalignmentsName_Key));
+    inputValues.neighbor_list_path = filterArgs.value<DataPath>(k_NeighborListPath_Key);
+    inputValues.c_axis_misalignment_list_path = filterArgs.value<DataPath>(k_CAxisMisalignmentListPath_Key);
+    inputValues.unbiased_local_c_axis_misalignments_path = parentAM.createChildPath(filterArgs.value<StringParameter::ValueType>(k_UnbiasedLocalCAxisMisalignmentsName_Key));
   }
   else
   {
-    inputValues.NeighborListPath = k_NeighborListPath;
-    inputValues.CAxisMisalignmentListPath = k_CAxisMisalignmentListPath;
-    inputValues.UnbiasedLocalCAxisMisalignmentsPath = k_UnbiasedLocalCAxisMisalignmentsPath;
+    inputValues.neighbor_list_path = k_NeighborListPath;
+    inputValues.c_axis_misalignment_list_path = k_CAxisMisalignmentListPath;
+    inputValues.unbiased_local_c_axis_misalignments_path = k_UnbiasedLocalCAxisMisalignmentsPath;
   }
 
   return ComputeLocalAverageCAxisMisalignments(dataStructure, messageHandler, shouldCancel, &inputValues)();

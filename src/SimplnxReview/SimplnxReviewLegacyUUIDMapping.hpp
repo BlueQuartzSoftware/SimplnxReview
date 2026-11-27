@@ -17,7 +17,7 @@
 
 namespace nx::core
 {
-  static const AbstractPlugin::SIMPLMapType k_SIMPL_to_SimplnxReview
+  static const AbstractPlugin::SIMPLMapType k_SimplToSimplnxReview
   {
     // syntax std::make_pair {Dream3d UUID , Dream3dnx UUID, {}}}, // dream3d-class-name
     {nx::core::Uuid::FromString("2c4a6d83-6a1b-56d8-9f65-9453b28845b9").value(), {.simplnx_uuid=nx::core::FilterTraits<MergeColoniesFilter>::uuid, .convert_json=&MergeColoniesFilter::FromSIMPLJson}}, // MergeColonies

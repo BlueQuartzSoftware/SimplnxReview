@@ -116,9 +116,9 @@ Result<> ComputeSaltykovSizesFilter::executeImpl(DataStructure& dataStructure, c
 
   ComputeSaltykovSizesInputValues inputValues;
 
-  inputValues.EquivalentDiametersPath = filterArgs.value<DataPath>(k_EquivalentDiametersArrayPath_Key);
-  inputValues.SaltykovEquivalentDiametersPath = inputValues.EquivalentDiametersPath.replaceName(filterArgs.value<std::string>(k_SaltykovEquivalentDiametersName_Key));
-  inputValues.Seed = seed;
+  inputValues.equivalent_diameters_path = filterArgs.value<DataPath>(k_EquivalentDiametersArrayPath_Key);
+  inputValues.saltykov_equivalent_diameters_path = inputValues.equivalent_diameters_path.replaceName(filterArgs.value<std::string>(k_SaltykovEquivalentDiametersName_Key));
+  inputValues.seed = seed;
 
   return ComputeSaltykovSizes(dataStructure, messageHandler, shouldCancel, &inputValues)();
 }

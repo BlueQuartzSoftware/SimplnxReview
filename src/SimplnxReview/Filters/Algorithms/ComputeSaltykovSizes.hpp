@@ -13,9 +13,9 @@ namespace nx::core
 
 struct SIMPLNXREVIEW_EXPORT ComputeSaltykovSizesInputValues
 {
-  DataPath EquivalentDiametersPath;
-  DataPath SaltykovEquivalentDiametersPath;
-  uint64 Seed{};
+  DataPath equivalent_diameters_path;
+  DataPath saltykov_equivalent_diameters_path;
+  uint64 seed{};
 };
 
 /**

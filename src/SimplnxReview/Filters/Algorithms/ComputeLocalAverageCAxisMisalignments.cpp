@@ -151,17 +151,17 @@ const std::atomic_bool& ComputeLocalAverageCAxisMisalignments::getCancel()
 // -----------------------------------------------------------------------------
 Result<> ComputeLocalAverageCAxisMisalignments::operator()()
 {
-  const auto& featureParentIds = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->FeatureParentIdsPath);
-  const auto& avgCAxisMisalignments = m_DataStructure.getDataRefAs<Float32ArrayType>(m_InputValues->AvgCAxisMisalignmentsPath);
-  auto& neighborList = m_DataStructure.getDataRefAs<Int32NeighborListType>(m_InputValues->NeighborListPath);
-  auto& cAxisMisalignmentList = m_DataStructure.getDataRefAs<Float32NeighborListType>(m_InputValues->CAxisMisalignmentListPath);
-  auto& numFeaturesPerParent = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->NumFeaturesPerParentPath);
-  auto& unbiasedLocalCAxisMisalignments = m_DataStructure.getDataRefAs<Float32ArrayType>(m_InputValues->UnbiasedLocalCAxisMisalignmentsPath);
-  auto& localCAxisMisalignments = m_DataStructure.getDataRefAs<Float32ArrayType>(m_InputValues->LocalCAxisMisalignmentsPath);
+  const auto& featureParentIds = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->feature_parent_ids_path);
+  const auto& avgCAxisMisalignments = m_DataStructure.getDataRefAs<Float32ArrayType>(m_InputValues->avg_c_axis_misalignments_path);
+  auto& neighborList = m_DataStructure.getDataRefAs<Int32NeighborListType>(m_InputValues->neighbor_list_path);
+  auto& cAxisMisalignmentList = m_DataStructure.getDataRefAs<Float32NeighborListType>(m_InputValues->c_axis_misalignment_list_path);
+  auto& numFeaturesPerParent = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->num_features_per_parent_path);
+  auto& unbiasedLocalCAxisMisalignments = m_DataStructure.getDataRefAs<Float32ArrayType>(m_InputValues->unbiased_local_c_axis_misalignments_path);
+  auto& localCAxisMisalignments = m_DataStructure.getDataRefAs<Float32ArrayType>(m_InputValues->local_c_axis_misalignments_path);
 
-  if(m_InputValues->CalcBiasedAvg)
+  if(m_InputValues->calc_biased_avg)
   {
-    if(m_InputValues->CalcUnbiasedAvg)
+    if(m_InputValues->calc_unbiased_avg)
     {
       return ::FindLocalAverageMisalignments<MisalignmentArguments<true, true>>(getCancel(), m_Throttle, featureParentIds, avgCAxisMisalignments, neighborList, cAxisMisalignmentList,
                                                                                 numFeaturesPerParent, unbiasedLocalCAxisMisalignments, localCAxisMisalignments)();
