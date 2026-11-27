@@ -51,7 +51,7 @@ std::vector<std::string> InterpolateValuesToUnstructuredGridFilter::defaultTags(
 //------------------------------------------------------------------------------
 Parameters InterpolateValuesToUnstructuredGridFilter::parameters() const
 {
-  GeometrySelectionParameter::AllowedTypes geomTypes = {IGeometry::Type::Vertex, IGeometry::Type::Edge,        IGeometry::Type::Triangle,
+  GeometrySelectionParameter::AllowedTypeSetType geomTypes = {IGeometry::Type::Vertex, IGeometry::Type::Edge,        IGeometry::Type::Triangle,
                                                         IGeometry::Type::Quad,   IGeometry::Type::Tetrahedral, IGeometry::Type::Hexahedral};
 
   Parameters params;
@@ -61,7 +61,7 @@ Parameters InterpolateValuesToUnstructuredGridFilter::parameters() const
   params.insert(std::make_unique<GeometrySelectionParameter>(k_DestinationGeometryPath_Key, "Interpolated Node-Based Geometry", "DataPath to node-based interpolated geometry", DataPath(), geomTypes));
 
   params.insert(std::make_unique<MultiArraySelectionParameter>(k_InterpolatedArrayPaths_Key, "Attribute Arrays to Interpolate", "DataPaths to interpolate", std::vector<DataPath>(),
-                                                               MultiArraySelectionParameter::AllowedTypes{IArray::ArrayType::DataArray}, GetAllNumericTypes()));
+                                                               MultiArraySelectionParameter::AllowedTypeSetType{IArray::ArrayType::DataArray}, GetAllNumericTypes()));
 
   params.insertSeparator(Parameters::Separator{"Output Data Object(s)"});
   params.insertLinkableParameter(
@@ -77,7 +77,7 @@ Parameters InterpolateValuesToUnstructuredGridFilter::parameters() const
 }
 
 //------------------------------------------------------------------------------
-IFilter::UniquePointer InterpolateValuesToUnstructuredGridFilter::clone() const
+IFilter::UniquePointerType InterpolateValuesToUnstructuredGridFilter::clone() const
 {
   return std::make_unique<InterpolateValuesToUnstructuredGridFilter>();
 }
@@ -103,13 +103,13 @@ IFilter::PreflightResult InterpolateValuesToUnstructuredGridFilter::preflightImp
 
   if(inputDataPaths.empty())
   {
-    return {.outputActions = MakeErrorResult<OutputActions>(-3000, "There are no attribute arrays to interpolate.  Please select at least one attribute array to interpolate.")};
+    return {.output_actions = MakeErrorResult<OutputActions>(-3000, "There are no attribute arrays to interpolate.  Please select at least one attribute array to interpolate.")};
   }
 
   auto tupleValidityCheck = dataStructure.validateNumberOfTuples(inputDataPaths);
   if(!tupleValidityCheck)
   {
-    return {.outputActions =
+    return {.output_actions =
                 MakeErrorResult<OutputActions>(-3002, fmt::format("The following DataArrays all must have equal numbers of tuples but this was not satisfied.\n{}", tupleValidityCheck.error()))};
   }
 

@@ -31,15 +31,15 @@ const std::atomic_bool& ComputeMicroTextureRegions::getCancel()
 Result<> ComputeMicroTextureRegions::operator()()
 {
   auto& imageGeom = m_DataStructure.getDataRefAs<ImageGeom>(m_InputValues->ImageGeomPath);
-  auto& featureIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeatureIdsArrayPath);
-  auto& microTextureRegionNumCells = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->MicroTextureRegionNumCellsArrayPath);
+  auto& featureIds = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->FeatureIdsArrayPath);
+  auto& microTextureRegionNumCells = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->MicroTextureRegionNumCellsArrayPath);
 
   usize numMicroTextureRegions = microTextureRegionNumCells.getNumberOfTuples();
 
   usize xPoints = imageGeom.getNumXCells();
   usize yPoints = imageGeom.getNumYCells();
   usize zPoints = imageGeom.getNumZCells();
-  FloatVec3 spacing = imageGeom.getSpacing();
+  FloatVec3Type spacing = imageGeom.getSpacing();
 
   std::vector<float32> microTextureRegionXMins(numMicroTextureRegions, spacing[0] * static_cast<float32>(xPoints));
   std::vector<float32> microTextureRegionXMaxs(numMicroTextureRegions, 0.0f);
@@ -85,7 +85,7 @@ Result<> ComputeMicroTextureRegions::operator()()
     progressThrottle.updateCount(i + 1);
   }
 
-  auto& microTextureRegionFractionOccupied = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->MicroTextureRegionFractionOccupiedArrayPath);
+  auto& microTextureRegionFractionOccupied = m_DataStructure.getDataRefAs<Float32ArrayType>(m_InputValues->MicroTextureRegionFractionOccupiedArrayPath);
   progressThrottle.reset(numMicroTextureRegions > 1 ? numMicroTextureRegions - 1 : 0, "Computing MicroTexture Region Fractions");
   for(usize i = 1; i < numMicroTextureRegions; i++)
   {

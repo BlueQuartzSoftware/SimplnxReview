@@ -14,7 +14,7 @@ constexpr AbstractPlugin::IdType k_ID = *Uuid::FromString("abcdef1b-014e-5adb-84
 SimplnxReviewPlugin::SimplnxReviewPlugin()
 : AbstractPlugin(k_ID, "SimplnxReview", "Plugin to hold highly experimental filters", "BlueQuartz Software, LLC")
 {
-  std::vector<::FilterCreationFunc> filterFuncs = ::GetPluginFilterList();
+  std::vector<::FilterCreationFuncType> filterFuncs = ::GetPluginFilterList();
   for(const auto& filterFunc : filterFuncs)
   {
     addFilter(filterFunc);

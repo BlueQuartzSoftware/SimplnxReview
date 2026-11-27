@@ -74,10 +74,10 @@ private:
   const IFilter::MessageHandler& m_MessageHandler;
 
   LaueOpsContainer m_OrientationOps;
-  Int32Array& m_FeatureParentIds;
-  Int32Array& m_FeaturePhases;
-  Float32Array& m_AvgQuats;
-  UInt32Array& m_CrystalStructures;
+  Int32ArrayType& m_FeatureParentIds;
+  Int32ArrayType& m_FeaturePhases;
+  Float32ArrayType& m_AvgQuats;
+  UInt32ArrayType& m_CrystalStructures;
   float32 m_AxisToleranceRad = 0.0;
   float32 m_AngleTolerance = 1.0;
 

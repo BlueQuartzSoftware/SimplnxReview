@@ -21,12 +21,12 @@ public:
   InterpolateValuesToUnstructuredGridFilter& operator=(InterpolateValuesToUnstructuredGridFilter&&) noexcept = delete;
 
   // Parameter Keys
-  static constexpr StringLiteral k_SourceGeometryPath_Key = "source_geometry_path";
-  static constexpr StringLiteral k_InterpolatedArrayPaths_Key = "interpolated_array_paths";
-  static constexpr StringLiteral k_UseExistingAttrMatrix_Key = "use_existing_attr_matrix";
-  static constexpr StringLiteral k_ExistingAttrMatrixPath_Key = "existing_attr_matrix_path";
-  static constexpr StringLiteral k_CreatedAttrMatrixName_Key = "created_attr_matrix_name";
-  static constexpr StringLiteral k_DestinationGeometryPath_Key = "destination_geometry_path";
+  static constexpr StringLiteralType k_SourceGeometryPath_Key = "source_geometry_path";
+  static constexpr StringLiteralType k_InterpolatedArrayPaths_Key = "interpolated_array_paths";
+  static constexpr StringLiteralType k_UseExistingAttrMatrix_Key = "use_existing_attr_matrix";
+  static constexpr StringLiteralType k_ExistingAttrMatrixPath_Key = "existing_attr_matrix_path";
+  static constexpr StringLiteralType k_CreatedAttrMatrixName_Key = "created_attr_matrix_name";
+  static constexpr StringLiteralType k_DestinationGeometryPath_Key = "destination_geometry_path";
 
   /**
    * @brief Reads SIMPL json and converts it simplnx Arguments.
@@ -83,7 +83,7 @@ public:
    * @brief Returns a copy of the filter.
    * @return
    */
-  UniquePointer clone() const override;
+  UniquePointerType clone() const override;
 
 protected:
   /**

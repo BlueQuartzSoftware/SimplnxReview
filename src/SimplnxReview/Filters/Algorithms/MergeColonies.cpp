@@ -53,7 +53,7 @@ bool CheckForBurgers(const ebsdlib::QuatD& betaQuat, const ebsdlib::QuatD& alpha
 {
   float64 dP = 0.0;
   float64 angle = 0.0;
-  constexpr float64 k_RadToDeg = 180.0 / Constants::k_PiD;
+  constexpr float64 k_RadToDeg = 180.0 / constants::k_PiD;
 
   // transpose gBeta so the sample direction is the output when
   // gBeta is multiplied by the crystal directions below
@@ -133,11 +133,11 @@ MergeColonies::MergeColonies(DataStructure& dataStructure, const IFilter::Messag
 , m_ShouldCancel(shouldCancel)
 , m_MessageHandler(mesgHandler)
 , m_OrientationOps(ebsdlib::LaueOps::GetAllOrientationOps())
-, m_FeatureParentIds(dataStructure.getDataRefAs<Int32Array>(inputValues->FeatureParentIdsPath))
-, m_FeaturePhases(dataStructure.getDataRefAs<Int32Array>(inputValues->FeaturePhasesPath))
-, m_AvgQuats(dataStructure.getDataRefAs<Float32Array>(inputValues->AvgQuatsPath))
-, m_CrystalStructures(dataStructure.getDataRefAs<UInt32Array>(inputValues->CrystalStructuresPath))
-, m_AxisToleranceRad(inputValues->AxisTolerance * Constants::k_PiF / 180.0f)
+, m_FeatureParentIds(dataStructure.getDataRefAs<Int32ArrayType>(inputValues->FeatureParentIdsPath))
+, m_FeaturePhases(dataStructure.getDataRefAs<Int32ArrayType>(inputValues->FeaturePhasesPath))
+, m_AvgQuats(dataStructure.getDataRefAs<Float32ArrayType>(inputValues->AvgQuatsPath))
+, m_CrystalStructures(dataStructure.getDataRefAs<UInt32ArrayType>(inputValues->CrystalStructuresPath))
+, m_AxisToleranceRad(inputValues->AxisTolerance * constants::k_PiF / 180.0f)
 , m_AngleTolerance(inputValues->AngleTolerance)
 {
 }
@@ -287,7 +287,7 @@ Result<> MergeColonies::operator()()
     return result;
   }
 
-  auto active = m_DataStructure.getDataRefAs<BoolArray>(m_InputValues->ActivePath);
+  auto active = m_DataStructure.getDataRefAs<BoolArrayType>(m_InputValues->ActivePath);
 
   usize totalFeatures = active.getNumberOfTuples();
   if(totalFeatures < 2)
@@ -296,8 +296,8 @@ Result<> MergeColonies::operator()()
                                    "Features were detected. A grouping value may be set too high");
   }
 
-  auto featureIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->FeatureIdsPath);
-  auto cellParentIds = m_DataStructure.getDataRefAs<Int32Array>(m_InputValues->CellParentIdsPath);
+  auto featureIds = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->FeatureIdsPath);
+  auto cellParentIds = m_DataStructure.getDataRefAs<Int32ArrayType>(m_InputValues->CellParentIdsPath);
 
   int32 numParents = 0;
   usize totalPoints = featureIds.getNumberOfTuples();
@@ -452,7 +452,7 @@ bool MergeColonies::determineGrouping(int32 referenceFeature, int32 neighborFeat
       ebsdlib::Rodrigues<double> rod = ax.toRodrigues();
       rod = m_OrientationOps[laueClass1]->getMDFFZRod(rod);
       ax = rod.toAxisAngle();
-      const float32 w = ax[3] * (Constants::k_180OverPiD); // Convert to degrees
+      const float32 w = ax[3] * (constants::k_180OverPiD); // Convert to degrees
 
       // Test each of the special Axis-Angle relationships
       // c = <0001>

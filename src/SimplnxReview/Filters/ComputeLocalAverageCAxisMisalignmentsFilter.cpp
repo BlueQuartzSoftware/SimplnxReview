@@ -68,17 +68,17 @@ Parameters ComputeLocalAverageCAxisMisalignmentsFilter::parameters() const
 
   params.insertSeparator(Parameters::Separator{"Input Feature Data"});
   params.insert(std::make_unique<ArraySelectionParameter>(k_FeatureParentIdsPath_Key, "Feature Parent Ids", "Input feature based ParentIds data array", DataPath{},
-                                                          ArraySelectionParameter::AllowedTypes{DataType::int32}, ArraySelectionParameter::AllowedComponentShapes{{1}}));
+                                                          ArraySelectionParameter::AllowedTypeSetType{DataType::int32}, ArraySelectionParameter::AllowedComponentShapesType{{1}}));
   params.insert(
-      std::make_unique<NeighborListSelectionParameter>(k_NeighborListPath_Key, "Neighbor List", "Feature based Neighbors", DataPath{}, NeighborListSelectionParameter::AllowedTypes{DataType::int32}));
+      std::make_unique<NeighborListSelectionParameter>(k_NeighborListPath_Key, "Neighbor List", "Feature based Neighbors", DataPath{}, NeighborListSelectionParameter::AllowedTypeSetType{DataType::int32}));
   params.insert(std::make_unique<NeighborListSelectionParameter>(k_CAxisMisalignmentListPath_Key, "C-Axis Mis-alignment NeighborList", "Input feature based C-Axis Mis-alignment NeighborList",
-                                                                 DataPath{}, NeighborListSelectionParameter::AllowedTypes{DataType::float32}));
+                                                                 DataPath{}, NeighborListSelectionParameter::AllowedTypeSetType{DataType::float32}));
   params.insert(std::make_unique<ArraySelectionParameter>(k_AvgCAxisMisalignmentsPath_Key, "Average C-Axis Mis-alignments", "Input feature based Average C-Axis Mis-alignments", DataPath{},
-                                                          ArraySelectionParameter::AllowedTypes{DataType::int32}, ArraySelectionParameter::AllowedComponentShapes{{1}}));
+                                                          ArraySelectionParameter::AllowedTypeSetType{DataType::int32}, ArraySelectionParameter::AllowedComponentShapesType{{1}}));
 
   params.insertSeparator(Parameters::Separator{"Output Feature Data"});
   params.insert(std::make_unique<DataGroupSelectionParameter>(k_NewCellFeatureAttributeMatrixPath_Key, "New Feature Attribute Matrix Name", "Output Feature Attribute Matrix to hold results",
-                                                              DataPath{}, DataGroupSelectionParameter::AllowedTypes{BaseGroup::GroupType::AttributeMatrix}));
+                                                              DataPath{}, DataGroupSelectionParameter::AllowedTypeSetType{BaseGroup::GroupType::AttributeMatrix}));
   params.insert(std::make_unique<DataObjectNameParameter>(k_NumFeaturesPerParentName_Key, "Number of Features Per Parent Array Name", "Output feature data array to hold number of features per parent",
                                                           "NumFeaturesPerParent"));
   params.insert(std::make_unique<DataObjectNameParameter>(k_LocalCAxisMisalignmentsName_Key, "Local C-Axis Mis-alignments Array Name",
@@ -98,7 +98,7 @@ Parameters ComputeLocalAverageCAxisMisalignmentsFilter::parameters() const
 }
 
 //------------------------------------------------------------------------------
-IFilter::UniquePointer ComputeLocalAverageCAxisMisalignmentsFilter::clone() const
+IFilter::UniquePointerType ComputeLocalAverageCAxisMisalignmentsFilter::clone() const
 {
   return std::make_unique<ComputeLocalAverageCAxisMisalignmentsFilter>();
 }
@@ -209,7 +209,7 @@ IFilter::PreflightResult ComputeLocalAverageCAxisMisalignmentsFilter::preflightI
   resultOutputActions.warnings().push_back({-65432, "WARNING: This filter is experimental in nature and has not had any testing, validation or verification. Use at your own risk"});
 
   // Return both the resultOutputActions and the preflightUpdatedValues via std::move()
-  return {.outputActions = std::move(resultOutputActions), .outputValues = std::move(preflightUpdatedValues)};
+  return {.output_actions = std::move(resultOutputActions), .output_values = std::move(preflightUpdatedValues)};
 }
 
 //------------------------------------------------------------------------------
@@ -255,16 +255,16 @@ namespace
 {
 namespace simpl
 {
-constexpr StringLiteral k_AvgCAxisMisalignmentsArrayPathKey = "AvgCAxisMisalignmentsArrayPath";
-constexpr StringLiteral k_CAxisMisalignmentListArrayPathKey = "CAxisMisalignmentListArrayPath";
-constexpr StringLiteral k_CalcBiasedAvgKey = "CalcBiasedAvg";
-constexpr StringLiteral k_CalcUnbiasedAvgKey = "CalcUnbiasedAvg";
-constexpr StringLiteral k_FeatureParentIdsArrayPathKey = "FeatureParentIdsArrayPath";
-constexpr StringLiteral k_LocalCAxisMisalignmentsArrayNameKey = "LocalCAxisMisalignmentsArrayName";
-constexpr StringLiteral k_NeighborListArrayPathKey = "NeighborListArrayPath";
-constexpr StringLiteral k_NumFeaturesPerParentArrayNameKey = "NumFeaturesPerParentArrayName";
-constexpr StringLiteral k_NewCellFeatureAttributeMatrixNameKey = "NewCellFeatureAttributeMatrixName";
-constexpr StringLiteral k_UnbiasedLocalCAxisMisalignmentsArrayNameKey = "UnbiasedLocalCAxisMisalignmentsArrayName";
+constexpr StringLiteralType k_AvgCAxisMisalignmentsArrayPathKey = "AvgCAxisMisalignmentsArrayPath";
+constexpr StringLiteralType k_CAxisMisalignmentListArrayPathKey = "CAxisMisalignmentListArrayPath";
+constexpr StringLiteralType k_CalcBiasedAvgKey = "CalcBiasedAvg";
+constexpr StringLiteralType k_CalcUnbiasedAvgKey = "CalcUnbiasedAvg";
+constexpr StringLiteralType k_FeatureParentIdsArrayPathKey = "FeatureParentIdsArrayPath";
+constexpr StringLiteralType k_LocalCAxisMisalignmentsArrayNameKey = "LocalCAxisMisalignmentsArrayName";
+constexpr StringLiteralType k_NeighborListArrayPathKey = "NeighborListArrayPath";
+constexpr StringLiteralType k_NumFeaturesPerParentArrayNameKey = "NumFeaturesPerParentArrayName";
+constexpr StringLiteralType k_NewCellFeatureAttributeMatrixNameKey = "NewCellFeatureAttributeMatrixName";
+constexpr StringLiteralType k_UnbiasedLocalCAxisMisalignmentsArrayNameKey = "UnbiasedLocalCAxisMisalignmentsArrayName";
 } // namespace simpl
 } // namespace
 
@@ -275,20 +275,20 @@ Result<Arguments> ComputeLocalAverageCAxisMisalignmentsFilter::FromSIMPLJson(con
   std::vector<Result<>> results;
 
   results.push_back(
-      SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_AvgCAxisMisalignmentsArrayPathKey, k_AvgCAxisMisalignmentsPath_Key));
+      simpl_conversion::ConvertParameter<simpl_conversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_AvgCAxisMisalignmentsArrayPathKey, k_AvgCAxisMisalignmentsPath_Key));
   results.push_back(
-      SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_CAxisMisalignmentListArrayPathKey, k_CAxisMisalignmentListPath_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedBooleanFilterParameterConverter>(args, json, simpl::k_CalcBiasedAvgKey, k_CalcBiasedAvg_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedBooleanFilterParameterConverter>(args, json, simpl::k_CalcUnbiasedAvgKey, k_CalcUnbiasedAvg_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_FeatureParentIdsArrayPathKey, k_FeatureParentIdsPath_Key));
+      simpl_conversion::ConvertParameter<simpl_conversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_CAxisMisalignmentListArrayPathKey, k_CAxisMisalignmentListPath_Key));
+  results.push_back(simpl_conversion::ConvertParameter<simpl_conversion::LinkedBooleanFilterParameterConverter>(args, json, simpl::k_CalcBiasedAvgKey, k_CalcBiasedAvg_Key));
+  results.push_back(simpl_conversion::ConvertParameter<simpl_conversion::LinkedBooleanFilterParameterConverter>(args, json, simpl::k_CalcUnbiasedAvgKey, k_CalcUnbiasedAvg_Key));
+  results.push_back(simpl_conversion::ConvertParameter<simpl_conversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_FeatureParentIdsArrayPathKey, k_FeatureParentIdsPath_Key));
   results.push_back(
-      SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, simpl::k_LocalCAxisMisalignmentsArrayNameKey, k_LocalCAxisMisalignmentsName_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_NeighborListArrayPathKey, k_NeighborListPath_Key));
+      simpl_conversion::ConvertParameter<simpl_conversion::LinkedPathCreationFilterParameterConverter>(args, json, simpl::k_LocalCAxisMisalignmentsArrayNameKey, k_LocalCAxisMisalignmentsName_Key));
+  results.push_back(simpl_conversion::ConvertParameter<simpl_conversion::DataArraySelectionFilterParameterConverter>(args, json, simpl::k_NeighborListArrayPathKey, k_NeighborListPath_Key));
   results.push_back(
-      SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, simpl::k_NumFeaturesPerParentArrayNameKey, k_NumFeaturesPerParentName_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::DataContainerSelectionFilterParameterConverter>(args, json, simpl::k_NewCellFeatureAttributeMatrixNameKey,
+      simpl_conversion::ConvertParameter<simpl_conversion::LinkedPathCreationFilterParameterConverter>(args, json, simpl::k_NumFeaturesPerParentArrayNameKey, k_NumFeaturesPerParentName_Key));
+  results.push_back(simpl_conversion::ConvertParameter<simpl_conversion::DataContainerSelectionFilterParameterConverter>(args, json, simpl::k_NewCellFeatureAttributeMatrixNameKey,
                                                                                                                        k_NewCellFeatureAttributeMatrixPath_Key));
-  results.push_back(SIMPLConversion::ConvertParameter<SIMPLConversion::LinkedPathCreationFilterParameterConverter>(args, json, simpl::k_UnbiasedLocalCAxisMisalignmentsArrayNameKey,
+  results.push_back(simpl_conversion::ConvertParameter<simpl_conversion::LinkedPathCreationFilterParameterConverter>(args, json, simpl::k_UnbiasedLocalCAxisMisalignmentsArrayNameKey,
                                                                                                                    k_UnbiasedLocalCAxisMisalignmentsName_Key));
 
   Result<> conversionResult = MergeResults(std::move(results));

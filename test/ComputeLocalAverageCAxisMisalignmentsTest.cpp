@@ -59,7 +59,7 @@ TEST_CASE("SimplnxReview::ComputeLocalAverageCAxisMisalignmentsFilter: Valid Fil
 
   // Preflight the filter and check result
   auto preflightResult = filter.preflight(dataStructure, args);
-  SIMPLNX_RESULT_REQUIRE_VALID(preflightResult.outputActions);
+  SIMPLNX_RESULT_REQUIRE_VALID(preflightResult.output_actions);
 
   // Execute the filter and check the result
   auto executeResult = filter.execute(dataStructure, args);
@@ -74,7 +74,7 @@ TEST_CASE("SimplnxReview::ComputeLocalAverageCAxisMisalignmentsFilter: Valid Fil
 TEST_CASE("SimplnxReview::ComputeLocalAverageCAxisMisalignmentsFilter: SIMPL Backwards Compatibility", "[SimplnxReview][ComputeLocalAverageCAxisMisalignmentsFilter][BackwardsCompatibility]")
 {
   auto app = Application::GetOrCreateInstance();
-  UnitTest::LoadPlugins();
+  unit_test::LoadPlugins();
   auto* filterListPtr = app->getFilterList();
 
   const fs::path conversionDir = fs::path(nx::core::unit_test::k_SourceDir.view()) / "test" / "simpl_conversion";

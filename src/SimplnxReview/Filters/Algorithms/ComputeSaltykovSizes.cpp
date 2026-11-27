@@ -61,8 +61,8 @@ Result<> ComputeSaltykovSizes::operator()()
   std::mt19937_64 gen(m_InputValues->Seed);
   std::uniform_int_distribution<int32> dist(std::numeric_limits<int32>::min(), std::numeric_limits<int32>::max());
 
-  const auto& equivalentDiameters = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->EquivalentDiametersPath);
-  auto& mSaltykovEquivalentDiameters = m_DataStructure.getDataRefAs<Float32Array>(m_InputValues->SaltykovEquivalentDiametersPath);
+  const auto& equivalentDiameters = m_DataStructure.getDataRefAs<Float32ArrayType>(m_InputValues->EquivalentDiametersPath);
+  auto& mSaltykovEquivalentDiameters = m_DataStructure.getDataRefAs<Float32ArrayType>(m_InputValues->SaltykovEquivalentDiametersPath);
 
   const int32 maxAttempts = 10;
   const uint64 randMaxFloat = 0xffffffff;

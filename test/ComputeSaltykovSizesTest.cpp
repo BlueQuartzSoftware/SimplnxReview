@@ -15,7 +15,7 @@ using namespace nx::core;
 TEST_CASE("SimplnxReview::ComputeSaltykovSizesFilter: SIMPL Backwards Compatibility", "[SimplnxReview][ComputeSaltykovSizesFilter][BackwardsCompatibility]")
 {
   auto app = Application::GetOrCreateInstance();
-  UnitTest::LoadPlugins();
+  unit_test::LoadPlugins();
   auto* filterListPtr = app->getFilterList();
 
   const fs::path conversionDir = fs::path(nx::core::unit_test::k_SourceDir.view()) / "test" / "simpl_conversion";

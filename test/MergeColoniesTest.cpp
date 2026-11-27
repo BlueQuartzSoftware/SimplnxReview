@@ -42,7 +42,7 @@ TEST_CASE("SimplnxReview::MergeColoniesFilter: Valid Filter Execution", "[Simpln
 TEST_CASE("SimplnxReview::MergeColoniesFilter: SIMPL Backwards Compatibility", "[SimplnxReview][MergeColoniesFilter][BackwardsCompatibility]")
 {
   auto app = Application::GetOrCreateInstance();
-  UnitTest::LoadPlugins();
+  unit_test::LoadPlugins();
   auto* filterListPtr = app->getFilterList();
 
   const fs::path conversionDir = fs::path(nx::core::unit_test::k_SourceDir.view()) / "test" / "simpl_conversion";
